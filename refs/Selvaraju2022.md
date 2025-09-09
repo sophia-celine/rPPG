@@ -1,5 +1,7 @@
 # Continuous Monitoring of Vital Signs Using Cameras: A Systematic Review
 
+Selvaraju, V.; Spicher, N.; Wang, J.; Ganapathy, N.; Warnecke, J.M.; Leonhardt, S.; Swaminathan, R.; Deserno, T.M. Continuous Monitoring of Vital Signs Using Cameras: A Systematic Review. Sensors 2022, 22, 4097. https://doi.org/10.3390/s22114097
+
 HR and RR can be measured using red, green, and blue (RGB) and near-infrared
 (NIR) as well as far-infrared (FIR) cameras. So far, BP and SpO2 are monitored with RGB cameras
 only, whereas BST is derived from FIR cameras only
