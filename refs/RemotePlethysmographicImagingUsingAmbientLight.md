@@ -1,0 +1,22 @@
+# Remote plethysmographic imaging using ambient light
+
+Artigo precursor da rPPG
+
+- Camera Canon sem ajuste automático de brilho
+- Raw signal as average of all pixel values in the ROI
+- ROI manually selected - forehead
+- Processing on MATLAB
+- Coarse grid 50x40
+- PV
+    - raw
+    - normalized
+    - bandpass - butterworth 4th order
+- FFT on signals over time
+    - used zero padding
+- Used direct representation - higher signal corresponds to a higher reflectance and smaller blood volume
+- Correction of movement artifacts
+    - The movement artifact map consisting of average powers for bandwidths (0.80 – 0.95 and 1.17– 1.33 Hz).
+    - Subtract movement artifact map from image power map
+
+> Two main issues limit the spatial resolution of the PPG images (power and phase) and accuracy of our current approach. First, movement artifacts and, second, reduced SNR due to CCD generated noise in the recorded pixel values. The first issue may be solvable by improved positioning of the volunteers (often the subjects were standing or sitting without head support), software to laterally synchronize frames and more homogeneous (artificial) illumination to reduce shading artifacts. The second issue may be abetted by simply using more advanced movie cameras with higher pixel resolution, allowing for a good SNR through pixel averaging while maintaining a good spatial resolution in the PPG images.
+>
