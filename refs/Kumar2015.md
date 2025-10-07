@@ -1,3 +1,4 @@
+# DistancePPG: Robust non-contact vital signs monitoring using a camera
 *Kumar M, Veeraraghavan A, Sabharwal A. DistancePPG: Robust non-contact vital signs monitoring using a camera. Biomed Opt Express. 2015 Apr 6;6(5):1565-88. doi: 10.1364/BOE.6.001565. PMID: 26137365; PMCID: PMC4467696.*
 
 > In this paper, we address the challenge of reliable vital sign estimation for people having darker skin tones, under low lighting conditions and under different natural motion scenarios to expand the scope of camerabased vital sign monitoring.
