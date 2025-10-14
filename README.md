@@ -7,3 +7,4 @@ Repositório para desenvolvimento de pesquisa de validação de algoritmos de fo
 - Kumar M, Veeraraghavan A, Sabharwal A. DistancePPG: Robust non-contact vital signs monitoring using a camera. Biomed Opt Express. 2015 Apr 6;6(5):1565-88. doi: 10.1364/BOE.6.001565. PMID: 26137365; PMCID: PMC4467696.
 - Ming-Zher Poh, Daniel J. McDuff, and Rosalind W. Picard, Non-contact, automated cardiac pulse measurements using video imaging and blind source separation, Opt. Express 18, 10762-10774 (2010)
 - M. -Z. Poh, D. J. McDuff and R. W. Picard, "Advancements in Noncontact, Multiparameter Physiological Measurements Using a Webcam," in IEEE Transactions on Biomedical Engineering, vol. 58, no. 1, pp. 7-11, Jan. 2011, doi: 10.1109/TBME.2010.2086456
+- G. de Haan and V. Jeanne, "Robust Pulse Rate From Chrominance-Based rPPG," in IEEE Transactions on Biomedical Engineering, vol. 60, no. 10, pp. 2878-2886, Oct. 2013, doi: 10.1109/TBME.2013.2266196
