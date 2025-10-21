@@ -9,3 +9,4 @@ Repositório para desenvolvimento de pesquisa de validação de algoritmos de fo
 - M. -Z. Poh, D. J. McDuff and R. W. Picard, "Advancements in Noncontact, Multiparameter Physiological Measurements Using a Webcam," in IEEE Transactions on Biomedical Engineering, vol. 58, no. 1, pp. 7-11, Jan. 2011, doi: 10.1109/TBME.2010.2086456
 - G. de Haan and V. Jeanne, "Robust Pulse Rate From Chrominance-Based rPPG," in IEEE Transactions on Biomedical Engineering, vol. 60, no. 10, pp. 2878-2886, Oct. 2013, doi: 10.1109/TBME.2013.2266196
 - M. Lewandowska, J. Ruminski, T. Kocejko, and J. Nowak, “Measuring pulse rate with a webcam—A non-contact method for evaluating cardiac activity,” in Proc. Federated Conf. Comput. Sci. Inform. Syst., 2011, pp. 405–410.
+- De Haan, G.; Jeanne, V. Improved motion robustness of remote-PPG by using the blood volume pulse signature. Physiol. Meas. 2014, 35, 1913–1926
