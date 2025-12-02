@@ -1,12 +1,13 @@
-import cv2
-import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
-from scipy.signal import butter, filtfilt, spectrogram
+from utils import extract_rgb_signals_rect, get_spectrum, plot_rgb_signals
 
-video_path = ''
+video_path = r'C:\Users\Sophia\Documents\rPPG\initial_tests\videos\60s.avi'
 fps = 25
+roi = (1200, 500, 1600, 800)
 
+df = extract_rgb_signals_rect(video_path, roi)
+plot_rgb_signals(df, fps)
+r, g, b, r_fft, g_fft, b_fft, freqs = get_spectrum(df, 0.5, 10, filter_order=4, fps=25)
 
-if __name__ == '__main__':
-    pass
+# This will now display all figures created by the functions above at once.
+plt.show()
