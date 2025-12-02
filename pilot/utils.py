@@ -27,10 +27,8 @@ def extract_rgb_signals_rect(video_path, rect):
         cap.release()
         raise ValueError("Unable to read the first frame from the video.")
 
-    # Draw the rectangle (in red, thickness=2)
     cv2.rectangle(first_frame, (x1, y1), (x2, y2), (0, 0, 255), 2)
 
-    # Show the frame
     cv2.imshow("First Frame with ROI", first_frame)
     print("Displaying first frame with ROI... Press any key to continue.")
     cv2.waitKey(0)
@@ -142,16 +140,13 @@ def get_spectrum(df, lowcut, highcut, filter_order=4, fps=30):
     g_fft = np.abs(np.fft.rfft(g - np.mean(g)))
     b_fft = np.abs(np.fft.rfft(b - np.mean(b)))
 
-    # --- Calculate SNR and get window boundaries for plotting ---
     snr_r, fund_win_r, harm_win_r = getSNR(r_fft, freqs, lowcut, highcut)
     snr_g, fund_win_g, harm_win_g = getSNR(g_fft, freqs, lowcut, highcut)
     snr_b, fund_win_b, harm_win_b = getSNR(b_fft, freqs, lowcut, highcut)
 
-    # === Time & Frequency plots ===
     fig, axes = plt.subplots(3, 2, figsize=(14, 10))
     fig.suptitle(f"RGB Signals (filtered {lowcut}-{highcut} Hz)", fontsize=14)
 
-    # --- Time Domain ---
     axes[0,0].plot(t, r, color='red')
     axes[0,0].set_title('R - Time')
     axes[0,0].set_ylabel('Intensity')
@@ -165,15 +160,12 @@ def get_spectrum(df, lowcut, highcut, filter_order=4, fps=30):
     axes[2,0].set_xlabel('Time (s)')
     axes[2,0].set_ylabel('Intensity')
 
-    # --- Frequency Domain ---
-    # R Channel
     axes[0,1].plot(freqs, r_fft, color='red')
     axes[0,1].set_title('R - Frequency')
     axes[0,1].text(0.05, 0.95, f"SNR: {snr_r:.2f} dB", transform=axes[0,1].transAxes,
                    fontsize=9, verticalalignment='top',
                    bbox=dict(boxstyle='round,pad=0.3', fc='wheat', alpha=0.5))
     
-    # G Channel (with SNR windows)
     axes[1,1].plot(freqs, g_fft, color='green')
     axes[1,1].set_title('G - Frequency')
     axes[1,1].axvspan(lowcut, highcut, color='gray', alpha=0.2, label='Noise Band')
@@ -184,7 +176,6 @@ def get_spectrum(df, lowcut, highcut, filter_order=4, fps=30):
                    fontsize=9, verticalalignment='top',
                    bbox=dict(boxstyle='round,pad=0.3', fc='wheat', alpha=0.5))
     
-    # B Channel
     axes[2,1].plot(freqs, b_fft, color='blue')
     axes[2,1].set_title('B - Frequency')
     axes[2,1].set_xlabel('Frequency (Hz)')
@@ -198,8 +189,6 @@ def get_spectrum(df, lowcut, highcut, filter_order=4, fps=30):
 
     plt.tight_layout(rect=[0, 0, 1, 0.96])
 
-    # --- Calculate and Print HR and SNR ---
-    # The green channel usually has the best rPPG signal
     band_indices_g = np.where((freqs >= lowcut) & (freqs <= highcut))
     peak_index_g = np.argmax(g_fft[band_indices_g])
     peak_freq_g = freqs[band_indices_g][peak_index_g]
@@ -209,7 +198,6 @@ def get_spectrum(df, lowcut, highcut, filter_order=4, fps=30):
     print(f"SNR for G channel: {snr_g:.2f} dB")
     print(f"SNR for B channel: {snr_b:.2f} dB")
 
-    # === Spectrograms ===
     fig, axes = plt.subplots(3, 1, figsize=(14, 8), sharex=True)
     fig.suptitle(f"Spectrograms of Filtered RGB Signals ({lowcut}-{highcut} Hz)", fontsize=14)
 
