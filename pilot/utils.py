@@ -5,14 +5,15 @@ import matplotlib.pyplot as plt
 from scipy.signal import butter, filtfilt, spectrogram
 
 
-def extract_rgb_signals_rect(video_path, rect):
+def extract_rgb_signals_rect(video_path, rect, start_time=0, end_time=None):
     """
     Extracts mean R, G, B signals from all pixels inside a rectangle across video frames.
 
     Parameters:
     - video_path (str): Path to input video.
     - rect (tuple): (x1, y1, x2, y2) defining the rectangle (top-left to bottom-right).
-    - output_csv (str): Output CSV filename.
+    - start_time (float): Time in seconds to start processing the video.
+    - end_time (float, optional): Time in seconds to stop processing. If None, process until the end.
     """
     x1, y1, x2, y2 = rect
     cap = cv2.VideoCapture(video_path)
@@ -20,8 +21,17 @@ def extract_rgb_signals_rect(video_path, rect):
     if not cap.isOpened():
         raise IOError("Error opening video file.")
 
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+    start_frame = int(start_time * fps)
+    end_frame = int(end_time * fps) if end_time is not None else total_frames
+
+    if start_frame >= total_frames:
+        raise ValueError("Start time is after the video ends.")
+
     signals = {"Mean_R": [], "Mean_G": [], "Mean_B": []}
-    frames = 0
+
     ret, first_frame = cap.read()
     if not ret:
         cap.release()
@@ -34,12 +44,15 @@ def extract_rgb_signals_rect(video_path, rect):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-    while True:
+    cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
+    current_frame_num = start_frame
+
+    while current_frame_num < end_frame:
         ret, frame = cap.read()
         if not ret:
             break
-        frames += 1
 
+        current_frame_num += 1
         roi = frame[y1:y2, x1:x2]
 
         mean_b = np.mean(roi[:, :, 0])
@@ -51,7 +64,7 @@ def extract_rgb_signals_rect(video_path, rect):
         signals["Mean_B"].append(mean_b)
 
     cap.release()
-    print(frames)
+    print(f"Processed {len(signals['Mean_R'])} frames from second {start_time} to {end_time or (total_frames/fps):.2f}.")
 
     df = pd.DataFrame(signals)
 
@@ -165,6 +178,10 @@ def get_spectrum(df, lowcut, highcut, filter_order=4, fps=30):
     axes[0,1].text(0.05, 0.95, f"SNR: {snr_r:.2f} dB", transform=axes[0,1].transAxes,
                    fontsize=9, verticalalignment='top',
                    bbox=dict(boxstyle='round,pad=0.3', fc='wheat', alpha=0.5))
+    axes[0,1].axvspan(lowcut, highcut, color='gray', alpha=0.2)
+    axes[0,1].axvspan(fund_win_r[0], fund_win_r[1], color='green', alpha=0.4)
+    axes[0,1].axvspan(harm_win_r[0], harm_win_r[1], color='yellow', alpha=0.4)
+
     
     axes[1,1].plot(freqs, g_fft, color='green')
     axes[1,1].set_title('G - Frequency')
@@ -182,6 +199,9 @@ def get_spectrum(df, lowcut, highcut, filter_order=4, fps=30):
     axes[2,1].text(0.05, 0.95, f"SNR: {snr_b:.2f} dB", transform=axes[2,1].transAxes,
                    fontsize=9, verticalalignment='top',
                    bbox=dict(boxstyle='round,pad=0.3', fc='wheat', alpha=0.5))
+    axes[2,1].axvspan(lowcut, highcut, color='gray', alpha=0.2)
+    axes[2,1].axvspan(fund_win_b[0], fund_win_b[1], color='green', alpha=0.4)
+    axes[2,1].axvspan(harm_win_b[0], harm_win_b[1], color='yellow', alpha=0.4)
 
     for ax in axes[:,1]:
         ax.set_xlim(0, 5)
