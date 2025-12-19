@@ -1,8 +1,12 @@
 import cv2
 
-rect = (240, 160, 440, 270)
+# rect = (840, 140, 1000, 220)
 # video_path = r'C:\Users\Sophia\Documents\UTI-11-12-2025\L7-11-12-2025-16-23.avi'
-video_path = r'C:\Users\Sophia\Documents\UTI-11-12-2025\L7-11-12-2025-16-26.avi'
+# video_path = r'C:\Users\Sophia\Documents\UTI-11-12-2025\L7-11-12-2025-16-26.avi'
+# video_path = r'C:\Users\Sophia\Documents\UTI-11-12-2025\L9-11-12-2025-16-04.avi'
+# video_path = r"C:\Users\Sophia\Documents\UTI-11-12-2025\L8-11-12-2025-16-40.avi"
+video_path = r'C:\Users\Sophia\Documents\rPPG\initial_tests\videos\60s.avi'
+rect = (1200, 500, 1600, 800)
 
 x1, y1, x2, y2 = rect
 cap = cv2.VideoCapture(video_path)

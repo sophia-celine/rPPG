@@ -1,0 +1,4 @@
+Estimated HR from Green channel: 37.04 bpm
+SNR for R channel: 0.20 dB
+SNR for G channel: 0.18 dB
+SNR for B channel: 0.11 dB
