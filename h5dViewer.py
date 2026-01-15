@@ -33,7 +33,7 @@ for raw_data, ts in zip(data, data_timestamps):
         while process_next:
             if local_data_add + 4 <= len(raw_data):
                 data_head = raw_data[local_data_add:local_data_add+4]
-                data_len = raw_data[local_data_add+3] * 2
+                data_len = int(raw_data[local_data_add+3]) * 2
                 if data_len > 0:
                     if local_data_add + 4 + data_len <= len(raw_data):
                         data = raw_data[local_data_add+4:local_data_add+4+data_len]
@@ -44,19 +44,16 @@ for raw_data, ts in zip(data, data_timestamps):
                     ids.append(int.from_bytes(data_head[0:3], byteorder='big'))
                     seqs.append(frame_seq)
                     npk += 1
-                    local_data_add = local_data_add + 4 + data_len
+                    local_data_add = int(local_data_add) + 4 + data_len
                 else:
                     process_next = False
             else:
                 process_next = False
 
-
 seqs = np.array(seqs)
 ids = np.array(ids)
 uniqIDs = np.unique(ids)
 uniqseqs = np.unique(seqs)
-
-
 
 idECGs = [65540, 65796, 66052, 66308, 66564, 66820, 67076, 67332, 67588, 67844, 68100, 68356]
 
