@@ -3,18 +3,25 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from datetime import datetime
+import heartpy as hp
+import matplotlib.pyplot as plt
 from scipy import signal
 from scipy.interpolate import interp1d
 
+sample_rate = 250
+
 
 # Substitua pelo caminho do seu arquivo HDF5
-file_path = "10.10.10.129_20251211_16.h5"
+file_path = "10.10.10.138_20251211_16.h5"
+HORA_INICIO = "16:02"
+HORA_FIM = "16:10"
+LEITO = "L9"
 
 # Definições
+
 DATA_PACK_HEAD = b"\x02\x0B\x00\x00"  # Definido como bytes
 data_add = 36
 
-# Abre o arquivo HDF5 no modo leitura
 hdf = h5py.File(file_path, 'r')
 
 data = hdf['data'][:]
@@ -33,7 +40,7 @@ for raw_data, ts in zip(data, data_timestamps):
         frame_seq = int.from_bytes(raw_data[24:26], byteorder='big')
         npk = 0
         process_next = True
-        local_data_add = data_add  # Use uma variável local para evitar sobrescrever a original
+        local_data_add = data_add 
         while process_next:
             if local_data_add + 4 <= len(raw_data):
                 data_head = raw_data[local_data_add:local_data_add+4]
@@ -43,7 +50,7 @@ for raw_data, ts in zip(data, data_timestamps):
                         data = raw_data[local_data_add+4:local_data_add+4+data_len]
                     else:
                         data = raw_data[local_data_add+4:]
-                    data = np.frombuffer(data, dtype='>i2')  # Converte para np.array de inteiros
+                    data = np.frombuffer(data, dtype='>i2')  
                     datas.append(data)
                     ids.append(int.from_bytes(data_head[0:3], byteorder='big'))
                     seqs.append(frame_seq)
@@ -62,14 +69,16 @@ uniqIDs = np.unique(ids)
 uniqseqs = np.unique(seqs)
 seqsts = np.array(seqsts)
 
+################## IDENTIFICAÇÃO DA FREQUÊNCIA CARDÍACA PELO ECG ##################
+
 # idECGs = [65540]
-ECGsID = 65540
+ECGsID = 65796
+# idECGs = [65540, 65796, 66052, 66308, 66564, 66820, 67076, 67332, 67588, 67844, 68100, 68356]
 
 if ECGsID in uniqIDs:
     indices = np.where(ids == ECGsID)[0]
     ts = seqsts[indices]
     Fs = len(datas[indices[0]])/np.median(np.diff(ts))
-    print(Fs)
     dt = 1/Fs
     dtSeq = dt * len(datas[indices[0]])
 
@@ -80,28 +89,43 @@ if ECGsID in uniqIDs:
     dates = [datetime.fromtimestamp(ts) for ts in time_vector]
     dates_np = np.array(dates)
 
-    start_dt = datetime.combine(dates_np[0].date(), datetime.strptime("16:35", "%H:%M").time())
-    end_dt = datetime.combine(dates_np[0].date(), datetime.strptime("16:45", "%H:%M").time())
+    start_dt = datetime.combine(dates_np[0].date(), datetime.strptime(HORA_INICIO, "%H:%M").time())
+    end_dt = datetime.combine(dates_np[0].date(), datetime.strptime(HORA_FIM, "%H:%M").time())
 
     mask = (dates_np >= start_dt) & (dates_np <= end_dt)
 
     sig = [datas[i] for i in indices]
     sig = np.concatenate(sig)
+    np.savetxt("ecg_signal.csv", sig[mask], delimiter=",", fmt='%d')
     print(sig)
+
+    # Calculate HR from ECG
+    ecg_m = sig[mask]
+    segment_width = 10
+    segment_overlap = 0.25
+    wd, m = hp.process_segmentwise(ecg_m, sample_rate=Fs, segment_width=segment_width, segment_overlap=segment_overlap)
+    hr_ecg = m['bpm']
+    step = segment_width * (1 - segment_overlap)
+    hr_times = np.arange(len(hr_ecg)) * step + (segment_width / 2)
+
     seq = [seqs[i] for i in indices]
     print(np.sum(np.diff(seq) > 1)/len(seq))
-    # plt.subplot(4,3,nplot)+
+    # plt.subplot(4,3,nplot)
     # plt.plot(dates, sig)
     plt.plot(dates_np[mask], sig[mask])
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
+    # nplot+=1
 plt.show()
 
+
+################## VETOR ##################
+
 idSpO2 = 458768
-idResp = 327688
-idP1 = 4063240
-idPVC = 3473416
-idART = 2883592
-idCO2 = 4784136
+# idResp = 327688
+# idP1 = 4063240
+# idPVC = 3473416
+# idART = 2883592
+# idCO2 = 4784136
 
 indices = np.where(ids == idSpO2)[0]
 sig = [datas[i] for i in indices]
@@ -122,8 +146,8 @@ dates = [datetime.fromtimestamp(ts) for ts in time_vector]
 
 dates_np = np.array(dates)
 
-start_dt = datetime.combine(dates_np[0].date(), datetime.strptime("16:17", "%H:%M").time())
-end_dt = datetime.combine(dates_np[0].date(), datetime.strptime("16:18", "%H:%M").time())
+start_dt = datetime.combine(dates_np[0].date(), datetime.strptime(HORA_INICIO, "%H:%M").time())
+end_dt = datetime.combine(dates_np[0].date(), datetime.strptime(HORA_FIM, "%H:%M").time())
 
 mask = (dates_np >= start_dt) & (dates_np <= end_dt)
 
@@ -139,32 +163,10 @@ t_m = t_m - t_m[0]  # Start timestamp from 0
 sos = signal.butter(2, [0.7, 4.0], btype='bandpass', fs=Fs, output='sos')
 sig_filt = signal.sosfiltfilt(sos, sig_m)
 
-# 2. Calculate Pulse Rate (Sliding Window FFT)
-window_sec = 15
-window_samples = int(window_sec * Fs)
-step_samples = int(1 * Fs)  # 1 second step
-hr_t = []
-hr_bpm = []
-
-# Zero padding for higher frequency resolution (0.1 BPM)
-n_pad = int(60 * Fs / 0.1)
-
-for i in range(0, len(sig_filt) - window_samples, step_samples):
-    segment = sig_filt[i:i+window_samples]
-    segment = segment * np.hanning(len(segment))
-    fft_out = np.fft.rfft(segment, n=n_pad)
-    freqs = np.fft.rfftfreq(n_pad, 1/Fs)
-    
-    valid_idx = np.where((freqs >= 0.7) & (freqs <= 4.0))[0]
-    if len(valid_idx) > 0:
-        peak_idx = valid_idx[np.argmax(np.abs(fft_out[valid_idx]))]
-        hr_bpm.append(freqs[peak_idx] * 60)
-        hr_t.append(t_m[i + window_samples//2])
-
-f_interp = interp1d(hr_t, hr_bpm, kind='linear', fill_value="extrapolate")
+f_interp = interp1d(hr_times, hr_ecg, kind='linear', fill_value="extrapolate")
 hr_interp = f_interp(t_m)
 
 data_save = np.vstack((sig_filt, hr_interp, t_m))
-np.savetxt("sp02_processed.txt", data_save, fmt='%.7e')
+np.savetxt(f"sp02_{LEITO}.txt", data_save, fmt='%.7e')
 
 plt.show()
