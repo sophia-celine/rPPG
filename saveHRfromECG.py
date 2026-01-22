@@ -13,9 +13,10 @@ sample_rate = 250
 
 # Substitua pelo caminho do seu arquivo HDF5
 file_path = "10.10.10.138_20251211_16.h5"
-HORA_INICIO = "16:02"
-HORA_FIM = "16:10"
+HORA_INICIO = "16:05"
+HORA_FIM = "16:07"
 LEITO = "L9"
+n_frames = 2997
 
 # Definições
 
@@ -164,9 +165,13 @@ sos = signal.butter(2, [0.7, 4.0], btype='bandpass', fs=Fs, output='sos')
 sig_filt = signal.sosfiltfilt(sos, sig_m)
 
 f_interp = interp1d(hr_times, hr_ecg, kind='linear', fill_value="extrapolate")
-hr_interp = f_interp(t_m)
 
-data_save = np.vstack((sig_filt, hr_interp, t_m))
+t_new = np.linspace(t_m[0], t_m[-1], n_frames)
+f_sig = interp1d(t_m, sig_filt, kind='linear', fill_value="extrapolate")
+sig_filt_new = f_sig(t_new)
+hr_interp_new = f_interp(t_new)
+
+data_save = np.vstack((sig_filt_new, hr_interp_new, t_new))
 np.savetxt(f"sp02_{LEITO}.txt", data_save, fmt='%.7e')
 
 plt.show()
