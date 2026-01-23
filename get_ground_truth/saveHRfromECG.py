@@ -12,11 +12,13 @@ sample_rate = 250
 
 
 # Substitua pelo caminho do seu arquivo HDF5
-file_path = "10.10.10.138_20251211_16.h5"
-HORA_INICIO = "16:05"
-HORA_FIM = "16:07"
+file_path = "/home/soph/rppg/rPPG/pilot/ground_truth/10.10.10.138_20251211_16.h5"
+HORA_INICIO = "16:02"
+HORA_FIM = "16:08"
 LEITO = "L9"
-n_frames = 2997
+n_points = 25*6*60 #2997
+hora_inicio = HORA_INICIO.replace(':', '-')
+hora_fim = HORA_FIM.replace(':', '-')
 
 # Definições
 
@@ -97,7 +99,7 @@ if ECGsID in uniqIDs:
 
     sig = [datas[i] for i in indices]
     sig = np.concatenate(sig)
-    np.savetxt("ecg_signal.csv", sig[mask], delimiter=",", fmt='%d')
+    np.savetxt(f"ecg_signal_{LEITO}_{hora_inicio}_{hora_fim}.csv", sig[mask], delimiter=",", fmt='%d')
     print(sig)
 
     # Calculate HR from ECG
@@ -166,12 +168,12 @@ sig_filt = signal.sosfiltfilt(sos, sig_m)
 
 f_interp = interp1d(hr_times, hr_ecg, kind='linear', fill_value="extrapolate")
 
-t_new = np.linspace(t_m[0], t_m[-1], n_frames)
+t_new = np.linspace(t_m[0], t_m[-1], n_points)
 f_sig = interp1d(t_m, sig_filt, kind='linear', fill_value="extrapolate")
 sig_filt_new = f_sig(t_new)
 hr_interp_new = f_interp(t_new)
 
 data_save = np.vstack((sig_filt_new, hr_interp_new, t_new))
-np.savetxt(f"sp02_{LEITO}.txt", data_save, fmt='%.7e')
+np.savetxt(f"sp02_{LEITO}_{hora_inicio}_{hora_fim}.txt", data_save, fmt='%.7e')
 
 plt.show()
