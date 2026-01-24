@@ -8,13 +8,13 @@ import matplotlib.pyplot as plt
 # Configuration
 # =========================
 
-FS = 250                    # ECG sampling rate (Hz)
+FS = 250
 
-WINDOW_15S = 15             # seconds
+WINDOW_15S = 15
 NUM_WINDOWS = 7
 TOTAL_ANALYSIS_TIME = WINDOW_15S * NUM_WINDOWS  # 105 s
 
-STEP_SECONDS = 1            # ECG sliding step
+STEP_SECONDS = 1
 STEP_SAMPLES = STEP_SECONDS * FS
 
 ECG_FILE = "/home/soph/rppg/rPPG/get_ground_truth/ecg_signal_L9_16-02_16-08.csv"
@@ -31,16 +31,10 @@ def estimate_hr_heartpy(ecg_segment, fs):
     try:
         wd, m = hp.process(
             ecg_segment,
-            sample_rate=fs,
-            windowsize=1
+            sample_rate=fs
         )
-
-        hr_values = wd['hr']
-        if len(hr_values) == 0:
-            return np.nan
-
-        return np.median(hr_values)
-
+        hr_value = m['bpm']
+        return hr_value
     except Exception:
         return np.nan
 
@@ -48,13 +42,13 @@ def estimate_hr_heartpy(ecg_segment, fs):
 # Load ECG once
 # =========================
 
-ecg = np.loadtxt(ECG_FILE)
+ecg = hp.get_data(ECG_FILE)
 
 window_15s_samples = WINDOW_15S * FS
 ecg_window_samples = TOTAL_ANALYSIS_TIME * FS
 
 # =========================
-# Iterate over HR prediction files
+# Load HR files
 # =========================
 
 hr_files = sorted([
@@ -64,27 +58,27 @@ hr_files = sorted([
 
 num_files = len(hr_files)
 
-fig, axes = plt.subplots(
-    num_files, 1,
-    figsize=(10, 3 * num_files),
-    sharex=True
-)
+# Storage
+correlation_results = {}
+best_hr_matches = {}
 
-if num_files == 1:
-    axes = [axes]
+# =========================
+# Main processing loop
+# =========================
 
 summary_results = {}
 
-for ax, hr_file in zip(axes, hr_files):
+for hr_file in hr_files:
+
     print(hr_file)
 
     ppg_hr = np.loadtxt(os.path.join(HR_PRED_FOLDER, hr_file))
-
     if len(ppg_hr) != NUM_WINDOWS:
         raise ValueError(f"{hr_file} must contain exactly {NUM_WINDOWS} values")
 
     best_corr = -np.inf
     best_start_sec = None
+    best_ecg_hr = None
     correlation_trace = []
 
     for start in range(0, len(ecg) - ecg_window_samples, STEP_SAMPLES):
@@ -93,11 +87,10 @@ for ax, hr_file in zip(axes, hr_files):
         ecg_hr = []
 
         for i in range(NUM_WINDOWS):
-            seg_start = i * window_15s_samples
-            seg_end = seg_start + window_15s_samples
-            segment = ecg_block[seg_start:seg_end]
-
-            hr = estimate_hr_heartpy(segment, FS)
+            seg = ecg_block[
+                i * window_15s_samples:(i + 1) * window_15s_samples
+            ]
+            hr = estimate_hr_heartpy(seg, FS)
             ecg_hr.append(hr)
 
         ecg_hr = np.array(ecg_hr)
@@ -111,34 +104,72 @@ for ax, hr_file in zip(axes, hr_files):
         if corr > best_corr:
             best_corr = corr
             best_start_sec = start / FS
+            best_ecg_hr = ecg_hr.copy()
+        
+        summary_results[hr_file] = (best_corr, best_start_sec)
 
-    summary_results[hr_file] = (best_corr, best_start_sec)
 
-    # -------------------------
-    # Plot correlation trace
-    # -------------------------
+    correlation_results[hr_file] = (correlation_trace, best_corr, best_start_sec)
+    best_hr_matches[hr_file] = (ppg_hr, best_ecg_hr)
 
-    if correlation_trace:
-        times, corrs = zip(*correlation_trace)
+# ======================================================
+# FIGURE 1 — Correlation traces
+# ======================================================
+
+fig1, axes1 = plt.subplots(
+    num_files, 1,
+    figsize=(10, 3 * num_files),
+    sharex=True
+)
+
+if num_files == 1:
+    axes1 = [axes1]
+
+for ax, hr_file in zip(axes1, hr_files):
+    trace, best_corr, best_start = correlation_results[hr_file]
+
+    if trace:
+        times, corrs = zip(*trace)
         ax.plot(times, corrs)
 
     ax.set_title(
-        f"{hr_file} | max corr = {best_corr:.3f} @ {best_start_sec:.1f}s"
+        f"{hr_file} | max corr = {best_corr:.3f} @ {best_start:.1f}s"
     )
     ax.set_ylabel("Correlation")
     ax.grid(True)
 
-# =========================
-# Final plot formatting
-# =========================
-
-axes[-1].set_xlabel("ECG start time (s)")
-plt.tight_layout()
+axes1[-1].set_xlabel("ECG start time (s)")
+# plt.tight_layout()
 plt.show()
 
-# =========================
-# Print summary
-# =========================
+# ======================================================
+# FIGURE 2 — Best HR sequence matches
+# ======================================================
+
+fig2, axes2 = plt.subplots(
+    num_files, 1,
+    figsize=(8, 3 * num_files),
+    sharex=True
+)
+
+if num_files == 1:
+    axes2 = [axes2]
+
+for ax, hr_file in zip(axes2, hr_files):
+    ppg_hr, ecg_hr = best_hr_matches[hr_file]
+
+    if ecg_hr is not None:
+        ax.plot(ppg_hr, marker='o', label="rPPG HR")
+        ax.plot(ecg_hr, marker='s', label="ECG HR (HeartPy)")
+
+    ax.set_title(hr_file)
+    ax.set_ylabel("Heart Rate (bpm)")
+    ax.legend()
+    ax.grid(True)
+
+axes2[-1].set_xlabel("15 s Window Index")
+# plt.tight_layout()
+plt.show()
 
 print("\n===== SUMMARY =====")
 for fname, (corr, start) in summary_results.items():

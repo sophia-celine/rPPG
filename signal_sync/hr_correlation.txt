@@ -1,0 +1,8 @@
+===== SUMMARY =====
+HR_CHROM.txt               corr=0.9544  start=229.00s
+HR_GREEN.txt               corr=0.9249  start=194.00s
+HR_ICA.txt                 corr=0.9385  start=229.00s
+HR_LGI.txt                 corr=0.8770  start=255.00s
+HR_OMIT.txt                corr=0.8770  start=255.00s
+HR_PBV.txt                 corr=0.9385  start=229.00s
+HR_POS.txt                 corr=0.9385  start=229.00s
