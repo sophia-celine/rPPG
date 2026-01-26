@@ -13,8 +13,8 @@ sample_rate = 250
 
 # Substitua pelo caminho do seu arquivo HDF5
 file_path = "/home/soph/rppg/rPPG/pilot/ground_truth/10.10.10.138_20251211_16.h5"
-HORA_INICIO = "16:02"
-HORA_FIM = "16:08"
+HORA_INICIO = "16:05:49"
+HORA_FIM = "16:07:49"
 LEITO = "L9"
 n_points = 25*6*60 #2997
 hora_inicio = HORA_INICIO.replace(':', '-')
@@ -92,8 +92,8 @@ if ECGsID in uniqIDs:
     dates = [datetime.fromtimestamp(ts) for ts in time_vector]
     dates_np = np.array(dates)
 
-    start_dt = datetime.combine(dates_np[0].date(), datetime.strptime(HORA_INICIO, "%H:%M").time())
-    end_dt = datetime.combine(dates_np[0].date(), datetime.strptime(HORA_FIM, "%H:%M").time())
+    start_dt = datetime.combine(dates_np[0].date(), datetime.strptime(HORA_INICIO, "%H:%M:%S").time())
+    end_dt = datetime.combine(dates_np[0].date(), datetime.strptime(HORA_FIM, "%H:%M:%S").time())
 
     mask = (dates_np >= start_dt) & (dates_np <= end_dt)
 
@@ -149,8 +149,8 @@ dates = [datetime.fromtimestamp(ts) for ts in time_vector]
 
 dates_np = np.array(dates)
 
-start_dt = datetime.combine(dates_np[0].date(), datetime.strptime(HORA_INICIO, "%H:%M").time())
-end_dt = datetime.combine(dates_np[0].date(), datetime.strptime(HORA_FIM, "%H:%M").time())
+start_dt = datetime.combine(dates_np[0].date(), datetime.strptime(HORA_INICIO, "%H:%M:%S").time())
+end_dt = datetime.combine(dates_np[0].date(), datetime.strptime(HORA_FIM, "%H:%M:%S").time())
 
 mask = (dates_np >= start_dt) & (dates_np <= end_dt)
 
