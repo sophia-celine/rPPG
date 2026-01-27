@@ -6,17 +6,18 @@ from datetime import datetime
 import heartpy as hp
 import matplotlib.pyplot as plt
 from scipy import signal
-from scipy.interpolate import interp1d
+from scipy.signal import resample
+
 
 sample_rate = 250
 
 
 # Substitua pelo caminho do seu arquivo HDF5
-file_path = "/home/soph/rppg/rPPG/pilot/ground_truth/10.10.10.138_20251211_16.h5"
+file_path = "../pilot/ground_truth/10.10.10.138_20251211_16.h5"
 HORA_INICIO = "16:05:49"
-HORA_FIM = "16:07:49"
+HORA_FIM = "16:07:48"
 LEITO = "L9"
-n_points = 25*6*60 #2997
+n_points = 2997
 hora_inicio = HORA_INICIO.replace(':', '-')
 hora_fim = HORA_FIM.replace(':', '-')
 
@@ -78,47 +79,48 @@ seqsts = np.array(seqsts)
 ECGsID = 65796
 # idECGs = [65540, 65796, 66052, 66308, 66564, 66820, 67076, 67332, 67588, 67844, 68100, 68356]
 
-if ECGsID in uniqIDs:
-    indices = np.where(ids == ECGsID)[0]
-    ts = seqsts[indices]
-    Fs = len(datas[indices[0]])/np.median(np.diff(ts))
-    dt = 1/Fs
-    dtSeq = dt * len(datas[indices[0]])
+# if ECGsID in uniqIDs:
+#     indices = np.where(ids == ECGsID)[0]
+#     ts = seqsts[indices]
+#     Fs = len(datas[indices[0]])/np.median(np.diff(ts))
+#     dt = 1/Fs
+#     dtSeq = dt * len(datas[indices[0]])
 
-    time_vector = []
-    for i, t in enumerate(ts):
-        time_vector.append(t + np.arange(len(datas[indices[i]])) * dt)
-    time_vector = np.concatenate(time_vector)
-    dates = [datetime.fromtimestamp(ts) for ts in time_vector]
-    dates_np = np.array(dates)
+#     time_vector = []
+#     for i, t in enumerate(ts):
+#         time_vector.append(t + np.arange(len(datas[indices[i]])) * dt)
+#     time_vector = np.concatenate(time_vector)
+#     dates = [datetime.fromtimestamp(ts) for ts in time_vector]
+#     dates_np = np.array(dates)
 
-    start_dt = datetime.combine(dates_np[0].date(), datetime.strptime(HORA_INICIO, "%H:%M:%S").time())
-    end_dt = datetime.combine(dates_np[0].date(), datetime.strptime(HORA_FIM, "%H:%M:%S").time())
+#     start_dt = datetime.combine(dates_np[0].date(), datetime.strptime(HORA_INICIO, "%H:%M:%S").time())
+#     end_dt = datetime.combine(dates_np[0].date(), datetime.strptime(HORA_FIM, "%H:%M:%S").time())
 
-    mask = (dates_np >= start_dt) & (dates_np <= end_dt)
+#     mask = (dates_np >= start_dt) & (dates_np <= end_dt)
 
-    sig = [datas[i] for i in indices]
-    sig = np.concatenate(sig)
-    np.savetxt(f"ecg_signal_{LEITO}_{hora_inicio}_{hora_fim}.csv", sig[mask], delimiter=",", fmt='%d')
-    print(sig)
+#     sig = [datas[i] for i in indices]
+#     sig = np.concatenate(sig)
+#     np.savetxt(f"ecg_signal_{LEITO}_{hora_inicio}_{hora_fim}.csv", sig[mask], delimiter=",", fmt='%d')
+#     print(sig)
 
-    # Calculate HR from ECG
-    ecg_m = sig[mask]
-    segment_width = 10
-    segment_overlap = 0.25
-    wd, m = hp.process_segmentwise(ecg_m, sample_rate=Fs, segment_width=segment_width, segment_overlap=segment_overlap)
-    hr_ecg = m['bpm']
-    step = segment_width * (1 - segment_overlap)
-    hr_times = np.arange(len(hr_ecg)) * step + (segment_width / 2)
+#     # Calculate HR from ECG
+#     ecg_m = sig[mask]
+#     segment_width = 15
+#     segment_overlap = 0
+#     wd, m = hp.process_segmentwise(ecg_m, sample_rate=250, segment_width=segment_width, segment_overlap=segment_overlap)
+#     hr_ecg = m['bpm']
+#     print('hr ecg initial len', len(hr_ecg))
+#     step = segment_width * (1 - segment_overlap)
+#     hr_times = np.arange(len(hr_ecg)) * step + (segment_width / 2)
 
-    seq = [seqs[i] for i in indices]
-    print(np.sum(np.diff(seq) > 1)/len(seq))
-    # plt.subplot(4,3,nplot)
-    # plt.plot(dates, sig)
-    plt.plot(dates_np[mask], sig[mask])
-    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
-    # nplot+=1
-plt.show()
+#     seq = [seqs[i] for i in indices]
+#     print(np.sum(np.diff(seq) > 1)/len(seq))
+#     # plt.subplot(4,3,nplot)
+#     # plt.plot(dates, sig)
+#     plt.plot(dates_np[mask], sig[mask])
+#     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
+#     # nplot+=1
+# plt.show()
 
 
 ################## VETOR ##################
@@ -156,24 +158,14 @@ mask = (dates_np >= start_dt) & (dates_np <= end_dt)
 
 plt.plot(dates_np[mask], sig[mask])
 plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
+plt.savefig(f"sp02_{LEITO}_{hora_inicio}_{hora_fim}.png")
 
-# Process and save data (Amplitude, HR, Timestamp)
-sig_m = sig[mask].astype(float)
-t_m = time_vector[mask]
-t_m = t_m - t_m[0]  # Start timestamp from 0
+print(sig[mask].shape)
+spo2wave = resample(sig[mask], n_points)
+spo2wave = np.reshape(spo2wave, (1, spo2wave.shape[0]))
+print(spo2wave.shape)
 
-# 1. Bandpass Filter (0.7 - 4.0 Hz) to get AC Amplitude
-sos = signal.butter(2, [0.7, 4.0], btype='bandpass', fs=Fs, output='sos')
-sig_filt = signal.sosfiltfilt(sos, sig_m)
 
-f_interp = interp1d(hr_times, hr_ecg, kind='linear', fill_value="extrapolate")
-
-t_new = np.linspace(t_m[0], t_m[-1], n_points)
-f_sig = interp1d(t_m, sig_filt, kind='linear', fill_value="extrapolate")
-sig_filt_new = f_sig(t_new)
-hr_interp_new = f_interp(t_new)
-
-data_save = np.vstack((sig_filt_new, hr_interp_new, t_new))
-np.savetxt(f"sp02_{LEITO}_{hora_inicio}_{hora_fim}.txt", data_save, fmt='%.7e')
+np.savetxt(f"sp02wave_{LEITO}_{hora_inicio}_{hora_fim}.txt", spo2wave, fmt='%.7e')
 
 plt.show()
