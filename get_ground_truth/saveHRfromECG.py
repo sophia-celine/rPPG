@@ -14,8 +14,8 @@ sample_rate = 250
 
 # Substitua pelo caminho do seu arquivo HDF5
 file_path = "../pilot/ground_truth/10.10.10.138_20251211_16.h5"
-HORA_INICIO = "16:05:49"
-HORA_FIM = "16:07:48"
+HORA_INICIO = "16:04:13"
+HORA_FIM = "16:06:12"
 LEITO = "L9"
 n_points = 2997
 hora_inicio = HORA_INICIO.replace(':', '-')

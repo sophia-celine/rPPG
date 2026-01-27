@@ -1,15 +1,11 @@
-groud_truth is spo2 signal resampled to the number o frames in the input video
-spo2wave = resample(sig[mask], n_points)
-spo2wave = np.reshape(spo2wave, (1, spo2wave.shape[0]))
-print(spo2wave.shape)
-
-config:
 BASE: ['']
 TOOLBOX_MODE: "unsupervised_method"      # "train_and_test"  or "only_test" or "unsupervised_method"
 UNSUPERVISED:
   METHOD: ["ICA", "POS", "CHROM", "GREEN", "LGI", "PBV", "OMIT"]
   METRICS: ['MAE', 'RMSE', 'MAPE', 'Pearson', 'SNR', 'BA']
   DATA:
+    INFO:
+      SKIN_COLOR: [1, 2, 3, 4] 
     FS: 25
     DATASET: ICU
     DO_PREPROCESS: True               # if first time, should be true
@@ -44,72 +40,72 @@ INFERENCE:
     WINDOW_SIZE: 15        # In seconds
 
 ===Unsupervised Method ( ICA ) Predicting ===
-100%|█████████████████████████████████████████████| 1/1 [00:13<00:00, 13.74s/it]
+100%|█████████████████████████████████████████████| 1/1 [00:15<00:00, 15.10s/it]
 Used Unsupervised Method: ICA
-FFT MAE (FFT Label): 3.2958984375 +/- 1.4124067950935222
-FFT RMSE (FFT Label): 5.179004745018658 +/- 3.947140435758539
-FFT MAPE (FFT Label): 4.654682274247492 +/- 2.0612565559835407
-FFT Pearson (FFT Label): 0.2009320955954367 +/- 0.3999221367882391
-FFT SNR (FFT Label): 1.5346002073338658 +/- 1.6546920761872694 (dB)
+FFT MAE (FFT Label): 2.9296875 +/- 1.0358009490037317
+FFT RMSE (FFT Label): 4.143203796014927 +/- 2.9744284934603473
+FFT MAPE (FFT Label): 3.926282051282051 +/- 1.3898837146395555
+FFT Pearson (FFT Label): 0.26876731988073294 +/- 0.39322684881293984
+FFT SNR (FFT Label): 2.15934046040136 +/- 1.4050110726997416 (dB)
 Saved ICA_ICU_FFT_BlandAltman_ScatterPlot.pdf to runs/exp/ICU_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendHC_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
 Saved ICA_ICU_FFT_BlandAltman_DifferencePlot.pdf to runs/exp/ICU_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendHC_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
 ===Unsupervised Method ( POS ) Predicting ===
-100%|█████████████████████████████████████████████| 1/1 [00:09<00:00,  9.01s/it]
+100%|█████████████████████████████████████████████| 1/1 [00:10<00:00, 10.92s/it]
 Used Unsupervised Method: POS
-FFT MAE (FFT Label): 4.39453125 +/- 1.1580606665655686
-FFT RMSE (FFT Label): 5.480943437657141 +/- 3.8656874472718226
-FFT MAPE (FFT Label): 6.061377430942649 +/- 1.7390538784701495
-FFT Pearson (FFT Label): 0.16265001215808886 +/- 0.40281198541109586
-FFT SNR (FFT Label): 1.1125835701735438 +/- 1.2837333952139072 (dB)
+FFT MAE (FFT Label): 2.5634765625 +/- 0.9602131788667159
+FFT RMSE (FFT Label): 3.7346334328072155 +/- 2.928255939592177
+FFT MAPE (FFT Label): 3.38764245014245 +/- 1.262385234678575
+FFT Pearson (FFT Label): 0.5242186517143346 +/- 0.34765759141114816
+FFT SNR (FFT Label): 1.5747947738937536 +/- 1.10426710786445 (dB)
 Saved POS_ICU_FFT_BlandAltman_ScatterPlot.pdf to runs/exp/ICU_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendHC_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
 Saved POS_ICU_FFT_BlandAltman_DifferencePlot.pdf to runs/exp/ICU_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendHC_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
 ===Unsupervised Method ( CHROM ) Predicting ===
-100%|█████████████████████████████████████████████| 1/1 [00:07<00:00,  7.28s/it]
+100%|█████████████████████████████████████████████| 1/1 [00:10<00:00, 10.35s/it]
 Used Unsupervised Method: CHROM
-FFT MAE (FFT Label): 3.2958984375 +/- 1.4124067950935222
-FFT RMSE (FFT Label): 5.179004745018658 +/- 3.947140435758539
-FFT MAPE (FFT Label): 4.654682274247492 +/- 2.0612565559835407
-FFT Pearson (FFT Label): 0.2009320955954367 +/- 0.3999221367882391
-FFT SNR (FFT Label): -1.0115967853146997 +/- 1.194044154822309 (dB)
+FFT MAE (FFT Label): 2.9296875 +/- 1.0358009490037317
+FFT RMSE (FFT Label): 4.143203796014927 +/- 2.9744284934603473
+FFT MAPE (FFT Label): 3.926282051282051 +/- 1.3898837146395555
+FFT Pearson (FFT Label): 0.26876731988073294 +/- 0.39322684881293984
+FFT SNR (FFT Label): -0.4873137483996608 +/- 1.0260491253889477 (dB)
 Saved CHROM_ICU_FFT_BlandAltman_ScatterPlot.pdf to runs/exp/ICU_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendHC_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
 Saved CHROM_ICU_FFT_BlandAltman_DifferencePlot.pdf to runs/exp/ICU_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendHC_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
 ===Unsupervised Method ( GREEN ) Predicting ===
-100%|█████████████████████████████████████████████| 1/1 [00:07<00:00,  7.00s/it]
+100%|█████████████████████████████████████████████| 1/1 [00:07<00:00,  7.38s/it]
 Used Unsupervised Method: GREEN
-FFT MAE (FFT Label): 22.705078125 +/- 4.069722431193762
-FFT RMSE (FFT Label): 25.456270308080224 +/- 12.931031905939825
-FFT MAPE (FFT Label): 30.43190263842438 +/- 5.483405409572216
-FFT Pearson (FFT Label): 0.5813989089756058 +/- 0.3321584232064511
-FFT SNR (FFT Label): -4.822347175965945 +/- 0.5706166943377158 (dB)
+FFT MAE (FFT Label): 24.5361328125 +/- 3.9079185736840287
+FFT RMSE (FFT Label): 26.910898053037844 +/- 13.003863365633121
+FFT MAPE (FFT Label): 32.2738603988604 +/- 5.221146265944473
+FFT Pearson (FFT Label): 0.41836623074801693 +/- 0.3708031141926258
+FFT SNR (FFT Label): -5.946823414280926 +/- 0.6367050955993612 (dB)
 Saved GREEN_ICU_FFT_BlandAltman_ScatterPlot.pdf to runs/exp/ICU_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendHC_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
 Saved GREEN_ICU_FFT_BlandAltman_DifferencePlot.pdf to runs/exp/ICU_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendHC_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
 ===Unsupervised Method ( LGI ) Predicting ===
-100%|█████████████████████████████████████████████| 1/1 [00:09<00:00,  9.89s/it]
+100%|█████████████████████████████████████████████| 1/1 [00:06<00:00,  6.75s/it]
 Used Unsupervised Method: LGI
-FFT MAE (FFT Label): 15.0146484375 +/- 4.673675177526936
-FFT RMSE (FFT Label): 20.004639087520992 +/- 13.399499940065752
-FFT MAPE (FFT Label): 19.66394153350675 +/- 5.9953839508778755
-FFT Pearson (FFT Label): -0.44096395531749655 +/- 0.3664129705925517
-FFT SNR (FFT Label): -3.444940677946055 +/- 0.9733037889069753 (dB)
+FFT MAE (FFT Label): 11.71875 +/- 4.363906965751825
+FFT RMSE (FFT Label): 17.01994634563806 +/- 11.68381477990889
+FFT MAPE (FFT Label): 15.789707977207978 +/- 6.005422648099761
+FFT Pearson (FFT Label): 0.7861680287143281 +/- 0.25230267227658243
+FFT SNR (FFT Label): -2.547984600523891 +/- 0.7986776240151648 (dB)
 Saved LGI_ICU_FFT_BlandAltman_ScatterPlot.pdf to runs/exp/ICU_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendHC_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
 Saved LGI_ICU_FFT_BlandAltman_DifferencePlot.pdf to runs/exp/ICU_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendHC_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
 ===Unsupervised Method ( PBV ) Predicting ===
-100%|█████████████████████████████████████████████| 1/1 [00:07<00:00,  7.25s/it]
+100%|█████████████████████████████████████████████| 1/1 [00:06<00:00,  6.77s/it]
 Used Unsupervised Method: PBV
-FFT MAE (FFT Label): 5.4931640625 +/- 2.034861215596881
-FFT RMSE (FFT Label): 7.956138055078283 +/- 6.013245567860773
-FFT MAPE (FFT Label): 7.598414467979686 +/- 2.861035289679046
-FFT Pearson (FFT Label): 0.332026138755218 +/- 0.38508844074733894
-FFT SNR (FFT Label): -0.6196881487626298 +/- 1.068489288920982 (dB)
+FFT MAE (FFT Label): 5.859375 +/- 2.4837634215546633
+FFT RMSE (FFT Label): 9.147946286716403 +/- 7.92191978706088
+FFT MAPE (FFT Label): 7.572115384615384 +/- 3.1320241706166976
+FFT Pearson (FFT Label): -0.06561466114626023 +/- 0.4073685301711178
+FFT SNR (FFT Label): 0.23493496490239374 +/- 0.95047814150656 (dB)
 Saved PBV_ICU_FFT_BlandAltman_ScatterPlot.pdf to runs/exp/ICU_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendHC_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
 Saved PBV_ICU_FFT_BlandAltman_DifferencePlot.pdf to runs/exp/ICU_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendHC_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
 ===Unsupervised Method ( OMIT ) Predicting ===
-100%|█████████████████████████████████████████████| 1/1 [00:08<00:00,  8.14s/it]
+100%|█████████████████████████████████████████████| 1/1 [00:06<00:00,  6.95s/it]
 Used Unsupervised Method: OMIT
-FFT MAE (FFT Label): 15.0146484375 +/- 4.673675177526936
-FFT RMSE (FFT Label): 20.004639087520992 +/- 13.399499940065752
-FFT MAPE (FFT Label): 19.66394153350675 +/- 5.9953839508778755
-FFT Pearson (FFT Label): -0.44096395531749655 +/- 0.3664129705925517
-FFT SNR (FFT Label): -3.3643974622108543 +/- 0.9750707767007665 (dB)
+FFT MAE (FFT Label): 11.71875 +/- 4.363906965751825
+FFT RMSE (FFT Label): 17.01994634563806 +/- 11.68381477990889
+FFT MAPE (FFT Label): 15.789707977207978 +/- 6.005422648099761
+FFT Pearson (FFT Label): 0.7861680287143281 +/- 0.25230267227658243
+FFT SNR (FFT Label): -2.458554084079883 +/- 0.7989118531518105 (dB)
 Saved OMIT_ICU_FFT_BlandAltman_ScatterPlot.pdf to runs/exp/ICU_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendHC_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
 Saved OMIT_ICU_FFT_BlandAltman_DifferencePlot.pdf to runs/exp/ICU_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendHC_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.

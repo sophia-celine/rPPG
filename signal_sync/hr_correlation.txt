@@ -1,8 +1,15 @@
-===== SUMMARY =====
-HR_CHROM.txt               corr=0.9544  start=229.00s
-HR_GREEN.txt               corr=0.9249  start=194.00s
-HR_ICA.txt                 corr=0.9385  start=229.00s
-HR_LGI.txt                 corr=0.8770  start=255.00s
-HR_OMIT.txt                corr=0.8770  start=255.00s
-HR_PBV.txt                 corr=0.9385  start=229.00s
-HR_POS.txt                 corr=0.9385  start=229.00s
+===== SUMMARY - PREDS WITH DYNAMIC DETECTION AND NO LARGE FACE BOX =====
+HR_CHROM.txt               corr=0.8477  start=203.00s
+HR_GREEN.txt               corr=0.6968  start=220.00s
+HR_ICA.txt                 corr=0.8477  start=203.00s
+HR_LGI.txt                 corr=0.9252  start=199.00s
+HR_OMIT.txt                corr=0.9252  start=199.00s
+HR_PBV.txt                 corr=0.8027  start=241.00s
+HR_POS.txt                 corr=0.8101  start=136.00s
+===== GLOBAL BEST FIT =====
+Best interval start: 133.00s
+Mean correlation:    0.6099
+Second best interval start: 198.00s
+Mean correlation:    0.6059
+Third best interval start: 199.00s
+Mean correlation:    0.5979
