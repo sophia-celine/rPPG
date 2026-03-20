@@ -7,7 +7,7 @@ HR_OMIT.txt                corr=0.9252  start=199.00s
 HR_PBV.txt                 corr=0.8027  start=241.00s
 HR_POS.txt                 corr=0.8101  start=136.00s
 ===== GLOBAL BEST FIT =====
-Best interval start: 133.00s
+Best interval start: 133.00s -- 16:04:13
 Mean correlation:    0.6099
 Second best interval start: 198.00s
 Mean correlation:    0.6059
