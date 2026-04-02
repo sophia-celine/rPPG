@@ -31,8 +31,8 @@ def save_gt_data():
     hora_inicio = HORA_INICIO.replace(':', '-')
     hora_fim = HORA_FIM.replace(':', '-')
     save_ecg = False
-    save_spo2wave = True
-    save3lines = True
+    save_spo2wave = False
+    save3lines = False
 
     # Definições
 
@@ -139,11 +139,21 @@ def save_gt_data():
     ################## VETOR ##################
 
     idSpO2 = 458768
-    # idResp = 327688
+    idResp = 327688
     # idP1 = 4063240
     # idPVC = 3473416
     # idART = 2883592
     # idCO2 = 4784136
+
+    indices = np.where(ids == idResp)[0]
+    sig = [datas[i] for i in indices]
+    sig = np.concatenate(sig)
+    seq = [seqs[i] for i in indices]
+
+    plt.plot(sig)
+    plt.xlabel('Tempo')
+    plt.ylabel('Amplitude')
+
 
     if save_spo2wave:
 

@@ -287,3 +287,37 @@ def getSNR(fft_mag, freqs, lowcut, highcut, signal_window_hz=0.2):
 
     snr = 10 * np.log10(signal_power / noise_power)
     return snr, (fund_window_low, fund_window_high), (harm_window_low, harm_window_high)
+
+
+def plot_snr_exemplification(freqs, fft_mag, lowcut, highcut, title="Exemplo de Cálculo de SNR"):
+    """
+    Gera um gráfico didático que exemplifica como o SNR é calculado.
+    
+    Mostra o espectro de magnitude e destaca as áreas integradas para o sinal 
+    (fundamental e harmônico) e a área considerada ruído.
+    """
+    # Calcula o SNR e obtém as janelas de frequência
+    snr, fund_win, harm_win = getSNR(fft_mag, freqs, lowcut, highcut)
+
+    plt.figure(figsize=(12, 6))
+    plt.plot(freqs, fft_mag, color='black', linewidth=1.5, label='Espectro de Magnitude')
+    
+    # Destaca a banda de busca total (onde o ruído é calculado)
+    plt.axvspan(lowcut, highcut, color='gray', alpha=0.1, label='Banda de Busca (Ruído)')
+    
+    # Destaca a janela da Frequência Fundamental (Sinal)
+    plt.axvspan(fund_win[0], fund_win[1], color='green', alpha=0.4, label='Sinal (Fundamental)')
+    
+    # Destaca a janela do Primeiro Harmônico (Sinal)
+    plt.axvspan(harm_win[0], harm_win[1], color='yellow', alpha=0.4, label='Sinal (Harmônico)')
+
+    # plt.title(f"{title}\nSNR Resultante: {snr:.2f} dB", fontsize=14)
+    plt.xlabel("Frequência (Hz)")
+    plt.ylabel("Magnitude")
+    
+    # Ajusta o zoom para a área de interesse (0 a 5Hz é comum para rPPG)
+    plt.xlim(0, 5) 
+    
+    plt.legend(loc='upper right')
+    plt.grid(True, linestyle=':', alpha=0.6)
+    plt.show()
