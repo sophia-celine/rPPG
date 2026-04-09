@@ -1,0 +1,70 @@
+===Unsupervised Method ( ICA ) Predicting ===
+100%|█████████████████████████████████████████████| 1/1 [00:05<00:00,  5.14s/it]
+Used Unsupervised Method: ICA
+FFT MAE (FFT Label): 43.212890625 +/- 8.378951065903967
+FFT RMSE (FFT Label): 49.284972191193525 +/- 24.75903983996736
+FFT MAPE (FFT Label): 43.91865079365079 +/- 7.523883529236781
+FFT Pearson (FFT Label): -0.01397474251555767 +/- 0.40820842441323685
+FFT SNR (FFT Label): -6.4601735685853185 +/- 0.5895429841725274 (dB)
+Saved ICA_test_FFT_BlandAltman_ScatterPlot.pdf to runs/exp/test_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendY5F_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
+Saved ICA_test_FFT_BlandAltman_DifferencePlot.pdf to runs/exp/test_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendY5F_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
+===Unsupervised Method ( POS ) Predicting ===
+100%|█████████████████████████████████████████████| 1/1 [00:04<00:00,  4.95s/it]
+Used Unsupervised Method: POS
+FFT MAE (FFT Label): 43.212890625 +/- 8.378951065903967
+FFT RMSE (FFT Label): 49.284972191193525 +/- 24.75903983996736
+FFT MAPE (FFT Label): 43.91865079365079 +/- 7.523883529236781
+FFT Pearson (FFT Label): -0.01397474251555767 +/- 0.40820842441323685
+FFT SNR (FFT Label): -6.4601735685853185 +/- 0.5895429841725274 (dB)
+Saved POS_test_FFT_BlandAltman_ScatterPlot.pdf to runs/exp/test_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendY5F_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
+Saved POS_test_FFT_BlandAltman_DifferencePlot.pdf to runs/exp/test_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendY5F_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
+===Unsupervised Method ( CHROM ) Predicting ===
+100%|█████████████████████████████████████████████| 1/1 [00:04<00:00,  4.93s/it]
+Used Unsupervised Method: CHROM
+FFT MAE (FFT Label): 43.212890625 +/- 8.378951065903967
+FFT RMSE (FFT Label): 49.284972191193525 +/- 24.75903983996736
+FFT MAPE (FFT Label): 43.91865079365079 +/- 7.523883529236781
+FFT Pearson (FFT Label): -0.01397474251555767 +/- 0.40820842441323685
+FFT SNR (FFT Label): -6.4601735685853185 +/- 0.5895429841725274 (dB)
+Saved CHROM_test_FFT_BlandAltman_ScatterPlot.pdf to runs/exp/test_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendY5F_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
+Saved CHROM_test_FFT_BlandAltman_DifferencePlot.pdf to runs/exp/test_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendY5F_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
+===Unsupervised Method ( GREEN ) Predicting ===
+100%|█████████████████████████████████████████████| 1/1 [00:05<00:00,  5.97s/it]
+Used Unsupervised Method: GREEN
+FFT MAE (FFT Label): 43.212890625 +/- 8.378951065903967
+FFT RMSE (FFT Label): 49.284972191193525 +/- 24.75903983996736
+FFT MAPE (FFT Label): 43.91865079365079 +/- 7.523883529236781
+FFT Pearson (FFT Label): -0.01397474251555767 +/- 0.40820842441323685
+FFT SNR (FFT Label): -6.4601735685853185 +/- 0.5895429841725274 (dB)
+Saved GREEN_test_FFT_BlandAltman_ScatterPlot.pdf to runs/exp/test_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendY5F_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
+Saved GREEN_test_FFT_BlandAltman_DifferencePlot.pdf to runs/exp/test_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendY5F_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
+===Unsupervised Method ( LGI ) Predicting ===
+100%|█████████████████████████████████████████████| 1/1 [00:05<00:00,  5.48s/it]
+Used Unsupervised Method: LGI
+FFT MAE (FFT Label): 43.212890625 +/- 8.378951065903967
+FFT RMSE (FFT Label): 49.284972191193525 +/- 24.75903983996736
+FFT MAPE (FFT Label): 43.91865079365079 +/- 7.523883529236781
+FFT Pearson (FFT Label): -0.01397474251555767 +/- 0.40820842441323685
+FFT SNR (FFT Label): -6.4601735685853185 +/- 0.5895429841725274 (dB)
+Saved LGI_test_FFT_BlandAltman_ScatterPlot.pdf to runs/exp/test_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendY5F_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
+Saved LGI_test_FFT_BlandAltman_DifferencePlot.pdf to runs/exp/test_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendY5F_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
+===Unsupervised Method ( PBV ) Predicting ===
+100%|█████████████████████████████████████████████| 1/1 [00:05<00:00,  5.59s/it]
+Used Unsupervised Method: PBV
+FFT MAE (FFT Label): 43.212890625 +/- 8.378951065903967
+FFT RMSE (FFT Label): 49.284972191193525 +/- 24.75903983996736
+FFT MAPE (FFT Label): 43.91865079365079 +/- 7.523883529236781
+FFT Pearson (FFT Label): -0.01397474251555767 +/- 0.40820842441323685
+FFT SNR (FFT Label): -6.4601735685853185 +/- 0.5895429841725274 (dB)
+Saved PBV_test_FFT_BlandAltman_ScatterPlot.pdf to runs/exp/test_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendY5F_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
+Saved PBV_test_FFT_BlandAltman_DifferencePlot.pdf to runs/exp/test_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendY5F_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
+===Unsupervised Method ( OMIT ) Predicting ===
+100%|█████████████████████████████████████████████| 1/1 [00:05<00:00,  5.62s/it]
+Used Unsupervised Method: OMIT
+FFT MAE (FFT Label): 43.212890625 +/- 8.378951065903967
+FFT RMSE (FFT Label): 49.284972191193525 +/- 24.75903983996736
+FFT MAPE (FFT Label): 43.91865079365079 +/- 7.523883529236781
+FFT Pearson (FFT Label): -0.01397474251555767 +/- 0.40820842441323685
+FFT SNR (FFT Label): -6.4601735685853185 +/- 0.5895429841725274 (dB)
+Saved OMIT_test_FFT_BlandAltman_ScatterPlot.pdf to runs/exp/test_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendY5F_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
+Saved OMIT_test_FFT_BlandAltman_DifferencePlot.pdf to runs/exp/test_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendY5F_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.

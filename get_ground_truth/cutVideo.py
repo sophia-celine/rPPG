@@ -4,10 +4,10 @@ Opens an .avi video and crops it between a start frame and an end frame.
 
 import cv2
 
-input_path = r"C:\Users\Sophia\Documents\20260309_Coleta Vinicius\20260309_Coleta Vinicius\video004_corrected.avi"
-output_path = r"C:\Users\Sophia\Documents\20260309_Coleta Vinicius\20260309_Coleta Vinicius\video004_cropped2.avi"
-start_frame = 249 
-end_frame = 3000
+input_path = r"C:\Users\Sophia\Videos\Baumer Video Records\l8-11-12-2025-16-45 - copia\L8=11-12-2025-16-45.avi"
+output_path = r"C:\Users\Sophia\Videos\Baumer Video Records\l8-11-12-2025-16-45 - copia\L8=11-12-2025-16-45-cropped.avi"
+start_frame = 110 
+end_frame = 2996
 
 cap = cv2.VideoCapture(input_path)
 print("Old frame count:", int(cap.get(cv2.CAP_PROP_FRAME_COUNT)))

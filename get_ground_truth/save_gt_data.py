@@ -21,16 +21,16 @@ sample_rate = 250
 
 def save_gt_data():
     
-
+#16:47:22
     # Substitua pelo caminho do seu arquivo HDF5
-    file_path = "../pilot/ground_truth/10.10.10.138_20251211_16.h5"
-    HORA_INICIO = "16:04:13"
-    HORA_FIM = "16:06:12"
-    LEITO = "L9v2"
+    file_path = "../pilot/ground_truth/10.10.10.140_20251211_16.h5"
+    HORA_INICIO = "16:23:00"
+    HORA_FIM = "16:25:00"
+    LEITO = "L7"
     n_points = 2997
     hora_inicio = HORA_INICIO.replace(':', '-')
     hora_fim = HORA_FIM.replace(':', '-')
-    save_ecg = False
+    save_ecg = True
     save_spo2wave = False
     save3lines = False
 
@@ -91,49 +91,51 @@ def save_gt_data():
     # idECGs = [65540]
     ECGsID = 65796
     # idECGs = [65540, 65796, 66052, 66308, 66564, 66820, 67076, 67332, 67588, 67844, 68100, 68356]
-    if save_ecg:
-        if ECGsID in uniqIDs:
-            indices = np.where(ids == ECGsID)[0]
-            ts = seqsts[indices]
-            Fs = len(datas[indices[0]])/np.median(np.diff(ts))
-            dt = 1/Fs
-            dtSeq = dt * len(datas[indices[0]])
+    if ECGsID in uniqIDs:
+        indices = np.where(ids == ECGsID)[0]
+        ts = seqsts[indices]
+        Fs = len(datas[indices[0]])/np.median(np.diff(ts))
+        dt = 1/Fs
+        dtSeq = dt * len(datas[indices[0]])
 
-            time_vector = []
-            for i, t in enumerate(ts):
-                time_vector.append(t + np.arange(len(datas[indices[i]])) * dt)
-            time_vector = np.concatenate(time_vector)
-            dates = [datetime.fromtimestamp(ts) for ts in time_vector]
-            dates_np = np.array(dates)
+        time_vector = []
+        for i, t in enumerate(ts):
+            time_vector.append(t + np.arange(len(datas[indices[i]])) * dt)
+        time_vector = np.concatenate(time_vector)
+        dates = [datetime.fromtimestamp(ts) for ts in time_vector]
+        dates_np = np.array(dates)
 
-            start_dt = datetime.combine(dates_np[0].date(), datetime.strptime(HORA_INICIO, "%H:%M:%S").time())
-            end_dt = datetime.combine(dates_np[0].date(), datetime.strptime(HORA_FIM, "%H:%M:%S").time())
+        start_dt = datetime.combine(dates_np[0].date(), datetime.strptime(HORA_INICIO, "%H:%M:%S").time())
+        end_dt = datetime.combine(dates_np[0].date(), datetime.strptime(HORA_FIM, "%H:%M:%S").time())
 
-            mask = (dates_np >= start_dt) & (dates_np <= end_dt)
+        mask = (dates_np >= start_dt) & (dates_np <= end_dt)
 
-            sig = [datas[i] for i in indices]
-            sig = np.concatenate(sig)
+        sig = [datas[i] for i in indices]
+        sig = np.concatenate(sig)
+        if save_ecg:
             np.savetxt(f"ECG/ecg_signal_{LEITO}_{hora_inicio}_{hora_fim}.csv", sig[mask], delimiter=",", fmt='%d')
-            print(sig)
+        # print(sig)
 
-            # # Calculate HR from ECG
-            # ecg_m = sig[mask]
-            # segment_width = 15
-            # segment_overlap = 0
-            # wd, m = hp.process_segmentwise(ecg_m, sample_rate=250, segment_width=segment_width, segment_overlap=segment_overlap)
-            # hr_ecg = m['bpm']
-            # print('hr ecg initial len', len(hr_ecg))
-            # step = segment_width * (1 - segment_overlap)
-            # hr_times = np.arange(len(hr_ecg)) * step + (segment_width / 2)
+        # # Calculate HR from ECG
+        # ecg_m = sig[mask]
+        # segment_width = 15
+        # segment_overlap = 0
+        # wd, m = hp.process_segmentwise(ecg_m, sample_rate=250, segment_width=segment_width, segment_overlap=segment_overlap)
+        # hr_ecg = m['bpm']
+        # print('hr ecg initial len', len(hr_ecg))
+        # step = segment_width * (1 - segment_overlap)
+        # hr_times = np.arange(len(hr_ecg)) * step + (segment_width / 2)
 
-            seq = [seqs[i] for i in indices]
-            print(np.sum(np.diff(seq) > 1)/len(seq))
-            # plt.subplot(4,3,nplot)
-            # plt.plot(dates, sig)
-            plt.plot(dates_np[mask], sig[mask])
-            plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
-            # nplot+=1
-        plt.show()
+        seq = [seqs[i] for i in indices]
+        print(np.sum(np.diff(seq) > 1)/len(seq))
+        # plt.subplot(4,3,nplot)
+        plt.plot(dates, sig)
+        plt.xlabel('Horário')
+        plt.ylabel('Amplitude')
+        plt.plot(dates_np[mask], sig[mask])
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
+        # nplot+=1
+    plt.show()
 
 
     ################## VETOR ##################
@@ -145,7 +147,7 @@ def save_gt_data():
     # idART = 2883592
     # idCO2 = 4784136
 
-    indices = np.where(ids == idResp)[0]
+    indices = np.where(ids == idSpO2)[0]
     sig = [datas[i] for i in indices]
     sig = np.concatenate(sig)
     seq = [seqs[i] for i in indices]

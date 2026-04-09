@@ -11,15 +11,15 @@ import matplotlib.pyplot as plt
 FS = 250
 
 WINDOW_15S = 15
-NUM_WINDOWS = 7
-TOTAL_ANALYSIS_TIME = WINDOW_15S * NUM_WINDOWS  # 105 s
+NUM_WINDOWS = 8
+TOTAL_ANALYSIS_TIME = WINDOW_15S * NUM_WINDOWS 
 
 STEP_SECONDS = 1
 STEP_SAMPLES = STEP_SECONDS * FS
 
-ECG_FILE = "../get_ground_truth/ECG/ecg_signal_L9_16-02_16-08.csv"
-HR_PRED_FOLDER = "./hr_pred_L9"
-
+ECG_FILE = r"../get_ground_truth\ECG\ecg_signal_L7_16-16-00_16-26-00.csv"
+# ECG_FILE = "../get_ground_truth\ECG\ecg_signal_L8_16-45-38_16-47-38.csv"
+HR_PRED_FOLDER = r"../preliminary_results\L7\hr_preds"
 # =========================
 # Utility functions
 # =========================
@@ -62,6 +62,7 @@ num_files = len(hr_files)
 correlation_results = {}
 best_hr_matches = {}
 all_correlations_list = []
+all_maes_list = []
 common_times = []
 
 # =========================
@@ -83,6 +84,7 @@ for hr_file in hr_files:
     best_ecg_hr = None
     correlation_trace = []
     file_corrs = []
+    file_maes = []
     file_times = []
 
     for start in range(0, len(ecg) - ecg_window_samples, STEP_SAMPLES):
@@ -103,8 +105,10 @@ for hr_file in hr_files:
             continue
 
         corr, _ = pearsonr(zscore(ecg_hr), zscore(ppg_hr))
+        mae = np.mean(np.abs(ecg_hr - ppg_hr))
         correlation_trace.append((start / FS, corr))
         file_corrs.append(corr)
+        file_maes.append(mae)
         file_times.append(start / FS)
 
         if corr > best_corr:
@@ -119,6 +123,7 @@ for hr_file in hr_files:
     best_hr_matches[hr_file] = (ppg_hr, best_ecg_hr)
     
     all_correlations_list.append(file_corrs)
+    all_maes_list.append(file_maes)
     if not common_times and file_times:
         common_times = file_times
 
@@ -143,7 +148,7 @@ for ax, hr_file in zip(axes1, hr_files):
         ax.plot(times, corrs)
 
     ax.set_title(
-        f"{hr_file} | corr máx = {best_corr:.3f} @ {best_start:.1f}s"
+        f"{os.path.splitext(hr_file)[0].split("_")[1]} | corr máx = {best_corr:.3f} @ {best_start:.1f}s"
     )
     ax.set_ylabel("Correlação")
     ax.grid(True)
@@ -172,8 +177,8 @@ for ax, hr_file in zip(axes2, hr_files):
         ax.plot(ppg_hr, marker='o', label="FC rPPG")
         ax.plot(ecg_hr, marker='s', label="FC ECG (HeartPy)")
 
-    ax.set_title(hr_file)
-    ax.set_ylabel("Frequência Cardíaca (bpm)")
+    ax.set_title(f"{os.path.splitext(hr_file)[0].split("_")[1]}")
+    ax.set_ylabel("FC (bpm)")
     ax.legend()
     ax.grid(True)
 
@@ -193,38 +198,113 @@ if all_correlations_list and len(all_correlations_list[0]) > 0:
     # Ensure alignment (truncate to minimum length if any discrepancies occurred)
     min_len = min(len(c) for c in all_correlations_list)
     all_correlations_arr = np.array([c[:min_len] for c in all_correlations_list])
+    all_maes_arr = np.array([m[:min_len] for m in all_maes_list])
     common_times = common_times[:min_len]
 
     mean_corrs = np.mean(all_correlations_arr, axis=0)
+    mean_maes = np.mean(all_maes_arr, axis=0)
+
+    # --- Cálculo do Melhor Ponto Combinado (Score) ---
+    # Normalizamos o MAE para o intervalo [0, 1] para subtrair da correlação
+    mae_min, mae_max = np.min(mean_maes), np.max(mean_maes)
+    norm_mae = (mean_maes - mae_min) / (mae_max - mae_min + 1e-6)
+    combined_score = mean_corrs - norm_mae # Queremos Max(Corr) e Min(MAE)
+    
+    best_combined_idx = np.argmax(combined_score)
+    best_combined_time = common_times[best_combined_idx]
+    best_combined_corr = mean_corrs[best_combined_idx]
+    best_combined_mae = mean_maes[best_combined_idx]
+
     best_global_idx = np.argmax(mean_corrs)
     best_global_val = mean_corrs[best_global_idx]
     best_global_time = common_times[best_global_idx]
     idx_second = np.argsort(mean_corrs)[-2]
     best_second_val = mean_corrs[idx_second]
     best_second_time = common_times[idx_second]
-    idx_third = np.argsort(mean_corrs)[-3]
-    best_third_val = mean_corrs[idx_third]
-    best_third_time = common_times[idx_third]
+
+    best_mae_idx = np.argmin(mean_maes)
+    best_mae_val = mean_maes[best_mae_idx]
+    best_mae_time = common_times[best_mae_idx]
+    print(f"Best interval start for correlation: {best_global_time:.2f}s")
+    print(f"Mean correlation:    {best_global_val:.4f}")
+    print(f"Second best interval start for correlation: {best_second_time:.2f}s")
+    print(f"Mean correlation:    {best_second_val:.4f}")
 
     print(f"\n===== GLOBAL BEST FIT =====")
-    print(f"Best interval start: {best_global_time:.2f}s")
-    print(f"Mean correlation:    {best_global_val:.4f}")
-    print(f"Second best interval start: {best_second_time:.2f}s")
-    print(f"Mean correlation:    {best_second_val:.4f}")
-    print(f"Third best interval start: {best_third_time:.2f}s")
-    print(f"Mean correlation:    {best_third_val:.4f}")
+    print(f"BEST COMBINED (Ideal): {best_combined_time:.2f}s")
+    print(f"  -> Corr: {best_combined_corr:.4f} | MAE: {best_combined_mae:.2f} BPM")
+    print(f"\nBest by Corr only:     {best_global_time:.2f}s (Corr: {best_global_val:.4f})")
+    print(f"Best by MAE only:      {best_mae_time:.2f}s (MAE: {best_mae_val:.2f} BPM)")
 
 
  # plt.figure(figsize=(10, 5))
     plt.plot(common_times, mean_corrs, label="Correlação Média", color='black', linewidth=2)
     plt.axvline(best_global_time, color='r', linestyle='--', label=f"Melhor Início: {best_global_time:.2f}s")
     plt.axvline(best_second_time, color='g', linestyle='--', label=f"Segundo Melhor Início: {best_second_time:.2f}s")
-    plt.axvline(best_third_time, color='b', linestyle='--', label=f"Terceiro Melhor Início: {best_third_time:.2f}s")
-    plt.title(f"Correlação Média de Todos os Sinais (Máx: {best_global_val:.3f})")
     plt.xlabel("Tempo de início do ECG (s)")
     plt.ylabel("Coeficiente de Correlação")
     plt.legend()
     plt.grid(True)
+    plt.show()
+
+    # ======================================================
+    # FIGURE 5 — Mean MAE (Erro Médio)
+    # ======================================================
+    plt.figure(figsize=(10, 5))
+    plt.plot(common_times, mean_maes, label="Erro Absoluto Médio (MAE)", color='red', linewidth=2)
+    plt.axvline(best_combined_time, color='magenta', linestyle='-', linewidth=3, label=f"PONTO IDEAL: {best_combined_time:.1f}s")
+    plt.scatter(best_combined_time, best_combined_mae, color='magenta', s=100, zorder=5, edgecolor='black')
+    
+    plt.title(f"Erro Médio (MAE) de Todos os Sinais (Mín: {best_mae_val:.3f} BPM)")
+    plt.xlabel("Tempo de início do ECG (s)")
+    plt.ylabel("MAE (BPM)")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+    # ======================================================
+    # FIGURE 6 — Comparação de Sequências no Ponto de Menor Erro Médio Global (MAE)
+    # ======================================================
+    print(f"Gerando comparação de sequências para o ponto de menor MAE ({best_mae_time:.2f}s)...")
+    
+    best_mae_samples = int(best_mae_time * FS)
+    ecg_block_min_mae = ecg[best_mae_samples : best_mae_samples + ecg_window_samples]
+    
+    # Calcular a sequência de FC do ECG no ponto de menor erro (uma única vez)
+    ecg_hr_min_mae = []
+    for i in range(NUM_WINDOWS):
+        seg = ecg_block_min_mae[i * window_15s_samples : (i + 1) * window_15s_samples]
+        ecg_hr_min_mae.append(estimate_hr_heartpy(seg, FS))
+    ecg_hr_min_mae = np.array(ecg_hr_min_mae)
+
+    fig6, axes6 = plt.subplots(num_files, 1, figsize=(10, 3 * num_files), sharex=True)
+    if num_files == 1:
+        axes6 = [axes6]
+
+    for ax, hr_file in zip(axes6, hr_files):
+        ppg_hr = best_hr_matches[hr_file][0]
+        min_len_plot = min(len(ecg_hr_min_mae), len(ppg_hr))
+        
+        y_true = ecg_hr_min_mae[:min_len_plot]
+        y_pred = ppg_hr[:min_len_plot]
+        local_mae = np.mean(np.abs(y_true - y_pred))
+
+        # Plotagem das duas sequências (estilo Best HR sequence matches)
+        ax.plot(range(1, min_len_plot + 1), y_true, marker='s', linestyle='-', color='blue', label='FC ECG (GT)', linewidth=2)
+        ax.plot(range(1, min_len_plot + 1), y_pred, marker='o', linestyle='--', color='red', label='FC rPPG', linewidth=2)
+        
+        ax.set_title(f"{os.path.splitext(hr_file)[0].split("_")[1]} (MAE local: {local_mae:.2f} BPM)")
+        ax.set_ylabel("FC (bpm)")
+        ax.set_xticks(range(1, min_len_plot + 1))
+        ax.grid(True, linestyle='--', alpha=0.7)
+        ax.legend(fontsize='x-small', loc='upper right')
+        
+        # Adiciona rótulos de valores para facilitar a comparação rápida
+        for j in range(min_len_plot):
+            ax.text(j + 1, y_pred[j] + 1, f"{y_pred[j]:.1f}", color='red', ha='center', fontsize=8)
+
+    axes6[-1].set_xlabel("Índice da Janela (1 a 8)")
+    plt.tight_layout()
     plt.show()
 
     # ======================================================

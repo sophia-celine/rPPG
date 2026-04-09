@@ -25,11 +25,11 @@ def run_evaluation():
     # Configuration
     # =========================
     # Path to the ground truth ECG CSV
-    ecg_csv = r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\ECG\vinicius_video004_ecg.csv"
+    ecg_csv = r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\ECG\ecg_signal_L7_16-23-00_16-25-00.csv"
     # Folder containing the 7 prediction txt files
-    predictions_folder = r"C:\Users\Sophia\Documents\rPPG\preliminary_results\vin004\hr_preds"
+    predictions_folder = r"C:\Users\Sophia\Documents\rPPG\preliminary_results\L7\hr_preds"
     
-    fs = 1000         # Sample rate of the input ECG
+    fs = 250         # Sample rate of the input ECG
     window_sec = 15   # Window size in seconds
 
     if not os.path.exists(ecg_csv):
@@ -73,8 +73,9 @@ def run_evaluation():
     
     # 1st Subplot: Overall Ground Truth HR
     axes[0].plot(ecg_hr_values, marker='o', linestyle='-', markersize=4, color='black', label='ECG Ground Truth')
-    axes[0].set_title('ECG Ground Truth HR (All Windows)')
-    axes[0].set_ylabel('BPM')
+    axes[0].set_title('ECG')
+    axes[0].set_ylabel('Frequência cardíaca (bpm)')
+    axes[0].set_xlabel('Janela de Amostragem')
     axes[0].grid(True)
     
     # =========================
@@ -131,10 +132,11 @@ def run_evaluation():
         
         # Plot in the next available subplot
         ax = axes[i + 1]
-        ax.plot(y_true, label='ECG (Ground Truth)', marker='o', linestyle='-', markersize=3, alpha=0.7)
-        ax.plot(y_pred, label='rPPG Prediction', marker='x', linestyle='--', markersize=3, alpha=0.9)
-        ax.set_title(f"File: {file_name}")
-        ax.set_ylabel('BPM')
+        ax.plot(y_true, label='ECG', marker='o', linestyle='-', markersize=3, alpha=0.7)
+        ax.plot(y_pred, label='rPPG', marker='x', linestyle='--', markersize=3, alpha=0.9)
+        ax.set_title(os.path.splitext(file_name)[0].split("_")[1])
+        ax.set_ylabel('Frequência cardíaca (bpm)')
+        ax.set_xlabel('Janela de Amostragem')
         ax.legend(fontsize='small')
         ax.grid(True)
 
@@ -142,7 +144,7 @@ def run_evaluation():
     for j in range(i + 2, len(axes)):
         axes[j].axis('off')
 
-    plt.suptitle(f"Heart Rate Evaluation - Subject {os.path.basename(os.path.dirname(predictions_folder))}", fontsize=16)
+    # plt.suptitle(f"Heart Rate Evaluation - Subject {os.path.basename(os.path.dirname(predictions_folder))}", fontsize=16)
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
     plt.show()
 
