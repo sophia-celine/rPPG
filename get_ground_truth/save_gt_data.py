@@ -21,18 +21,18 @@ sample_rate = 250
 
 def save_gt_data():
     
-#16:47:22
+#16:47:22 4:48
     # Substitua pelo caminho do seu arquivo HDF5
     file_path = "../pilot/ground_truth/10.10.10.140_20251211_16.h5"
-    HORA_INICIO = "16:18:00"
-    HORA_FIM = "16:26:00"
+    HORA_INICIO = "16:22:48"
+    HORA_FIM = "16:24:47"
     LEITO = "L7"
     n_points = 2997
     hora_inicio = HORA_INICIO.replace(':', '-')
     hora_fim = HORA_FIM.replace(':', '-')
-    save_ecg = True
-    save_spo2wave = False
-    save3lines = False
+    save_ecg = False
+    save_spo2wave = True
+    save3lines = True
 
     # Definições
 
