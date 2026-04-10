@@ -17,9 +17,10 @@ TOTAL_ANALYSIS_TIME = WINDOW_15S * NUM_WINDOWS
 STEP_SECONDS = 1
 STEP_SAMPLES = STEP_SECONDS * FS
 
-ECG_FILE = r"../get_ground_truth\ECG\ecg_signal_L7_16-16-00_16-26-00.csv"
+ECG_FILE = r"../get_ground_truth\ECG\ecg_signal_L7_16-18-00_16-26-00.csv"
 # ECG_FILE = "../get_ground_truth\ECG\ecg_signal_L8_16-45-38_16-47-38.csv"
-HR_PRED_FOLDER = r"../preliminary_results\L7\hr_preds"
+NOISY_ECG = True
+HR_PRED_FOLDER = r"../preliminary_results\L7\v2\\hr_preds"
 # =========================
 # Utility functions
 # =========================
@@ -43,6 +44,11 @@ def estimate_hr_heartpy(ecg_segment, fs):
 # =========================
 
 ecg = hp.get_data(ECG_FILE)
+if NOISY_ECG:
+    ecg = hp.remove_baseline_wander(ecg, FS)
+    wd, m = hp.process(hp.scale_data(ecg), sample_rate=FS)
+    plt.figure(figsize=(12,4))
+    hp.plotter(wd, m)
 
 window_15s_samples = WINDOW_15S * FS
 ecg_window_samples = TOTAL_ANALYSIS_TIME * FS

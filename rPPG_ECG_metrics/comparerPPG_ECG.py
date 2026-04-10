@@ -5,6 +5,19 @@ import heartpy as hp
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 import matplotlib.pyplot as plt
 
+def filter_ecg(data, sample_rate):
+    '''
+    function that filters using remove_baseline_wander 
+    and visualises result
+    '''
+    filtered = hp.remove_baseline_wander(data, sample_rate)
+    plt.figure(figsize=(12,3))
+    plt.title('signal with baseline wander removed')
+    plt.plot(filtered)
+    plt.show()
+    
+    return filtered
+
 def estimate_hr_heartpy(segment, fs):
     """
     Estimates Heart Rate (HR) from a signal segment using HeartPy.
@@ -26,6 +39,7 @@ def run_evaluation():
     # =========================
     # Path to the ground truth ECG CSV
     ecg_csv = r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\ECG\ecg_signal_L7_16-23-00_16-25-00.csv"
+    noisy_ecg = True
     # Folder containing the 7 prediction txt files
     predictions_folder = r"C:\Users\Sophia\Documents\rPPG\preliminary_results\L7\hr_preds"
     
@@ -51,6 +65,8 @@ def run_evaluation():
     # =========================
     print(f"Loading ECG data from: {ecg_csv}")
     sig = hp.get_data(ecg_csv)
+    if noisy_ecg:
+        sig = filter_ecg(sig, sample_rate=fs)
     
     window_len = int(window_sec * fs)
     n_windows = len(sig) // window_len
