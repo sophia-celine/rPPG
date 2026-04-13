@@ -38,12 +38,12 @@ def run_evaluation():
     # Configuration
     # =========================
     # Path to the ground truth ECG CSV
-    ecg_csv = r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\ECG\ecg_signal_L7_16-23-00_16-25-00.csv"
-    noisy_ecg = True
+    ecg_csv = r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\ECG\vinicius_video004_ecg.csv"
+    noisy_ecg = False
     # Folder containing the 7 prediction txt files
-    predictions_folder = r"C:\Users\Sophia\Documents\rPPG\preliminary_results\L7\hr_preds"
+    predictions_folder = r"C:\Users\Sophia\Documents\rPPG\preliminary_results\vin004\hr_preds"
     
-    fs = 250         # Sample rate of the input ECG
+    fs = 1000         # Sample rate of the input ECG
     window_sec = 15   # Window size in seconds
 
     if not os.path.exists(ecg_csv):

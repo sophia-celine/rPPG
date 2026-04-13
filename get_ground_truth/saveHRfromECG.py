@@ -5,6 +5,7 @@ from scipy.interpolate import interp1d
 import os
 import matplotlib.pyplot as plt
 import time
+import cv2
 
 
 def filter_and_visualise(data, sample_rate):
@@ -42,20 +43,25 @@ def estimate_hr_heartpy(segment, fs):
         return hr_value
     except Exception:
         return np.nan
+    
+def count_video_frames(vid_path):
+    cap = cv2.VideoCapture(vid_path)
+    return int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
 def save_hr_from_ecg():
     # =========================
     # Configuration
     # =========================
     # Path to the CSV file
-    input_csv = r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\ECG\ecg_signal_L7_16-23-00_16-25-00.csv"
-    output_txt = r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\ECG\ecg_signal_L8_16-45-38_16-47-38.txt"
+    input_csv = r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\ECG\vinicius_video017_ecg.csv"
+    output_txt = r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\ECG\vinicius_video017_ecg.txt"
+    vid_path = r"C:\Users\Sophia\Documents\20260309_Coleta Vinicius\20260309_Coleta Vinicius\video017_cropped.avi"
     
-    fs = 250       # Sample rate of the input ECG (e.g., 1000 Hz)
-    n_points = 2886  # Target number of points for the output (to match video duration/frames)
+    fs = 1000       # Sample rate of the input ECG (e.g., 1000 Hz)
+    n_points = count_video_frames(vid_path)  # Target number of points for the output (to match video duration/frames)
     window_sec = 15  # Sliding window size in seconds
     step_sec = 1     # Step size in seconds
-    noisy = True
+    noisy = False
 
     if not os.path.exists(input_csv):
         print(f"Error: Input file not found at {input_csv}")
