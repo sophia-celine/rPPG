@@ -23,16 +23,16 @@ def save_gt_data():
     
 #16:47:22 4:48
     # Substitua pelo caminho do seu arquivo HDF5
-    file_path = "../pilot/ground_truth/10.10.10.140_20251211_16.h5"
-    HORA_INICIO = "16:22:48"
-    HORA_FIM = "16:24:47"
-    LEITO = "L7"
+    file_path = "../pilot/ground_truth/10.10.10.138_20251211_16.h5"
+    HORA_INICIO = "16:05:26"
+    HORA_FIM = "16:07:25"
+    LEITO = "L9"
     n_points = 2997
     hora_inicio = HORA_INICIO.replace(':', '-')
     hora_fim = HORA_FIM.replace(':', '-')
     save_ecg = False
     save_spo2wave = True
-    save3lines = True
+    save3lines = False
 
     # Definições
 
@@ -95,6 +95,7 @@ def save_gt_data():
         indices = np.where(ids == ECGsID)[0]
         ts = seqsts[indices]
         Fs = len(datas[indices[0]])/np.median(np.diff(ts))
+        print('fs ecg:', Fs)
         dt = 1/Fs
         dtSeq = dt * len(datas[indices[0]])
 
@@ -140,8 +141,8 @@ def save_gt_data():
 
     ################## VETOR ##################
 
-    idSpO2 = 458768
-    idResp = 327688
+    idSpO2 = 458768 # fs 62,5 Hz
+    idResp = 327688 # 125 Hz
     # idP1 = 4063240
     # idPVC = 3473416
     # idART = 2883592
@@ -151,6 +152,10 @@ def save_gt_data():
     sig = [datas[i] for i in indices]
     sig = np.concatenate(sig)
     seq = [seqs[i] for i in indices]
+    ts = seqsts[indices]
+    Fs = len(datas[indices[0]])/np.median(np.diff(ts))
+    print(f"fs :", Fs)
+
 
     plt.plot(sig)
     plt.xlabel('Tempo')
@@ -166,6 +171,7 @@ def save_gt_data():
         ts = seqsts[indices]
 
         Fs = len(datas[indices[0]])/np.median(np.diff(ts))
+        print('fs spo2:', Fs)
         dt = 1/Fs
         dtSeq = dt * len(datas[indices[0]])
 
@@ -190,7 +196,7 @@ def save_gt_data():
         sig_m = sig[mask].astype(float)
         t_m = time_vector[mask]
         t_m_rel = t_m - t_m[0]
-
+        np.savetxt(f"spo2/original_spo2_{LEITO}_{hora_inicio}_{hora_fim}.txt", sig_m, fmt='%.7e')
         # 1. Resample PPG Signal (Line 1)
         spo2wave = resample(sig_m, n_points)
 
