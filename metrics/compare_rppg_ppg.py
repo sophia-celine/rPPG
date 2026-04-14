@@ -39,7 +39,7 @@ def sync_and_correlate(rppg_path, ppg_path, fs_rppg=25, fs_ppg=62.5):
             
     except Exception as e:
         print(f"Erro ao carregar arquivos: {e}")
-        return None, None
+        return None, None, None, None
 
     # 2. Reamostragem baseada no tempo real (considerando frequências diferentes)
     fs_common = max(fs_rppg, fs_ppg)
@@ -136,7 +136,7 @@ def sync_and_correlate(rppg_path, ppg_path, fs_rppg=25, fs_ppg=62.5):
     print(f"Coeficiente de Pearson: {coef_pearson:.4f}")
     print(f"P-valor: {p_valor:.4e}")
     
-    return coef_pearson, best_lag
+    return coef_pearson, best_lag, synced_rppg, synced_ppg
 
 if __name__ == "__main__":
     # =========================
@@ -181,14 +181,53 @@ if __name__ == "__main__":
             print(f"\n" + "="*60)
             print(f"ANALISANDO: {filename}")
             
-            pearson, lag = sync_and_correlate(rppg_full_path, PPG_PATH, fs_rppg=FS_RPPG, fs_ppg=FS_PPG)
+            pearson, lag, s_rppg, s_ppg = sync_and_correlate(rppg_full_path, PPG_PATH, fs_rppg=FS_RPPG, fs_ppg=FS_PPG)
             if pearson is not None:
-                summary_results.append((filename, pearson, lag))
+                summary_results.append({
+                    'name': filename,
+                    'pearson': pearson,
+                    'lag': lag,
+                    'rppg': s_rppg,
+                    'ppg': s_ppg
+                })
+
+        # =========================
+        # PLOT ADICIONAL (RESUMO DE SOBREPOSIÇÃO)
+        # =========================
+        if summary_results:
+            num_files = len(summary_results)
+            cols = 2
+            rows = int(np.ceil(num_files / cols))
+            
+            fig, axes = plt.subplots(rows, cols, figsize=(15, 4 * rows), squeeze=False)
+            axes = axes.flatten()
+            
+            for i, res in enumerate(summary_results):
+                ax = axes[i]
+                # Plotamos um trecho (ex: primeiros 10 segundos na fs_common) para melhor visibilidade
+                fs_common = max(FS_RPPG, FS_PPG)
+                limit = int(10 * fs_common) # Ajuste esse valor para ver mais ou menos tempo
+                
+                ax.plot(res['ppg'][:limit], label='PPG (Ground Truth)', color='blue', alpha=0.6)
+                ax.plot(res['rppg'][:limit], label='rPPG (Sincronizado)', color='red', alpha=0.8)
+                
+                ax.set_title(f"{res['name']}\nPearson: {res['pearson']:.4f}")
+                ax.set_xlabel("Amostras")
+                ax.set_ylabel("Amplitude (Z-score)")
+                ax.legend(fontsize='small')
+                ax.grid(True, linestyle='--', alpha=0.5)
+
+            # Remove subplots vazios se houver
+            for j in range(i + 1, len(axes)):
+                fig.delaxes(axes[j])
+                
+            plt.tight_layout()
+            plt.show()
 
         # Exibição do resumo comparativo final
         if summary_results:
             print("\n\n" + "="*45)
             print(f"{'ARQUIVO':<30} | {'PEARSON':<10} | {'LAG'}")
             print("-" * 50)
-            for name, p, l in summary_results:
-                print(f"{name:<30} | {p:.4f}     | {l}")
+            for res in summary_results:
+                print(f"{res['name']:<30} | {res['pearson']:.4f}     | {res['lag']}")
