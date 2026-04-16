@@ -19,7 +19,8 @@ def sync_and_correlate(rppg_path, ppg_path, fs_rppg=25, fs_ppg=62.5):
         raw_rppg = np.loadtxt(rppg_path)
         raw_ppg = np.loadtxt(ppg_path)
 
-        
+        method_name = os.path.basename(rppg_path).split('_')[1]
+
         # Tratamento para arquivos com múltiplas linhas (ex: Sinal, HR, Time)
         if raw_ppg.ndim > 1:
             raw_ppg = raw_ppg[0, :] if raw_ppg.shape[0] < raw_ppg.shape[1] else raw_ppg[:, 0]
@@ -32,7 +33,7 @@ def sync_and_correlate(rppg_path, ppg_path, fs_rppg=25, fs_ppg=62.5):
         plt.figure(figsize=(12, 4))
         plt.plot(np.arange(len(raw_rppg))/fs_rppg, normalize_signal(raw_rppg), label='rPPG (Raw)', color='red', alpha=0.6)
         plt.plot(np.arange(len(raw_ppg))/fs_ppg, normalize_signal(raw_ppg), label='PPG (Raw)', color='blue', alpha=0.6)
-        plt.title(f"Sinais Originais Sobrepostos - {os.path.basename(rppg_path)}\n(Eixo X em segundos, Amplitudes Normalizadas)")
+        plt.title(f"Sinais Originais Sobrepostos - {method_name}\n(Eixo X em segundos, Amplitudes Normalizadas)")
         plt.xlabel("Tempo (s)")
         plt.legend()
         plt.show()
@@ -143,10 +144,10 @@ if __name__ == "__main__":
     # CONFIGURAÇÃO
     # =========================
     # Caminho para o seu arquivo PPG fixo (Ground Truth)
-    PPG_PATH = r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\spo2\original_spo2_L9_16-05-26_16-07-25.txt" 
+    PPG_PATH = r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\spo2\original_spo2_L7_16-22-48_16-24-47.txt" 
     
     # Pasta contendo os arquivos rPPG (.txt)
-    RPPG_FOLDER = r"C:\Users\Sophia\Documents\rPPG\preliminary_results\L9\bvp" 
+    RPPG_FOLDER = r"C:\Users\Sophia\Documents\rPPG\preliminary_results\L7\bvp" 
     
     # Frequências de amostragem originais
     FS_RPPG = 25      # Câmera (rPPG)
@@ -184,7 +185,7 @@ if __name__ == "__main__":
             pearson, lag, s_rppg, s_ppg = sync_and_correlate(rppg_full_path, PPG_PATH, fs_rppg=FS_RPPG, fs_ppg=FS_PPG)
             if pearson is not None:
                 summary_results.append({
-                    'name': filename,
+                    'name': filename.split('_')[1],
                     'pearson': pearson,
                     'lag': lag,
                     'rppg': s_rppg,

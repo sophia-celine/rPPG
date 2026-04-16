@@ -17,22 +17,25 @@ def estimate_hr_heartpy(segment, fs):
     except Exception:
         return np.nan
 
-sample_rate = 250
 
 def save_gt_data():
     
-#16:47:22 4:48
+    # L9 - 16:05:26 - 16:07:25
+    # L7 - 16:22:48 - 16:24:47
+    # L8 - 16:45:38 - 16:47:38
     # Substitua pelo caminho do seu arquivo HDF5
-    file_path = "../pilot/ground_truth/10.10.10.138_20251211_16.h5"
-    HORA_INICIO = "16:05:26"
-    HORA_FIM = "16:07:25"
-    LEITO = "L9"
+    file_path = "../pilot/ground_truth/10.10.10.140_20251211_16.h5"
+    HORA_INICIO = "16:22:48"
+    HORA_FIM = "16:24:47"
+    LEITO = "L7"
     n_points = 2997
     hora_inicio = HORA_INICIO.replace(':', '-')
     hora_fim = HORA_FIM.replace(':', '-')
     save_ecg = False
-    save_spo2wave = True
+    save_spo2wave = False
+    resample_spo2 = False
     save3lines = False
+    sample_rate_ecg = 250
 
     # Definições
 
@@ -115,17 +118,7 @@ def save_gt_data():
         sig = np.concatenate(sig)
         if save_ecg:
             np.savetxt(f"ECG/ecg_signal_{LEITO}_{hora_inicio}_{hora_fim}.csv", sig[mask], delimiter=",", fmt='%d')
-        # print(sig)
 
-        # # Calculate HR from ECG
-        # ecg_m = sig[mask]
-        # segment_width = 15
-        # segment_overlap = 0
-        # wd, m = hp.process_segmentwise(ecg_m, sample_rate=250, segment_width=segment_width, segment_overlap=segment_overlap)
-        # hr_ecg = m['bpm']
-        # print('hr ecg initial len', len(hr_ecg))
-        # step = segment_width * (1 - segment_overlap)
-        # hr_times = np.arange(len(hr_ecg)) * step + (segment_width / 2)
 
         seq = [seqs[i] for i in indices]
         print(np.sum(np.diff(seq) > 1)/len(seq))
@@ -197,47 +190,49 @@ def save_gt_data():
         t_m = time_vector[mask]
         t_m_rel = t_m - t_m[0]
         np.savetxt(f"spo2/original_spo2_{LEITO}_{hora_inicio}_{hora_fim}.txt", sig_m, fmt='%.7e')
-        # 1. Resample PPG Signal (Line 1)
-        spo2wave = resample(sig_m, n_points)
 
-        if not save3lines:
-            spo2wave = np.reshape(spo2wave, (1, spo2wave.shape[0]))
-            np.savetxt(f"spo2/sp02wave_{LEITO}_{hora_inicio}_{hora_fim}.txt", spo2wave, fmt='%.7e')
-            return
+        if resample_spo2:
+            # 1. Resample PPG Signal (Line 1)
+            spo2wave = resample(sig_m, n_points)
 
-        # 2. Calculate Timesteps (Line 3)
-        t_new = np.linspace(t_m_rel[0], t_m_rel[-1], n_points)
+            if not save3lines:
+                spo2wave = np.reshape(spo2wave, (1, spo2wave.shape[0]))
+                np.savetxt(f"spo2/sp02wave_{LEITO}_{hora_inicio}_{hora_fim}.txt", spo2wave, fmt='%.7e')
+                return
 
-        # 3. Calculate HR Estimates (Line 2)
-        # Use a sliding window to get estimates over time
-        window_sec = 15
-        step_sec = 1
-        window_len = int(window_sec * Fs)
-        step_len = int(step_sec * Fs)
+            # 2. Calculate Timesteps (Line 3)
+            t_new = np.linspace(t_m_rel[0], t_m_rel[-1], n_points)
 
-        hr_times = []
-        hr_values = []
+            # 3. Calculate HR Estimates (Line 2)
+            # Use a sliding window to get estimates over time
+            window_sec = 15
+            step_sec = 1
+            window_len = int(window_sec * Fs)
+            step_len = int(step_sec * Fs)
 
-        for i in range(0, len(sig_m) - window_len, step_len):
-            segment = sig_m[i : i + window_len]
-            hr = estimate_hr_heartpy(segment, Fs)
-            hr_values.append(hr)
-            hr_times.append(t_m_rel[i + window_len // 2])
+            hr_times = []
+            hr_values = []
 
-        # Interpolate HR to match the resampled signal length
-        hr_times = np.array(hr_times)
-        hr_values = np.array(hr_values)
-        valid_mask = ~np.isnan(hr_values)
+            for i in range(0, len(sig_m) - window_len, step_len):
+                segment = sig_m[i : i + window_len]
+                hr = estimate_hr_heartpy(segment, Fs)
+                hr_values.append(hr)
+                hr_times.append(t_m_rel[i + window_len // 2])
 
-        if np.sum(valid_mask) > 1:
-            f_hr = interp1d(hr_times[valid_mask], hr_values[valid_mask], kind='linear', fill_value="extrapolate")
-            hr_resampled = f_hr(t_new)
-        else:
-            hr_resampled = np.full(n_points, np.nan)
+            # Interpolate HR to match the resampled signal length
+            hr_times = np.array(hr_times)
+            hr_values = np.array(hr_values)
+            valid_mask = ~np.isnan(hr_values)
 
-        # Save to file: Line 1=PPG, Line 2=HR, Line 3=Time
-        data_save = np.vstack((spo2wave, hr_resampled, t_new))
-        np.savetxt(f"spo2/sp02wave_{LEITO}_{hora_inicio}_{hora_fim}.txt", data_save, fmt='%.7e')
+            if np.sum(valid_mask) > 1:
+                f_hr = interp1d(hr_times[valid_mask], hr_values[valid_mask], kind='linear', fill_value="extrapolate")
+                hr_resampled = f_hr(t_new)
+            else:
+                hr_resampled = np.full(n_points, np.nan)
+
+            # Save to file: Line 1=PPG, Line 2=HR, Line 3=Time
+            data_save = np.vstack((spo2wave, hr_resampled, t_new))
+            np.savetxt(f"spo2/sp02wave_{LEITO}_{hora_inicio}_{hora_fim}.txt", data_save, fmt='%.7e')
 
     plt.show()
 

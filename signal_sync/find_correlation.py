@@ -17,9 +17,9 @@ TOTAL_ANALYSIS_TIME = WINDOW_15S * NUM_WINDOWS
 STEP_SECONDS = 1
 STEP_SAMPLES = STEP_SECONDS * FS
 
-ECG_FILE = r"../get_ground_truth\ECG\ecg_signal_L9_16-02-00_16-10-00.csv"
-NOISY_ECG = False
-HR_PRED_FOLDER = r"../preliminary_results\L9\hr_preds"
+ECG_FILE = r"../get_ground_truth\ECG\ecg_signal_L7_16-18-00_16-26-00.csv"
+NOISY_ECG = True
+HR_PRED_FOLDER = r"../preliminary_results\L7\hr_preds"
 # =========================
 # Utility functions
 # =========================
