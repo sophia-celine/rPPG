@@ -6,16 +6,8 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 import matplotlib.pyplot as plt
 
 def filter_ecg(data, sample_rate):
-    '''
-    function that filters using remove_baseline_wander 
-    and visualises result
-    '''
+    """Filters ECG data using HeartPy's remove_baseline_wander."""
     filtered = hp.remove_baseline_wander(data, sample_rate)
-    plt.figure(figsize=(12,3))
-    plt.title('signal with baseline wander removed')
-    plt.plot(filtered)
-    plt.show()
-    
     return filtered
 
 def estimate_hr_heartpy(segment, fs):
@@ -38,12 +30,12 @@ def run_evaluation():
     # Configuration
     # =========================
     # Path to the ground truth ECG CSV
-    ecg_csv = r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\ECG\vinicius_video004_ecg.csv"
-    noisy_ecg = False
+    ecg_csv = r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\ECG\ecg_signal_L7_16-23-00_16-25-00.csv"
+    noisy_ecg = True
     # Folder containing the 7 prediction txt files
-    predictions_folder = r"C:\Users\Sophia\Documents\rPPG\preliminary_results\vin004\hr_preds"
+    predictions_folder = r"C:\Users\Sophia\Documents\rPPG\preliminary_results\L7\hr_preds"
     
-    fs = 1000         # Sample rate of the input ECG
+    fs = 250         # Sample rate of the input ECG
     window_sec = 15   # Window size in seconds
 
     if not os.path.exists(ecg_csv):
@@ -66,7 +58,14 @@ def run_evaluation():
     print(f"Loading ECG data from: {ecg_csv}")
     sig = hp.get_data(ecg_csv)
     if noisy_ecg:
+        # Optionally plot the filtered ECG if noisy_ecg is True
+        plt.figure(figsize=(12,3))
+        plt.title('Sinal ECG Original e Filtrado (Baseline Wander Removido)')
+        plt.plot(sig, label='Original', alpha=0.7)
         sig = filter_ecg(sig, sample_rate=fs)
+        plt.plot(sig, label='Filtrado', color='red')
+        plt.legend()
+        plt.show()
     
     window_len = int(window_sec * fs)
     n_windows = len(sig) // window_len
@@ -80,19 +79,24 @@ def run_evaluation():
     
     ecg_hr_values = np.array(ecg_hr_values)
 
-    # Initialize Subplots: 1 (Ground Truth) + number of prediction files
-    num_plots = len(txt_files) + 1
-    cols = 2
-    rows = int(np.ceil(num_plots / cols))
-    fig, axes = plt.subplots(rows, cols, figsize=(16, 4 * rows))
-    axes = axes.flatten()
+    # Figura 1: Comparação de FC (Ground Truth + Métodos)
+    num_hr = 1 + len(txt_files)
+    rows_hr = int(np.ceil(num_hr / 2))
+    fig_hr, axes_hr = plt.subplots(rows_hr, 2, figsize=(16, 4 * rows_hr))
+    axes_hr = axes_hr.flatten()
+
+    # Figura 2: Erro Absoluto por Janela
+    num_err = len(txt_files)
+    rows_err = int(np.ceil(num_err / 2))
+    fig_err, axes_err = plt.subplots(rows_err, 2, figsize=(16, 4 * rows_err))
+    axes_err = axes_err.flatten()
     
-    # 1st Subplot: Overall Ground Truth HR
-    axes[0].plot(ecg_hr_values, marker='o', linestyle='-', markersize=4, color='black', label='ECG Ground Truth')
-    axes[0].set_title('ECG')
-    axes[0].set_ylabel('Frequência cardíaca (bpm)')
-    axes[0].set_xlabel('Janela de Amostragem')
-    axes[0].grid(True)
+    # Plot do Ground Truth na Figura de FC
+    axes_hr[0].plot(ecg_hr_values, marker='o', linestyle='-', markersize=4, color='black', label='ECG Ground Truth')
+    axes_hr[0].set_title('ECG (Ground Truth)')
+    axes_hr[0].set_ylabel('Frequência cardíaca (bpm)')
+    axes_hr[0].set_xlabel('Janela de Amostragem')
+    axes_hr[0].grid(True)
     
     # =========================
     # 2. Compare with Prediction Files
@@ -146,22 +150,36 @@ def run_evaluation():
         print(f"  RMSE: {rmse:.2f} BPM")
         print(f"  MAPE: {mape:.2f}%")
         
-        # Plot in the next available subplot
-        ax = axes[i + 1]
-        ax.plot(y_true, label='ECG', marker='o', linestyle='-', markersize=3, alpha=0.7)
-        ax.plot(y_pred, label='rPPG', marker='x', linestyle='--', markersize=3, alpha=0.9)
-        ax.set_title(os.path.splitext(file_name)[0].split("_")[1])
-        ax.set_ylabel('Frequência cardíaca (bpm)')
-        ax.set_xlabel('Janela de Amostragem')
-        ax.legend(fontsize='small')
-        ax.grid(True)
+        # Plot de comparação de FC na Figura 1
+        ax_hr = axes_hr[i + 1]
+        ax_hr.plot(y_true, label='ECG', marker='o', linestyle='-', markersize=3, alpha=0.7)
+        ax_hr.plot(y_pred, label='rPPG', marker='x', linestyle='--', markersize=3, alpha=0.9)
+        ax_hr.set_title(f"{os.path.splitext(file_name)[0].split('_')[1]} - FC")
+        ax_hr.set_ylabel('Frequência cardíaca (bpm)')
+        ax_hr.set_xlabel('Janela de Amostragem')
+        ax_hr.legend(fontsize='small')
+        ax_hr.grid(True)
 
-    # Hide any unused subplots (if any)
-    for j in range(i + 2, len(axes)):
-        axes[j].axis('off')
+        # Calcular o erro absoluto por janela para os dados válidos
+        abs_error_per_window = np.abs(y_true_clean - y_pred_clean)
+        
+        # Plot do Erro Absoluto na Figura 2 (Gráfico de Linha)
+        ax_mae = axes_err[i]
+        window_indices = np.arange(min_len)[mask] # Obter os índices originais das janelas para os dados válidos
+        ax_mae.plot(window_indices, abs_error_per_window, color='tab:red', marker='s', linestyle='-', markersize=3, alpha=0.8)
+        ax_mae.set_title(f"{os.path.splitext(file_name)[0].split('_')[1]} - Erro Absoluto por Janela")
+        ax_mae.set_ylabel('Erro Absoluto (BPM)')
+        ax_mae.set_xlabel('Janela de Amostragem')
+        ax_mae.grid(True)
 
-    # plt.suptitle(f"Heart Rate Evaluation - Subject {os.path.basename(os.path.dirname(predictions_folder))}", fontsize=16)
-    plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+    # Ocultar subplots não utilizados em ambas as figuras
+    for j in range(num_hr, len(axes_hr)):
+        axes_hr[j].axis('off')
+    for j in range(num_err, len(axes_err)):
+        axes_err[j].axis('off')
+
+    fig_hr.tight_layout()
+    fig_err.tight_layout()
     plt.show()
 
 if __name__ == "__main__":

@@ -1,0 +1,28 @@
+--- HR_CHROM.txt ---
+  MAE:  0.89 BPM
+  RMSE: 1.06 BPM
+  MAPE: 1.14%
+--- HR_GREEN.txt ---
+  MAE:  11.60 BPM
+  RMSE: 14.99 BPM
+  MAPE: 14.93%
+--- HR_ICA.txt ---
+  MAE:  0.89 BPM
+  RMSE: 1.06 BPM
+  MAPE: 1.14%
+--- HR_LGI.txt ---
+  MAE:  4.06 BPM
+  RMSE: 5.50 BPM
+  MAPE: 5.20%
+--- HR_OMIT.txt ---
+  MAE:  4.06 BPM
+  RMSE: 5.50 BPM
+  MAPE: 5.20%
+--- HR_PBV.txt ---
+  MAE:  1.29 BPM
+  RMSE: 1.51 BPM
+  MAPE: 1.66%
+--- HR_POS.txt ---
+  MAE:  0.89 BPM
+  RMSE: 1.06 BPM
+  MAPE: 1.14%
