@@ -1,0 +1,28 @@
+--- CHROM ---
+  MAE:  4.92 BPM
+  RMSE: 8.00 BPM
+  MAPE: 6.66%
+--- GREEN ---
+  MAE:  8.12 BPM
+  RMSE: 10.85 BPM
+  MAPE: 11.14%
+--- ICA ---
+  MAE:  1.61 BPM
+  RMSE: 2.07 BPM
+  MAPE: 2.21%
+--- LGI ---
+  MAE:  1.73 BPM
+  RMSE: 2.16 BPM
+  MAPE: 2.39%
+--- OMIT ---
+  MAE:  2.04 BPM
+  RMSE: 2.54 BPM
+  MAPE: 2.81%
+--- PBV ---
+  MAE:  2.17 BPM
+  RMSE: 2.61 BPM
+  MAPE: 2.99%
+--- POS ---
+  MAE:  2.04 BPM
+  RMSE: 2.54 BPM
+  MAPE: 2.81%

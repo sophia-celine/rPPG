@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import pandas as pd
+import scipy
 from scipy.signal import butter, filtfilt
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 import matplotlib.pyplot as plt
@@ -13,6 +14,9 @@ def bandpass_filter(data, lowcut, highcut, fs, order=4):
     b, a = butter(order, [low, high], btype='band')
     return filtfilt(b, a, data)
 
+def _next_power_of_2(x):
+    """Calculate the nearest power of 2."""
+    return 1 if x == 0 else 2 ** (x - 1).bit_length()
 
 def _calculate_fft_hr(ppg_signal, fs=60, low_pass=0.6, high_pass=3.3):
     # Note: to more closely match results in the NeurIPS 2023 toolbox paper,
@@ -28,32 +32,32 @@ def _calculate_fft_hr(ppg_signal, fs=60, low_pass=0.6, high_pass=3.3):
     return fft_hr
 
 
-def estimate_hr_fft(segment, fs):
-    """
-    Estima a Frequência Cardíaca (HR) usando FFT.
-    Filtra o sinal e busca o pico de magnitude na faixa de 45-210 BPM.
-    """
-    try:
-        # 1. Filtro passa-banda (0.75 Hz a 3.5 Hz ~ 45 a 210 BPM)
-        filtered = bandpass_filter(segment, 0.6, 3.3, fs)
+# def estimate_hr_fft(segment, fs):
+#     """
+#     Estima a Frequência Cardíaca (HR) usando FFT.
+#     Filtra o sinal e busca o pico de magnitude na faixa de 45-210 BPM.
+#     """
+#     try:
+#         # 1. Filtro passa-banda (0.75 Hz a 3.5 Hz ~ 45 a 210 BPM)
+#         filtered = bandpass_filter(segment, 0.6, 3.3, fs)
         
-        # 2. Janelamento (Hamming) para reduzir leakage espectral
-        windowed = filtered * np.hamming(len(filtered))
+#         # 2. Janelamento (Hamming) para reduzir leakage espectral
+#         windowed = filtered * np.hamming(len(filtered))
         
-        # 3. FFT
-        n = len(windowed)
-        freqs = np.fft.rfftfreq(n, d=1/fs)
-        fft_mag = np.abs(np.fft.rfft(windowed))
+#         # 3. FFT
+#         n = len(windowed)
+#         freqs = np.fft.rfftfreq(n, d=1/fs)
+#         fft_mag = np.abs(np.fft.rfft(windowed))
         
-        # 4. Encontrar o pico de frequência na faixa de interesse
-        mask = (freqs >= 0.6) & (freqs <= 3.3)
-        if not np.any(mask):
-            return np.nan
+#         # 4. Encontrar o pico de frequência na faixa de interesse
+#         mask = (freqs >= 0.6) & (freqs <= 3.3)
+#         if not np.any(mask):
+#             return np.nan
             
-        peak_freq = freqs[mask][np.argmax(fft_mag[mask])]
-        return peak_freq * 60  # Converte Hz para BPM
-    except Exception:
-        return np.nan
+#         peak_freq = freqs[mask][np.argmax(fft_mag[mask])]
+#         return peak_freq * 60  # Converte Hz para BPM
+#     except Exception:
+#         return np.nan
 
 def calculate_mape(y_true, y_pred):
     """Calcula o Erro Médio Absoluto Percentual."""

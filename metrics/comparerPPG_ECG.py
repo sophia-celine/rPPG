@@ -30,12 +30,12 @@ def run_evaluation():
     # Configuration
     # =========================
     # Path to the ground truth ECG CSV
-    ecg_csv = r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\ECG\ecg_signal_L7_16-23-00_16-25-00.csv"
-    noisy_ecg = True
+    ecg_csv = r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\ECG\vinicius_video023_ecg.csv"
+    noisy_ecg = False
     # Folder containing the 7 prediction txt files
-    predictions_folder = r"C:\Users\Sophia\Documents\rPPG\preliminary_results\L7\hr_preds"
+    predictions_folder = r"C:\Users\Sophia\Documents\rPPG\preliminary_results\vin023\hr_preds"
     
-    fs = 250         # Sample rate of the input ECG
+    fs = 1000         # Sample rate of the input ECG
     window_sec = 15   # Window size in seconds
 
     if not os.path.exists(ecg_csv):
@@ -93,7 +93,7 @@ def run_evaluation():
     
     # Plot do Ground Truth na Figura de FC
     axes_hr[0].plot(ecg_hr_values, marker='o', linestyle='-', markersize=4, color='black', label='ECG Ground Truth')
-    axes_hr[0].set_title('ECG (Ground Truth)')
+    axes_hr[0].set_title('ECG')
     axes_hr[0].set_ylabel('Frequência cardíaca (bpm)')
     axes_hr[0].set_xlabel('Janela de Amostragem')
     axes_hr[0].grid(True)
@@ -154,7 +154,7 @@ def run_evaluation():
         ax_hr = axes_hr[i + 1]
         ax_hr.plot(y_true, label='ECG', marker='o', linestyle='-', markersize=3, alpha=0.7)
         ax_hr.plot(y_pred, label='rPPG', marker='x', linestyle='--', markersize=3, alpha=0.9)
-        ax_hr.set_title(f"{os.path.splitext(file_name)[0].split('_')[1]} - FC")
+        ax_hr.set_title(f"{os.path.splitext(file_name)[0].split('_')[1]}")
         ax_hr.set_ylabel('Frequência cardíaca (bpm)')
         ax_hr.set_xlabel('Janela de Amostragem')
         ax_hr.legend(fontsize='small')
