@@ -133,6 +133,7 @@ def process_rppg_file(file_path):
             results['is_reliable'].append(std_rr < SD_THRESHOLD)
         else:
             for k in results: results[k].append(np.nan)
+        print(results)
 
     return results
 
@@ -175,5 +176,5 @@ def run_batch_analysis(folder_path):
 
 if __name__ == "__main__":
     # Altere para o caminho da sua pasta de sinais BVP
-    TARGET_FOLDER = r"C:\Users\Sophia\Documents\rPPG\preliminary_results\L7\bvp"
+    TARGET_FOLDER = r"C:\Users\Sophia\Documents\rPPG\preliminary_results\L9\bvp"
     run_batch_analysis(TARGET_FOLDER)

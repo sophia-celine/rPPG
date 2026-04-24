@@ -30,13 +30,13 @@ def sync_and_correlate(rppg_path, ppg_path, fs_rppg=25, fs_ppg=62.5):
         print(f"Pontos originais - rPPG: {len(raw_rppg)}, PPG: {len(raw_ppg)}")
 
         # Mostrar sinais originais sobrepostos no tempo real (sem sincronização)
-        plt.figure(figsize=(12, 4))
-        plt.plot(np.arange(len(raw_rppg))/fs_rppg, normalize_signal(raw_rppg), label='rPPG (Raw)', color='red', alpha=0.6)
-        plt.plot(np.arange(len(raw_ppg))/fs_ppg, normalize_signal(raw_ppg), label='PPG (Raw)', color='blue', alpha=0.6)
-        plt.title(f"Sinais Originais Sobrepostos - {method_name}\n(Eixo X em segundos, Amplitudes Normalizadas)")
-        plt.xlabel("Tempo (s)")
-        plt.legend()
-        plt.show()
+        # plt.figure(figsize=(12, 4))
+        # plt.plot(np.arange(len(raw_rppg))/fs_rppg, normalize_signal(raw_rppg), label='rPPG (Raw)', color='red', alpha=0.6)
+        # plt.plot(np.arange(len(raw_ppg))/fs_ppg, normalize_signal(raw_ppg), label='PPG (Raw)', color='blue', alpha=0.6)
+        # plt.title(f"Sinais Originais Sobrepostos - {method_name}\n(Eixo X em segundos, Amplitudes Normalizadas)")
+        # plt.xlabel("Tempo (s)")
+        # plt.legend()
+        # plt.show()
             
     except Exception as e:
         print(f"Erro ao carregar arquivos: {e}")
@@ -95,42 +95,42 @@ def sync_and_correlate(rppg_path, ppg_path, fs_rppg=25, fs_ppg=62.5):
     # =========================
     # Visualização
     # =========================
-    fig = plt.figure(figsize=(12, 10))
+    # fig = plt.figure(figsize=(12, 10))
     
-    # Subplot 1: Sinais Originais (Normalizados para comparação visual)
-    plt.subplot(4, 1, 1)
-    plt.plot(rppg_norm, label='rPPG (Original)', color='red', alpha=0.6)
-    plt.plot(ppg_norm, label='PPG (Original)', color='blue', alpha=0.6)
-    plt.title("Etapa 1: Sinais Originais (Normalizados e Reamostrados)")
-    plt.legend()
-    plt.grid(True)
+    # # Subplot 1: Sinais Originais (Normalizados para comparação visual)
+    # plt.subplot(4, 1, 1)
+    # plt.plot(rppg_norm, label='rPPG (Original)', color='red', alpha=0.6)
+    # plt.plot(ppg_norm, label='PPG (Original)', color='blue', alpha=0.6)
+    # plt.title("Etapa 1: Sinais Originais (Normalizados e Reamostrados)")
+    # plt.legend()
+    # plt.grid(True)
 
-    # Subplot 2: Resultado da Correlação Cruzada
-    plt.subplot(4, 1, 2)
-    plt.plot(lags, correlation, color='black')
-    plt.axvline(x=best_lag, color='green', linestyle='--', label=f'Melhor Lag: {best_lag}')
-    plt.title("Etapa 2: Correlação Cruzada (Busca pelo atraso ideal)")
-    plt.legend()
-    plt.grid(True)
+    # # Subplot 2: Resultado da Correlação Cruzada
+    # plt.subplot(4, 1, 2)
+    # plt.plot(lags, correlation, color='black')
+    # plt.axvline(x=best_lag, color='green', linestyle='--', label=f'Melhor Lag: {best_lag}')
+    # plt.title("Etapa 2: Correlação Cruzada (Busca pelo atraso ideal)")
+    # plt.legend()
+    # plt.grid(True)
 
-    # Subplot 3: Sinais Sincronizados
-    plt.subplot(4, 1, 3)
-    plt.plot(synced_rppg, label='rPPG Alinhado', color='red')
-    plt.plot(synced_ppg, label='PPG Alinhado', color='blue', linestyle='--')
-    plt.title(f"Etapa 3: Sinais Sincronizados (Lag aplicado: {best_lag})")
-    plt.legend()
-    plt.grid(True)
+    # # Subplot 3: Sinais Sincronizados
+    # plt.subplot(4, 1, 3)
+    # plt.plot(synced_rppg, label='rPPG Alinhado', color='red')
+    # plt.plot(synced_ppg, label='PPG Alinhado', color='blue', linestyle='--')
+    # plt.title(f"Etapa 3: Sinais Sincronizados (Lag aplicado: {best_lag})")
+    # plt.legend()
+    # plt.grid(True)
 
-    # Subplot 4: Gráfico de Dispersão (Scatter Plot) para Pearson
-    plt.subplot(4, 1, 4)
-    plt.scatter(synced_ppg, synced_rppg, alpha=0.3, s=10, color='purple')
-    plt.xlabel("PPG (Contact)")
-    plt.ylabel("rPPG (Remote)")
-    plt.title(f"Resultado Final: Coeficiente de Pearson = {coef_pearson:.4f}")
-    plt.grid(True)
+    # # Subplot 4: Gráfico de Dispersão (Scatter Plot) para Pearson
+    # plt.subplot(4, 1, 4)
+    # plt.scatter(synced_ppg, synced_rppg, alpha=0.3, s=10, color='purple')
+    # plt.xlabel("PPG (Contact)")
+    # plt.ylabel("rPPG (Remote)")
+    # plt.title(f"Resultado Final: Coeficiente de Pearson = {coef_pearson:.4f}")
+    # plt.grid(True)
 
-    plt.tight_layout()
-    plt.show()
+    # plt.tight_layout()
+    # plt.show()
 
     print(f"\n--- Resultados da Análise ({os.path.basename(rppg_path)}) ---")
     print(f"Melhor Lag encontrado: {best_lag} pontos (@ {fs_common} Hz -> {best_lag/fs_common:.3f} s)")
@@ -146,11 +146,11 @@ if __name__ == "__main__":
     # Caminho para o seu arquivo PPG fixo (Ground Truth)
     # PPG_PATH = r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\spo2\original_spo2_L7_16-22-48_16-24-47.txt" 
     # PPG_PATH = r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\spo2\original_spo2_L9_16-05-26_16-07-25.txt" 
-    PPG_PATH = r"C:\Users\sophi\OneDrive\Documentos\rPPG\get_ground_truth\spo2\original_spo2_L9_16-05-26_16-07-25.txt" 
+    PPG_PATH = r"..\get_ground_truth\spo2\original_spo2_L9_16-05-26_16-07-25.txt" 
     
     
     # Pasta contendo os arquivos rPPG (.txt)
-    RPPG_FOLDER = r"C:\Users\sophi\OneDrive\Documentos\rPPG\preliminary_results\L9\bvp" 
+    RPPG_FOLDER = r"..\preliminary_results\L9\bvp" 
     
     # Frequências de amostragem originais
     FS_RPPG = 25      # Câmera (rPPG)

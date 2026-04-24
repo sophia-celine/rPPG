@@ -107,12 +107,12 @@ if __name__ == "__main__":
     # CONFIGURAÇÃO
     # =========================
     # Caminho para a pasta com seus resultados de BVP
-    TARGET_FOLDER = r"C:\Users\Sophia\Documents\rPPG\preliminary_results\vin019\bvp"
+    TARGET_FOLDER = r"..\preliminary_results\L9\bvp"
     # Caminho para o sinal de referência (ex: Ground Truth de outra pasta)
     # REFERENCE_PATH = r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\spo2\original_spo2_L9_16-05-26_16-07-25.txt"
-    REFERENCE_PATH = r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\spo2\original_spo2_L7_16-22-48_16-24-47.txt"
+    REFERENCE_PATH = r"..\get_ground_truth\spo2\original_spo2_L9_16-05-26_16-07-25"
     N_SAMPLES = 1000  # Quantidade de amostras para visualizar 
-    FS = 50          # Frequência de amostragem (FPS da câmera)
+    FS = 25          # Frequência de amostragem (FPS da câmera)
     REF_FS = 62.5    # Frequência do sinal de referência (ex: SpO2)
     SHOW_REF = False
 

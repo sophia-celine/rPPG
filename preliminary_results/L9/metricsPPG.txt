@@ -71,3 +71,35 @@ FFT Pearson (FFT Label): 0.21259760138109357 +/- 0.3989156677559401
 FFT SNR (FFT Label): -1.374289623945184 +/- 0.9377102452398534 (dB)
 Saved OMIT_test_FFT_BlandAltman_ScatterPlot.pdf to runs/exp/test_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendY5F_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
 Saved OMIT_test_FFT_BlandAltman_DifferencePlot.pdf to runs/exp/test_SizeW72_SizeH72_ClipLength180_DataTypeRaw_DataAugNone_LabelTypeRaw_Crop_faceTrue_BackendY5F_Large_boxFalse_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse_unsupervised/bland_altman_plots.
+
+=== DeepPhys pretrained on PURE ===
+Testing uses pretrained model!
+Running model evaluation on the testing dataset!
+100%|█████████████████████████████████████████████| 4/4 [00:06<00:00,  1.72s/it]
+FFT MAE (FFT Label): 10.986328125 +/- 4.987733815384364
+FFT RMSE (FFT Label): 17.880696702734916 +/- 13.929796791502161
+FFT MAPE (FFT Label): 14.03133903133903 +/- 6.316684095847858
+FFT Pearson (FFT Label): -0.022743960887087616 +/- 0.4081426858839048
+FFT SNR (FFT Label): -3.781839582383893 +/- 0.7985395722237265 (dB)
+
+=== DeepPhys pretrained on UBFC-rPPG ===
+100%|█████████████████████████████████████████████| 1/1 [00:02<00:00,  2.67s/it]
+FFT MAE (FFT Label): 9.1552734375 +/- 3.821161515144508
+FFT RMSE (FFT Label): 14.164364945664342 +/- 10.179395398079764
+FFT MAPE (FFT Label): 11.5511803011803 +/- 4.7472950948244215
+FFT Pearson (FFT Label): -0.44561588024319215 +/- 0.36547377636776374
+FFT SNR (FFT Label): -3.0423176555277838 +/- 0.9271720006070715 (dB)
+Saved UBFC-rPPG_DeepPhys_test_FFT_BlandAltman_ScatterPlot.pdf to runs/exp/test_SizeW72_SizeH72_ClipLength180_DataTypeDiffNormalized_Standardized_DataAugNone_LabelTypeDiffNormalized_Crop_faceTrue_BackendHC_Large_boxTrue_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse/bland_altman_plots.
+Saved UBFC-rPPG_DeepPhys_test_FFT_BlandAltman_DifferencePlot.pdf to runs/exp/test_SizeW72_SizeH72_ClipLength180_DataTypeDiffNormalized_Standardized_DataAugNone_LabelTypeDiffNormalized_Crop_faceTrue_BackendHC_Large_boxTrue_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse/bland_altman_plots.
+Saving outputs to: runs/exp/test_SizeW72_SizeH72_ClipLength180_DataTypeDiffNormalized_Standardized_DataAugNone_LabelTypeDiffNormalized_Crop_faceTrue_BackendHC_Large_boxTrue_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse/saved_test_outputs/UBFC-rPPG_DeepPhys_test_outputs.pickle
+
+=== PhysFormer pretrained on UBFC-rPPG ===
+100%|█████████████████████████████████████████████| 1/1 [00:02<00:00,  2.88s/it]
+FFT MAE (FFT Label): 5.126953125 +/- 2.359148936778282
+FFT RMSE (FFT Label): 8.41488668926469 +/- 6.328532982272506
+FFT MAPE (FFT Label): 6.573056573056574 +/- 3.0507494793535717
+FFT Pearson (FFT Label): 0.4785791770835352 +/- 0.35846012592338317
+FFT SNR (FFT Label): -2.1239387135000882 +/- 0.5996709700450775 (dB)
+Saved UBFC-rPPG_PhysFormer_DiffNormalized_test_FFT_BlandAltman_ScatterPlot.pdf to runs/exp/test_SizeW128_SizeH128_ClipLength180_DataTypeDiffNormalized_DataAugNone_LabelTypeDiffNormalized_Crop_faceTrue_BackendHC_Large_boxTrue_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse/bland_altman_plots.
+Saved UBFC-rPPG_PhysFormer_DiffNormalized_test_FFT_BlandAltman_DifferencePlot.pdf to runs/exp/test_SizeW128_SizeH128_ClipLength180_DataTypeDiffNormalized_DataAugNone_LabelTypeDiffNormalized_Crop_faceTrue_BackendHC_Large_boxTrue_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse/bland_altman_plots.
+Saving outputs to: runs/exp/test_SizeW128_SizeH128_ClipLength180_DataTypeDiffNormalized_DataAugNone_LabelTypeDiffNormalized_Crop_faceTrue_BackendHC_Large_boxTrue_Large_size1.5_Dyamic_DetTrue_det_len25_Median_face_boxFalse/saved_test_outputs/UBFC-rPPG_PhysFormer_DiffNormalized_test_outputs.pickle
