@@ -18,7 +18,7 @@ def _next_power_of_2(x):
     """Calculate the nearest power of 2."""
     return 1 if x == 0 else 2 ** (x - 1).bit_length()
 
-def _calculate_fft_hr(ppg_signal, fs=60, low_pass=0.6, high_pass=3.3):
+def estimate_hr_fft(ppg_signal, fs=60, low_pass=0.6, high_pass=3.3):
     # Note: to more closely match results in the NeurIPS 2023 toolbox paper,
     # we recommend low_pass=0.75 and high_pass=2.5 instead of the defaults above.
     """Calculate heart rate based on PPG using Fast Fourier transform (FFT)."""
@@ -69,11 +69,11 @@ def run_evaluation_ppg_fft():
     # =========================
     # Caminho para o TXT do PPG (Ground Truth)
     # ppg_txt = r"C:\Users\sophi\OneDrive\Documentos\rPPG\get_ground_truth\spo2\original_spo2_L7_16-22-48_16-24-47.txt"
-    ppg_txt = r"C:\Users\sophi\OneDrive\Documentos\rPPG\get_ground_truth\spo2\original_spo2_L9_16-05-26_16-07-25.txt"
+    ppg_txt = "/home/soph/rppg/rPPG/get_ground_truth/spo2/sp02wave_L7_16-22-48_16-24-47.txt"
     # Pasta contendo os arquivos txt de predição
-    predictions_folder = r"C:\Users\sophi\OneDrive\Documentos\rPPG\preliminary_results\L9\hr_preds"
+    predictions_folder = "/home/soph/rppg/rPPG/preliminary_results/L7/dl_hr_preds"
     
-    fs = 62.5        # Frequência do sensor SpO2 (PPG)
+    fs = 25        # Frequência do sensor SpO2 (PPG)
     window_sec = 15   # Tamanho da janela em segundos
 
     if not os.path.exists(ppg_txt):
@@ -152,13 +152,26 @@ def run_evaluation_ppg_fft():
         
         if len(y_true_clean) == 0: continue
 
-        mae = mean_absolute_error(y_true_clean, y_pred_clean)
-        rmse = np.sqrt(mean_squared_error(y_true_clean, y_pred_clean))
-        mape = calculate_mape(y_true_clean, y_pred_clean)
-        
+        num_test_samples = len(y_true_clean)
+
+        # Calculate MAE and Standard Error
+        mae = np.mean(np.abs(y_pred_clean - y_true_clean))
+        mae_se = np.std(np.abs(y_pred_clean - y_true_clean)) / np.sqrt(num_test_samples)
+
+        # Calculate RMSE and Standard Error
+        squared_errors = np.square(y_pred_clean - y_true_clean)
+        rmse = np.sqrt(np.mean(squared_errors))
+        rmse_se = np.sqrt(np.std(squared_errors) / np.sqrt(num_test_samples))
+
+        # Calculate MAPE and Standard Error
+        mape = np.mean(np.abs((y_pred_clean - y_true_clean) / y_true_clean)) * 100
+        mape_se = (np.std(np.abs((y_pred_clean - y_true_clean) / y_true_clean)) / np.sqrt(num_test_samples)) * 100
+
         print(f"--- {file_name} vs FFT ---")
-        print(f"  MAE: {mae:.2f} | RMSE: {rmse:.2f} | MAPE: {mape:.2f}%")
-        
+        print("  FFT MAE (FFT Label): {0:.2f} +/- {1:.2f}".format(mae, mae_se))
+        print("  FFT RMSE (FFT Label): {0:.2f} +/- {1:.2f}".format(rmse, rmse_se))
+        print("  FFT MAPE (FFT Label): {0:.2f}% +/- {1:.2f}%".format(mape, mape_se))
+
         # Plot Comparação
         ax_hr = axes_hr[i + 1]
         ax_hr.plot(y_true, label='PPG FFT', marker='o', alpha=0.7, color='green')

@@ -9,11 +9,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-data = loadmat(r"C:\Users\Sophia\Documents\20260423_Coleta Vinicius\20260423_Coleta Vinicius\Coleta01.mat")
+data = loadmat("/home/soph/rppg/rPPG/preliminary_results/vin019/Coleta01.mat")
 print(data.keys())
 ch1 = data['Data1__Stopped__Ch1']
 ch1_struct = ch1[0, 0]
-ecg_data = ch1_struct['values'][1500000:1700000]
+ecg_data = ch1_struct['values'][480000:600000]
 save_ecg = True
 noise_up = False
 video_duration = 120 # seconds
@@ -44,7 +44,7 @@ plot_data = ecg_data[init_idx:end_idx]
 print(plot_data)
 
 df = pd.DataFrame(plot_data)
-if save_ecg: df.to_csv(r'C:\Users\Sophia\Documents\rPPG\get_ground_truth\ECG\vinicius_video023_ecg.csv', index=False)
+if save_ecg: df.to_csv("/home/soph/rppg/rPPG/get_ground_truth/ECG/vinicius_video019_ecg2.csv", index=False)
 
 plot_time = time[init_idx:end_idx]
 

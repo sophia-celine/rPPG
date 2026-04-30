@@ -146,11 +146,11 @@ if __name__ == "__main__":
     # Caminho para o seu arquivo PPG fixo (Ground Truth)
     # PPG_PATH = r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\spo2\original_spo2_L7_16-22-48_16-24-47.txt" 
     # PPG_PATH = r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\spo2\original_spo2_L9_16-05-26_16-07-25.txt" 
-    PPG_PATH = r"..\get_ground_truth\spo2\original_spo2_L9_16-05-26_16-07-25.txt" 
+    PPG_PATH = "/home/soph/rppg/rPPG/get_ground_truth/spo2/original_spo2_L9_16-05-26_16-07-25.txt"
     
     
     # Pasta contendo os arquivos rPPG (.txt)
-    RPPG_FOLDER = r"..\preliminary_results\L9\bvp" 
+    RPPG_FOLDER = "/home/soph/rppg/rPPG/preliminary_results/L9/bvp_dl" 
     
     # Frequências de amostragem originais
     FS_RPPG = 25      # Câmera (rPPG)

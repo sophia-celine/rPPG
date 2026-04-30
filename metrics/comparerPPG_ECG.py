@@ -30,10 +30,10 @@ def run_evaluation():
     # Configuration
     # =========================
     # Path to the ground truth ECG CSV
-    ecg_csv = r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\ECG\vinicius_video023_ecg.csv"
+    ecg_csv = "/home/soph/rppg/rPPG/get_ground_truth/ECG/vinicius_video019_ecg2.csv"
     noisy_ecg = False
     # Folder containing the 7 prediction txt files
-    predictions_folder = r"C:\Users\Sophia\Documents\rPPG\preliminary_results\vin023\hr_preds"
+    predictions_folder = "/home/soph/rppg/rPPG/preliminary_results/vin019/dl_hr_preds"
     
     fs = 1000         # Sample rate of the input ECG
     window_sec = 15   # Window size in seconds
