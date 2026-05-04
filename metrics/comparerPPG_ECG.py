@@ -30,10 +30,10 @@ def run_evaluation():
     # Configuration
     # =========================
     # Path to the ground truth ECG CSV
-    ecg_csv = "/home/soph/rppg/rPPG/get_ground_truth/ECG/vinicius_video019_ecg2.csv"
+    ecg_csv = "/home/soph/rppg/rPPG/get_ground_truth/ECG/vinicius_video023_ecg.csv"
     noisy_ecg = False
     # Folder containing the 7 prediction txt files
-    predictions_folder = "/home/soph/rppg/rPPG/preliminary_results/vin019/dl_hr_preds"
+    predictions_folder = "/home/soph/rppg/rPPG/preliminary_results/vin023/dl_hr_preds"
     
     fs = 1000         # Sample rate of the input ECG
     window_sec = 15   # Window size in seconds
@@ -57,6 +57,9 @@ def run_evaluation():
     # =========================
     print(f"Loading ECG data from: {ecg_csv}")
     sig = hp.get_data(ecg_csv)
+    # wd, m = hp.process(sig[15000:45000], sample_rate=fs)
+    # hp.plotter(wd, m)
+    
     if noisy_ecg:
         # Optionally plot the filtered ECG if noisy_ecg is True
         plt.figure(figsize=(12,3))
