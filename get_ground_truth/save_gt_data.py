@@ -24,10 +24,10 @@ def save_gt_data():
     # L7 - 16:22:48 - 16:24:47
     # L8 - 16:45:38 - 16:47:38
     # Substitua pelo caminho do seu arquivo HDF5
-    file_path = "../pilot/ground_truth/10.10.10.129_20251211_16.h5"
-    HORA_INICIO = "16:44:38"
-    HORA_FIM = "16:47:38"
-    LEITO = "L8"
+    file_path = "../pilot/ground_truth/10.10.10.140_20251211_16.h5"
+    HORA_INICIO = "16:22:48"
+    HORA_FIM = "16:24:47"
+    LEITO = "L7"
     n_points = 2997
     hora_inicio = HORA_INICIO.replace(':', '-')
     hora_fim = HORA_FIM.replace(':', '-')

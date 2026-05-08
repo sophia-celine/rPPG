@@ -29,11 +29,14 @@ def run_evaluation():
     # =========================
     # Configuration
     # =========================
-    # Path to the ground truth ECG CSV
-    ecg_csv = "/home/soph/rppg/rPPG/get_ground_truth/ECG/vinicius_video023_ecg.csv"
-    noisy_ecg = False
+    # Path to the ground truth ECG CSV 
+    ecg_csv = "/home/soph/rppg/rPPG/get_ground_truth/ECG/vinicius_video019_ecg2.csv"
+    # Define se os gráficos do ECG (sinal e HR baseline) serão exibidos
+    SHOW_ECG_PLOT = False
+    # Define o número de colunas nos gráficos de subplots
+    PLOT_COLS = 2
     # Folder containing the 7 prediction txt files
-    predictions_folder = "/home/soph/rppg/rPPG/preliminary_results/vin023/dl_hr_preds"
+    predictions_folder = "/home/soph/rppg/rPPG/preliminary_results/vin019/hr_preds"
     
     fs = 1000         # Sample rate of the input ECG
     window_sec = 15   # Window size in seconds
@@ -57,18 +60,20 @@ def run_evaluation():
     # =========================
     print(f"Loading ECG data from: {ecg_csv}")
     sig = hp.get_data(ecg_csv)
-    # wd, m = hp.process(sig[15000:45000], sample_rate=fs)
-    # hp.plotter(wd, m)
     
-    if noisy_ecg:
-        # Optionally plot the filtered ECG if noisy_ecg is True
+    # Sempre filtra o sinal para garantir qualidade na estimativa da FC
+    filtered_sig = filter_ecg(sig, sample_rate=fs)
+
+    if SHOW_ECG_PLOT:
+        # Plot do sinal ECG original e filtrado
         plt.figure(figsize=(12,3))
         plt.title('Sinal ECG Original e Filtrado (Baseline Wander Removido)')
         plt.plot(sig, label='Original', alpha=0.7)
-        sig = filter_ecg(sig, sample_rate=fs)
-        plt.plot(sig, label='Filtrado', color='red')
+        plt.plot(filtered_sig, label='Filtrado', color='red')
         plt.legend()
         plt.show()
+    
+    sig = filtered_sig
     
     window_len = int(window_sec * fs)
     n_windows = len(sig) // window_len
@@ -83,23 +88,26 @@ def run_evaluation():
     ecg_hr_values = np.array(ecg_hr_values)
 
     # Figura 1: Comparação de FC (Ground Truth + Métodos)
-    num_hr = 1 + len(txt_files)
-    rows_hr = int(np.ceil(num_hr / 2))
-    fig_hr, axes_hr = plt.subplots(rows_hr, 2, figsize=(16, 4 * rows_hr))
+    num_hr = (1 if SHOW_ECG_PLOT else 0) + len(txt_files)
+    rows_hr = int(np.ceil(num_hr / PLOT_COLS))
+    fig_hr, axes_hr = plt.subplots(rows_hr, PLOT_COLS, figsize=(7 * PLOT_COLS, 4 * rows_hr), squeeze=False)
     axes_hr = axes_hr.flatten()
 
     # Figura 2: Erro Absoluto por Janela
     num_err = len(txt_files)
-    rows_err = int(np.ceil(num_err / 2))
-    fig_err, axes_err = plt.subplots(rows_err, 2, figsize=(16, 4 * rows_err))
+    rows_err = int(np.ceil(num_err / PLOT_COLS))
+    fig_err, axes_err = plt.subplots(rows_err, PLOT_COLS, figsize=(7 * PLOT_COLS, 4 * rows_err), squeeze=False)
     axes_err = axes_err.flatten()
     
-    # Plot do Ground Truth na Figura de FC
-    axes_hr[0].plot(ecg_hr_values, marker='o', linestyle='-', markersize=4, color='black', label='ECG Ground Truth')
-    axes_hr[0].set_title('ECG')
-    axes_hr[0].set_ylabel('Frequência cardíaca (bpm)')
-    axes_hr[0].set_xlabel('Janela de Amostragem')
-    axes_hr[0].grid(True)
+    hr_plot_offset = 0
+    if SHOW_ECG_PLOT:
+        # Plot do Ground Truth na Figura de FC
+        axes_hr[0].plot(ecg_hr_values, marker='o', linestyle='-', markersize=4, color='black', label='ECG Ground Truth')
+        axes_hr[0].set_title('ECG')
+        axes_hr[0].set_ylabel('Frequência cardíaca (bpm)')
+        axes_hr[0].set_xlabel('Janela de Amostragem')
+        axes_hr[0].grid(True)
+        hr_plot_offset = 1
     
     # =========================
     # 2. Compare with Prediction Files
@@ -154,7 +162,7 @@ def run_evaluation():
         print(f"  MAPE: {mape:.2f}%")
         
         # Plot de comparação de FC na Figura 1
-        ax_hr = axes_hr[i + 1]
+        ax_hr = axes_hr[i + hr_plot_offset]
         ax_hr.plot(y_true, label='ECG', marker='o', linestyle='-', markersize=3, alpha=0.7)
         ax_hr.plot(y_pred, label='rPPG', marker='x', linestyle='--', markersize=3, alpha=0.9)
         ax_hr.set_title(f"{os.path.splitext(file_name)[0].split('_')[1]}")

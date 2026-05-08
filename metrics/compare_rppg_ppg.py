@@ -150,7 +150,7 @@ if __name__ == "__main__":
     
     
     # Pasta contendo os arquivos rPPG (.txt)
-    RPPG_FOLDER = "/home/soph/rppg/rPPG/preliminary_results/L9/bvp_dl" 
+    RPPG_FOLDER = "/home/soph/rppg/rPPG/preliminary_results/examples" 
     
     # Frequências de amostragem originais
     FS_RPPG = 25      # Câmera (rPPG)
@@ -158,17 +158,8 @@ if __name__ == "__main__":
 
     # Geração de dados sintéticos para demonstração (caso os arquivos não existam)
     if not os.path.exists(PPG_PATH):
-        print("Arquivos não encontrados. Criando dados sintéticos para demonstração...")
-        t = np.linspace(0, 10, 300)
-        sig_ppg = np.sin(2 * np.pi * 1.2 * t) + np.random.normal(0, 0.1, 300)
-        np.savetxt(PPG_PATH, sig_ppg)
-        
-        if not os.path.exists(RPPG_FOLDER):
-            os.makedirs(RPPG_FOLDER)
-            for i in range(3):
-                shift = 0.2 * (i + 1)
-                sig_rppg = np.sin(2 * np.pi * 1.2 * (t - shift))[:250-i*10] + np.random.normal(0, 0.1*(i+1), 250-i*10)
-                np.savetxt(os.path.join(RPPG_FOLDER, f"rppg_metodo_{i+1}.txt"), sig_rppg)
+        print("Arquivos não encontrados. ")
+    
 
     # =========================
     # PROCESSAMENTO EM LOTE
@@ -210,14 +201,18 @@ if __name__ == "__main__":
                 ax = axes[i]
                 # Plotamos um trecho (ex: primeiros 10 segundos na fs_common) para melhor visibilidade
                 fs_common = max(FS_RPPG, FS_PPG)
-                limit = int(10 * fs_common) # Ajuste esse valor para ver mais ou menos tempo
+                limit = int(10 * fs_common)
+
+                # Criar vetor de tempo para o trecho selecionado
+                actual_limit = min(limit, len(res['ppg']))
+                time_axis = np.arange(actual_limit) / fs_common
                 
-                ax.plot(res['ppg'][:limit], label='PPG (Ground Truth)', color='blue', alpha=0.6)
-                ax.plot(res['rppg'][:limit], label='rPPG (Sincronizado)', color='red', alpha=0.8)
+                ax.plot(time_axis, res['ppg'][:actual_limit], label='PPG', color='blue', alpha=0.6)
+                ax.plot(time_axis, res['rppg'][:actual_limit], label='rPPG (Sincronizado)', color='red', alpha=0.8)
                 
                 ax.set_title(f"{res['name']}\nPearson: {res['pearson']:.4f}")
-                ax.set_xlabel("Amostras")
-                ax.set_ylabel("Amplitude (Z-score)")
+                ax.set_xlabel("Tempo (s)")
+                ax.set_ylabel("Amplitude normalizada")
                 ax.legend(fontsize='small')
                 ax.grid(True, linestyle='--', alpha=0.5)
 

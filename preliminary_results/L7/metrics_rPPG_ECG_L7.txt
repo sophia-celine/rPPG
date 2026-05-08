@@ -26,3 +26,44 @@
   MAE:  27.03 BPM
   RMSE: 33.62 BPM
   MAPE: 25.74%
+  
+  --- HR_PhysFormerPURE.txt ---
+  MAE:  16.97 BPM
+  RMSE: 26.69 BPM
+  MAPE: 16.43%
+--- HR_PhysFormerUBFC-rPPG.txt ---
+  MAE:  40.54 BPM
+  RMSE: 41.43 BPM
+  MAPE: 38.67%
+--- HR_EfficientPhysPURE.txt ---
+  MAE:  45.47 BPM
+  RMSE: 46.69 BPM
+  MAPE: 43.43%
+--- HR_PhysNetUBFC-rPPG.txt ---
+  MAE:  26.20 BPM
+  RMSE: 29.30 BPM
+  MAPE: 25.10%
+--- HR_TSCAN-UBFC-rPPG.txt ---
+  MAE:  33.15 BPM
+  RMSE: 36.16 BPM
+  MAPE: 31.72%
+--- HR_PhysNetPURE.txt ---
+  MAE:  33.15 BPM
+  RMSE: 36.16 BPM
+  MAPE: 31.72%
+--- HR_EfficientPhysUBFC-rPPG.txt ---
+  MAE:  48.49 BPM
+  RMSE: 49.84 BPM
+  MAPE: 46.33%
+--- HR_DeepPhysPURE.txt ---
+  MAE:  51.00 BPM
+  RMSE: 51.35 BPM
+  MAPE: 48.77%
+--- HR_DeepPhysUBFC-rPPG.txt ---
+  MAE:  50.16 BPM
+  RMSE: 51.83 BPM
+  MAPE: 47.81%
+--- HR_TSCAN-PURE.txt ---
+  MAE:  50.16 BPM
+  RMSE: 53.07 BPM
+  MAPE: 47.87%
