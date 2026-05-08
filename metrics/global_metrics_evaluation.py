@@ -186,7 +186,7 @@ def run_global_evaluation(patients_config, window_sec=15):
 
     if patient_errors_data:
         num_patients = len(patients_config)
-        cols_plot = 3
+        cols_plot = 2
         rows_plot = int(np.ceil(num_patients / cols_plot))
 
         fig_mae_per_window, axes_mae_per_window = plt.subplots(
@@ -196,7 +196,7 @@ def run_global_evaluation(patients_config, window_sec=15):
 
         for p_idx, patient_data_entry in patient_errors_data.items():
             ax = axes_mae_per_window[p_idx]
-            patient_label = f"Paciente {patient_data_entry['id']} (Métodos {patient_data_entry['type']})"
+            patient_label = f"{patient_data_entry['id']} (Métodos {patient_data_entry['type']})"
             patient_methods_data = patient_data_entry['methods']
 
             max_window_idx_for_patient = -1
@@ -248,47 +248,47 @@ if __name__ == "__main__":
     # =========================================================
     DATA_CONFIG = [
         {
-            "patient_name": "3",
-            "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/ecg_signal_L8_16-45-38_16-47-38.csv",
-            "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/L8/dl_hr_preds",
-            "fs": 250,
+            "patient_name": "Vídeo 1",
+            "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/vinicius_video019_ecg2.csv",
+            "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/vin019/dl_hr_preds",
+            "fs": 1000,
             "type": "supervisionados"
         },
         {
-            "patient_name": "2",
-            "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/ecg_signal_L9_16-05-26_16-07-25.csv",
-            "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/L9/dl_hr_preds",
-            "fs": 250,
+            "patient_name": "Vídeo 2",
+            "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/vinicius_video023_ecg.csv",
+            "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/vin023/dl_hr_preds",
+            "fs": 1000,
             "type": "supervisionados"
         },
+        # {
+        #     "patient_name": "1",
+        #     "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/ecg_signal_L7_16-22-48_16-24-47.csv",
+        #     "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/L7/dl_hr_preds",
+        #     "fs": 250,
+        #     "type": "supervisionados"
+        # },
         {
-            "patient_name": "1",
-            "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/ecg_signal_L7_16-22-48_16-24-47.csv",
-            "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/L7/dl_hr_preds",
-            "fs": 250,
-            "type": "supervisionados"
-        },
-        {
-            "patient_name": "3",
-            "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/ecg_signal_L8_16-45-38_16-47-38.csv",
-            "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/L8/hr_preds",
-            "fs": 250,
+            "patient_name": "Vídeo 1",
+            "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/vinicius_video019_ecg2.csv",
+            "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/vin019/hr_preds",
+            "fs": 1000,
             "type": "não supervisionados"
         },
         {
-            "patient_name": "2",
-            "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/ecg_signal_L9_16-05-26_16-07-25.csv",
-            "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/L9/hr_preds",
-            "fs": 250,
+            "patient_name": "Vídeo 2",
+            "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/vinicius_video023_ecg.csv",
+            "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/vin023/hr_preds",
+            "fs": 1000,
             "type": "não supervisionados"
         },
-        {
-            "patient_name": "1",
-            "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/ecg_signal_L7_16-22-48_16-24-47.csv",
-            "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/L7/hr_preds",
-            "fs": 250,
-            "type": "não supervisionados"
-        },
+        # {
+        #     "patient_name": "1",
+        #     "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/ecg_signal_L7_16-22-48_16-24-47.csv",
+        #     "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/L7/hr_preds",
+        #     "fs": 250,
+        #     "type": "não supervisionados"
+        # },
     ]
     
     # Tamanho da janela (deve ser o mesmo usado na geração das predições)

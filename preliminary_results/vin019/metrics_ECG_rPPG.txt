@@ -2,30 +2,37 @@
   MAE:  1.86 BPM
   RMSE: 2.35 BPM
   MAPE: 2.56%
+  SNR:  0.39 dB
 --- HR_CHROM.txt ---
   MAE:  3.11 BPM
   RMSE: 4.67 BPM
   MAPE: 4.23%
+  SNR:  0.71 dB
 --- HR_OMIT.txt ---
   MAE:  1.86 BPM
   RMSE: 2.35 BPM
   MAPE: 2.56%
+  SNR:  0.21 dB
 --- HR_POS.txt ---
   MAE:  1.86 BPM
   RMSE: 2.35 BPM
   MAPE: 2.56%
+  SNR:  1.49 dB
 --- HR_ICA.txt ---
   MAE:  1.69 BPM
   RMSE: 2.25 BPM
   MAPE: 2.32%
+  SNR:  4.74 dB
 --- HR_GREEN.txt ---
   MAE:  8.85 BPM
   RMSE: 11.73 BPM
   MAPE: 12.18%
+  SNR:  -6.40 dB
 --- HR_PBV.txt ---
   MAE:  2.03 BPM
   RMSE: 2.46 BPM
   MAPE: 2.79%
+  SNR:  -2.44 dB
   
   --- HR_PhysFormerPURE.txt ---
   MAE:  2.34 BPM
