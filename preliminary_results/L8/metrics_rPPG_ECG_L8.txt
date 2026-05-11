@@ -1,69 +1,86 @@
---- HR_CHROM.txt ---
-  MAE:  3.68 BPM
-  RMSE: 6.34 BPM
-  MAPE: 4.26%
---- HR_GREEN.txt ---
-  MAE:  24.56 BPM
-  RMSE: 27.44 BPM
-  MAPE: 27.00%
---- HR_ICA.txt ---
-  MAE:  18.52 BPM
-  RMSE: 21.53 BPM
-  MAPE: 20.26%
 --- HR_LGI.txt ---
-  MAE:  2.63 BPM
-  RMSE: 5.00 BPM
-  MAPE: 3.07%
+  MAE:  2.59 BPM
+  RMSE: 4.99 BPM
+  MAPE: 3.02%
+  SNR:  -2.51 dB
+--- HR_CHROM.txt ---
+  MAE:  3.65 BPM
+  RMSE: 6.34 BPM
+  MAPE: 4.22%
+  SNR:  0.07 dB
 --- HR_OMIT.txt ---
-  MAE:  4.54 BPM
-  RMSE: 8.00 BPM
-  MAPE: 5.16%
---- HR_PBV.txt ---
-  MAE:  2.84 BPM
-  RMSE: 5.06 BPM
-  MAPE: 3.29%
+  MAE:  4.49 BPM
+  RMSE: 7.99 BPM
+  MAPE: 5.11%
+  SNR:  -4.03 dB
 --- HR_POS.txt ---
-  MAE:  2.63 BPM
-  RMSE: 5.00 BPM
-  MAPE: 3.07%
+  MAE:  2.59 BPM
+  RMSE: 4.99 BPM
+  MAPE: 3.02%
+  SNR:  1.51 dB
+--- HR_ICA.txt ---
+  MAE:  18.56 BPM
+  RMSE: 21.59 BPM
+  MAPE: 20.30%
+  SNR:  -7.68 dB
+--- HR_GREEN.txt ---
+  MAE:  24.60 BPM
+  RMSE: 27.50 BPM
+  MAPE: 27.02%
+  SNR:  -10.80 dB
+--- HR_PBV.txt ---
+  MAE:  2.80 BPM
+  RMSE: 5.05 BPM
+  MAPE: 3.25%
+  SNR:  -1.41 dB
 
-  --- HR_PhysFormerPURE.txt ---
+--- HR_PhysFormerPURE.txt ---
   MAE:  8.25 BPM
   RMSE: 15.92 BPM
   MAPE: 9.08%
+  SNR:  -2.56 dB
 --- HR_PhysFormerUBFC-rPPG.txt ---
   MAE:  8.53 BPM
   RMSE: 14.37 BPM
   MAPE: 9.42%
+  SNR:  -1.96 dB
 --- HR_EfficientPhysPURE.txt ---
   MAE:  6.82 BPM
   RMSE: 13.82 BPM
   MAPE: 7.52%
+  SNR:  -0.87 dB
 --- HR_PhysNetUBFC-rPPG.txt ---
   MAE:  17.86 BPM
   RMSE: 23.15 BPM
   MAPE: 19.59%
+  SNR:  -5.36 dB
 --- HR_TSCAN-UBFC-rPPG.txt ---
   MAE:  16.61 BPM
   RMSE: 22.73 BPM
   MAPE: 18.59%
+  SNR:  -3.96 dB
 --- HR_PhysNetPURE.txt ---
   MAE:  1.20 BPM
   RMSE: 1.87 BPM
   MAPE: 1.38%
+  SNR:  -1.66 dB
 --- HR_EfficientPhysUBFC-rPPG.txt ---
   MAE:  6.82 BPM
   RMSE: 13.82 BPM
   MAPE: 7.52%
+  SNR:  -1.61 dB
 --- HR_DeepPhysPURE.txt ---
   MAE:  29.52 BPM
   RMSE: 34.72 BPM
   MAPE: 32.99%
+  SNR:  -6.25 dB
 --- HR_DeepPhysUBFC-rPPG.txt ---
   MAE:  18.72 BPM
   RMSE: 25.62 BPM
   MAPE: 21.06%
+  SNR:  -3.07 dB
 --- HR_TSCAN-PURE.txt ---
   MAE:  17.62 BPM
   RMSE: 24.35 BPM
   MAPE: 19.47%
+  SNR:  -4.96 dB

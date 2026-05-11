@@ -76,18 +76,20 @@ def run_evaluation():
     # Configuration
     # =========================
     # Path to the ground truth ECG CSV 
-    ecg_csv = "/home/soph/rppg/rPPG/get_ground_truth/ECG/vinicius_video019_ecg2.csv"
+    ecg_csv = "/home/soph/rppg/rPPG/get_ground_truth/ECG/ecg_signal_L8_16-45-38_16-47-38.csv"
     # Define se os gráficos do ECG (sinal e HR baseline) serão exibidos
-    SHOW_ECG_PLOT = False
+    SHOW_ECG_PLOT = True
     # Define o número de colunas nos gráficos de subplots
     PLOT_COLS = 2
     # Folder containing the 7 prediction txt files
-    predictions_folder = "/home/soph/rppg/rPPG/preliminary_results/vin019/dl_hr_preds"
+    predictions_folder = "/home/soph/rppg/rPPG/preliminary_results/L8/dl_hr_preds"
     # Folder containing the raw BVP signals (waveforms) for SNR calculation
-    bvp_signals_folder = "/home/soph/rppg/rPPG/preliminary_results/vin019/bvp_dl"
+    bvp_signals_folder = "/home/soph/rppg/rPPG/preliminary_results/L8/bvp_dl"
+
+    DL_analysis = True
     
-    fs_ecg = 1000      # Sample rate of the input ECG
-    fs_camera = 50     # FPS do vídeo/rPPG
+    fs_ecg = 250      # Sample rate of the input ECG
+    fs_camera = 25     # FPS do vídeo/rPPG
     window_sec = 15    # Window size in seconds
 
     if not os.path.exists(ecg_csv):
@@ -202,8 +204,11 @@ def run_evaluation():
         
         # --- Cálculo de SNR ---
         avg_snr = np.nan
-        bvp_file = os.path.join(bvp_signals_folder, f"BVP_{method_name}_subject1.txt")
-        print(bvp_file)
+        if DL_analysis:
+            bvp_file = os.path.join(bvp_signals_folder, f"BVP_{method_name}_subject1.txt")
+        else:
+            bvp_file = os.path.join(bvp_signals_folder, f"BVP_{method_name}_0_0.txt")
+        # print(bvp_file)
         if os.path.exists(bvp_file):
             # print('found bvp file')
             try:
