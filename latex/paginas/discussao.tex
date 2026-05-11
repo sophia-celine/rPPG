@@ -1,0 +1,32 @@
+\chapter{Discussão}
+
+Com base no que foi disposto, verifica-se que a extração de sinais de fotopletismografia remota em vídeos de pacientes internados em Unidades de Terapia Intensiva
+pode ser realizada por meio de métodos baseados em algoritmos e modelos matemáticos, denominados métodos não supervisionados, bem como pode ser realizada por meio
+de modelos baseados em aprendizado profundo, referidos como métodos supervisionados. Esses métodos resultam em uma onda de pulso de volume sanguíneo a qual possui 
+correspondência identificável com o sinal de fotopletismografia convencional e a partir da qual pode-se estimar valores de frequência cardíaca. No entanto, 
+artefatos de iluminação e de movimento impactam de forma significativa na qualidade do sinal extraído, como foi possível verificar a partir dos resultados da 
+coleta de validação, na qual as estimativas de frequência cardíaca extraídas do vídeo com maior incidência desses elementos apresentaram maior discrepância em 
+relação aos valores de referência obtidos por meio do eletrocardiograma. 
+
+Além disso, o sinal obtido é influenciado pela detecção e rastreamento da região de interesse, o que foi verificado no processamento dos dados da coleta preliminar. Nesse caso,
+o sinal extraído a partir do vídeo do paciente 1 apresentou um baixo índice de correlação com o sinal de fotopletismografia de referência, bem como as estimativas
+de frequência cardíaca realizadas resultaram nos maiores valores de erro médio absoluto entre todos os resultados. Isso pode ser explicado devido ao fato de que
+a ferramenta de detecção de face utilizada não reconheceu o rosto do paciente, possivelmente devido à oclusão significativa dessa região, em decorrência da
+presença de equipamentos de suporte ventilatório. Assim, para todos os métodos, foram utilizados os quadros completos do vídeo como entrada, o que gera o aumento
+da incidência de elementos de ruído e, consequentemente, a degradação do sinal, o que é atenuado quando apenas a região de interesse é introduzida aos modelos. Observa-se, 
+ainda, que, nesse caso, o sinal de PPG de referência difere da forma de onda fotopletismográfica convencional esperada, o que pode decorrer da influência de fatores
+fisiológicos relacionados à condição clínica do paciente, de modo que a comparação com o sinal obtido remotamente torna-se dificultada. 
+
+
+ 
+
+Usar o ruído no ECG para sincronização de dados funciona e será usado na coleta definitiva
+
+
+Vídeos em que houve maior movimentação e mudança de iluminação apresentaram erro maior em todos os métodos, a exemplo do segundo vídeo da coleta de validação 
+que tem mais movimento que o primeiro e tem erro maior. Além disso, a análise do erro por janela também mostra erros maiores em janelas que contém mudanças de 
+posição ou de iluminação no vídeo, o que reflete a influência significativa desses fatores mesmo nos métodos que 
+
+Os modelos de DL treinados em diferentes datasets geraram resultados de métricas de erro significativamente diferentes. 
+
+
