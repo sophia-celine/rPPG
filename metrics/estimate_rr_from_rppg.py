@@ -1,18 +1,32 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.signal import find_peaks, butter, filtfilt
+from scipy.signal import find_peaks, butter, filtfilt, welch
 from scipy.interpolate import interp1d
 
 # =========================================================
 # CONFIGURAÇÕES GLOBAIS
 # =========================================================
 FS_RPPG = 25.0        # Frequência de amostragem original (Câmera)
+FS_REF = 125.0        # Frequência de amostragem do sinal de referência (Impedância)
 FS_RESAMP = 4.0       # Frequência de re-amostragem das modulações (Hz)
 WINDOW_SEC = 30       # Tamanho da janela de análise (Segundos)
 RR_MIN_BPM = 4.0      # Frequência respiratória mínima (BPM)
 RR_MAX_BPM = 65.0     # Frequência respiratória máxima (BPM)
 SD_THRESHOLD = 4.0    # Limite de desvio padrão para fusão robusta (BPM)
+
+# Configurações de visualização
+PLOT_CONFIG = {
+    'rr_estimates': True,  # Estimativas de RR por janela
+    'sig_bw': False,        # Sinal temporal da modulação BW
+    'sig_am': False,        # Sinal temporal da modulação AM
+    'sig_fm': False,        # Sinal temporal da modulação FM
+    'psd_bw': True,        # Espectro de potência (PSD) da modulação BW
+    'psd_am': True,        # Espectro de potência (PSD) da modulação AM
+    'psd_fm': True,        # Espectro de potência (PSD) da modulação FM
+    'error_per_window': True, # Erro absoluto por janela comparando modulações
+    'psd_ref': True        # Espectro de potência (PSD) do sinal de referência
+}
 
 def butter_bandpass(data, lowcut, highcut, fs, order=4):
     """Aplica filtro Butterworth para isolar a banda do pulso."""
@@ -74,6 +88,34 @@ def estimate_rr_fft(sig, fs):
     peak_idx = np.argmax(mag[mask])
     return freqs[mask][peak_idx] * 60
 
+def calculate_metrics(y_true, y_pred):
+    """Calcula MAE, RMSE e MAPE ignorando NaNs."""
+    mask = ~np.isnan(y_true) & ~np.isnan(y_pred)
+    y_t = np.array(y_true)[mask]
+    y_p = np.array(y_pred)[mask]
+    if len(y_t) == 0:
+        return np.nan, np.nan, np.nan
+    mae = np.mean(np.abs(y_t - y_p))
+    rmse = np.sqrt(np.mean((y_t - y_p)**2))
+    mape = np.mean(np.abs((y_t - y_p) / y_t)) * 100
+    return mae, rmse, mape
+
+def process_reference_signal(file_path, fs_ref):
+    """Lê o arquivo de referência e calcula RR por janelas de 30s."""
+    try:
+        sig = np.loadtxt(file_path)
+        if sig.ndim > 1:
+            sig = sig[0, :] if sig.shape[0] < sig.shape[1] else sig[:, 0]
+    except Exception as e:
+        print(f"Erro ao ler referência {file_path}: {e}")
+        return None, None
+
+    win_samples = int(WINDOW_SEC * fs_ref)
+    n_windows = len(sig) // win_samples
+    ref_rr = [estimate_rr_fft(sig[i*win_samples : (i+1)*win_samples], fs_ref) 
+              for i in range(n_windows)]
+    return np.array(ref_rr), sig
+
 def process_rppg_file(file_path):
     """Processa um arquivo individual e extrai as sequências de RR."""
     try:
@@ -87,7 +129,10 @@ def process_rppg_file(file_path):
     win_samples = int(WINDOW_SEC * FS_RPPG)
     n_windows = len(signal) // win_samples
     
-    results = {'bw': [], 'am': [], 'fm': [], 'fusion': [], 'is_reliable': []}
+    results = {
+        'bw': [], 'am': [], 'fm': [], 'fusion': [], 'is_reliable': [],
+        'sig_bw': [], 'sig_am': [], 'sig_fm': []
+    }
     
     for i in range(n_windows):
         seg = signal[i*win_samples : (i+1)*win_samples]
@@ -115,6 +160,10 @@ def process_rppg_file(file_path):
         # 3. Frequência (FM) - Algoritmo de Berger
         fm_t = t_orig[p_idx]
         _, sig_fm = berger_algorithm(fm_t, FS_RESAMP, WINDOW_SEC)
+
+        results['sig_bw'].append(sig_bw)
+        results['sig_am'].append(sig_am)
+        results['sig_fm'].append(sig_fm)
         
         # --- Estimativa Espectral (FFT) ---
         rr_bw = estimate_rr_fft(sig_bw, FS_RESAMP)
@@ -133,48 +182,200 @@ def process_rppg_file(file_path):
             results['is_reliable'].append(std_rr < SD_THRESHOLD)
         else:
             for k in results: results[k].append(np.nan)
-        print(results)
+
+    # Concatenar sinais para plotagem temporal
+    for k in ['sig_bw', 'sig_am', 'sig_fm']:
+        if results[k]:
+            results[k] = np.concatenate(results[k])
+        else:
+            results[k] = np.array([])
 
     return results
 
-def run_batch_analysis(folder_path):
-    """Varre a pasta e gera os gráficos comparativos."""
+def run_batch_analysis(folder_path, ref_path=None):
+    """Varre a pasta e gera os gráficos em subplots."""
     if not os.path.exists(folder_path):
         print(f"Erro: Pasta {folder_path} não encontrada.")
         return
         
     files = sorted([f for f in os.listdir(folder_path) if f.endswith('.txt')])
-    
+    all_results = []
+
+    print(f"Processando {len(files)} arquivos...")
     for f in files:
-        res = process_file_data = process_rppg_file(os.path.join(folder_path, f))
-        if not res or len(res['fusion']) == 0: continue
+        res = process_rppg_file(os.path.join(folder_path, f))
+        if res and len(res['fusion']) > 0:
+            all_results.append((f, res))
+
+    if not all_results:
+        print("Nenhum resultado válido processado.")
+        return
+
+    ref_rr = None
+    ref_sig = None
+    if ref_path:
+        print(f"Processando sinal de referência: {ref_path}")
+        ref_rr, ref_sig = process_reference_signal(ref_path, FS_REF)
+
+    num_methods = len(all_results)
+    cols = 2
+    rows = int(np.ceil(num_methods / cols))
+
+    plots = {}
+    def setup_fig(key, title):
+        if PLOT_CONFIG.get(key):
+            fig, axes = plt.subplots(rows, cols, figsize=(16, 4 * rows), squeeze=False)
+            fig.suptitle(title, fontsize=16)
+            plots[key] = (fig, axes.flatten())
+
+    setup_fig('rr_estimates', 'Estimativas de Frequência Respiratória (RR) por Janela')
+    setup_fig('sig_bw', 'Sequências de Modulação de Linha de Base (BW)')
+    setup_fig('sig_am', 'Sequências de Modulação de Amplitude (AM)')
+    setup_fig('sig_fm', 'Sequências de Modulação de Frequência (FM)')
+    setup_fig('psd_bw', 'Espectro de Potência (PSD) - Modulação BW')
+    setup_fig('psd_am', 'Espectro de Potência (PSD) - Modulação AM')
+    setup_fig('psd_fm', 'Espectro de Potência (PSD) - Modulação FM')
+    setup_fig('error_per_window', 'Erro Absoluto por Janela (BPM) - Comparação de Modulações')
+
+    for i, (filename, res) in enumerate(all_results):
+        method_name = filename.split('_')[1] if '_' in filename else filename
+
+        # Plot Figura 1 (RR por janela)
+        if 'rr_estimates' in plots:
+            ax1 = plots['rr_estimates'][1][i]
+            wins = np.arange(len(res['fusion']))
+            ax1.plot(wins, res['bw'], 'g--', alpha=0.4, label='BW')
+            ax1.plot(wins, res['am'], 'b--', alpha=0.4, label='AM')
+            ax1.plot(wins, res['fm'], 'r--', alpha=0.4, label='FM')
+
+            fusion = np.array(res['fusion'])
+            reliable = np.array(res['is_reliable'], dtype=bool)
+            ax1.scatter(wins[reliable], fusion[reliable], color='black', s=30, label='Fusão (OK)')
+            ax1.scatter(wins[~reliable], fusion[~reliable], color='red', marker='x', label='Fusão (Instável)')
+            ax1.plot(wins, fusion, 'k-', alpha=0.2)
+
+            # Plot da Referência e Cálculo de Métricas
+            title_metrics = ""
+            if ref_rr is not None:
+                min_len = min(len(res['fusion']), len(ref_rr))
+                ax1.plot(np.arange(min_len), ref_rr[:min_len], 'k-', linewidth=1.5, label='GT (Ref)', alpha=0.7)
+                
+                mae, rmse, mape = calculate_metrics(ref_rr[:min_len], fusion[:min_len])
+                title_metrics = f"\nMAE:{mae:.1f} RMSE:{rmse:.1f} MAPE:{mape:.1f}%"
+
+            ax1.set_title(f"RR: {method_name}{title_metrics}")
+            ax1.set_ylabel("RPM")
+            ax1.set_ylim(RR_MIN_BPM - 5, RR_MAX_BPM + 5)
+            ax1.legend(loc='upper right', fontsize='x-small', ncol=2)
+            ax1.grid(True, alpha=0.3)
+
+        # Plot Modulação BW (Figura 2)
+        norm = lambda x: (x - np.mean(x)) / np.std(x) if len(x) > 0 else x
         
-        wins = np.arange(len(res['fusion']))
-        plt.figure(figsize=(12, 6))
+        if 'sig_bw' in plots:
+            ax_bw = plots['sig_bw'][1][i]
+            t_mod = np.arange(len(res['sig_bw'])) / FS_RESAMP
+            ax_bw.plot(t_mod, norm(res['sig_bw']), 'g', alpha=0.7)
+            ax_bw.set_title(f"Método: {method_name}")
+            ax_bw.set_xlabel("Tempo (s)")
+            ax_bw.set_ylabel("Amp. Normalizada")
+            ax_bw.grid(True, alpha=0.3)
+
+        # Plot Modulação AM (Figura 3)
+        if 'sig_am' in plots:
+            ax_am = plots['sig_am'][1][i]
+            t_mod = np.arange(len(res['sig_am'])) / FS_RESAMP
+            ax_am.plot(t_mod, norm(res['sig_am']), 'b', alpha=0.7)
+            ax_am.set_title(f"Método: {method_name}")
+            ax_am.set_xlabel("Tempo (s)")
+            ax_am.set_ylabel("Amp. Normalizada")
+            ax_am.grid(True, alpha=0.3)
+
+        # Plot Modulação FM (Figura 4)
+        if 'sig_fm' in plots:
+            ax_fm = plots['sig_fm'][1][i]
+            t_mod = np.arange(len(res['sig_fm'])) / FS_RESAMP
+            ax_fm.plot(t_mod, norm(res['sig_fm']), 'r', alpha=0.7)
+            ax_fm.set_title(f"Método: {method_name}")
+            ax_fm.set_xlabel("Tempo (s)")
+            ax_fm.set_ylabel("Amp. Normalizada")
+            ax_fm.grid(True, alpha=0.3)
+
+        def plot_modulation_psd(ax, sig, color, title):
+            if len(sig) == 0: return
+            fs = FS_RESAMP
+            freqs, psd = welch(sig - np.mean(sig), fs=fs, nperseg=len(sig)//2, nfft=2048)
+            rpm = freqs * 60
+            ax.plot(rpm, psd, color=color, lw=2)
+            ax.set_xlim(0, RR_MAX_BPM + 20)
+            ax.set_title(f"PSD {title}: {method_name}")
+            ax.set_xlabel("RPM")
+            ax.set_ylabel("Densidade de Potência")
+            ax.axvspan(RR_MIN_BPM, RR_MAX_BPM, color='gray', alpha=0.1, label='Banda Resp.')
+            ax.grid(True, alpha=0.3)
+
+        # Plot PSDs (Figuras 5, 6 e 7)
+        if 'psd_bw' in plots:
+            plot_modulation_psd(plots['psd_bw'][1][i], res['sig_bw'], 'g', 'BW')
+        if 'psd_am' in plots:
+            plot_modulation_psd(plots['psd_am'][1][i], res['sig_am'], 'b', 'AM')
+        if 'psd_fm' in plots:
+            plot_modulation_psd(plots['psd_fm'][1][i], res['sig_fm'], 'r', 'FM')
+
+        # Plot Figura de Erro por Janela
+        if 'error_per_window' in plots and ref_rr is not None:
+            ax_err = plots['error_per_window'][1][i]
+            min_len = min(len(res['fusion']), len(ref_rr))
+            wins = np.arange(min_len)
+            
+            # Cálculo dos erros absolutos em relação à referência
+            err_bw = np.abs(np.array(res['bw'][:min_len]) - ref_rr[:min_len])
+            err_am = np.abs(np.array(res['am'][:min_len]) - ref_rr[:min_len])
+            err_fm = np.abs(np.array(res['fm'][:min_len]) - ref_rr[:min_len])
+            err_fusion = np.abs(np.array(res['fusion'][:min_len]) - ref_rr[:min_len])
+            
+            ax_err.plot(wins, err_bw, 'g--', alpha=0.5, label='Erro BW')
+            ax_err.plot(wins, err_am, 'b--', alpha=0.5, label='Erro AM')
+            ax_err.plot(wins, err_fm, 'r--', alpha=0.5, label='Erro FM')
+            ax_err.plot(wins, err_fusion, 'k-', linewidth=1.5, label='Erro Fusão')
+            
+            ax_err.set_title(f"Erro: {method_name}")
+            ax_err.set_ylabel("Erro (BPM)")
+            ax_err.set_xlabel("Janela")
+            ax_err.legend(loc='upper right', fontsize='x-small', ncol=2)
+            ax_err.grid(True, alpha=0.3)
+
+    # Plot do Espectro de Referência (Figura Independente)
+    if PLOT_CONFIG.get('psd_ref') and ref_sig is not None:
+        fig_psd_ref, ax_ref = plt.subplots(figsize=(10, 6))
+        fig_psd_ref.suptitle('Espectro de Potência (PSD) - Sinal de Referência (GT)', fontsize=16)
         
-        # Plot das estimativas individuais
-        plt.plot(wins, res['bw'], 'g--', alpha=0.4, label='RR (Mod. Linha de Base)')
-        plt.plot(wins, res['am'], 'b--', alpha=0.4, label='RR (Mod. Amplitude)')
-        plt.plot(wins, res['fm'], 'r--', alpha=0.4, label='RR (Mod. Frequência)')
+        # Usando Welch no sinal completo para ver a frequência respiratória dominante
+        fs = FS_REF
+        freqs, psd = welch(ref_sig - np.mean(ref_sig), fs=fs, nperseg=int(WINDOW_SEC * fs), nfft=4096)
+        rpm = freqs * 60
         
-        # Plot da fusão com destaque para confiabilidade
-        fusion = np.array(res['fusion'])
-        reliable = np.array(res['is_reliable'], dtype=bool)
-        
-        plt.scatter(wins[reliable], fusion[reliable], color='black', s=50, label='Fusão (Confiável)', zorder=5)
-        plt.scatter(wins[~reliable], fusion[~reliable], color='red', marker='x', label='Fusão (Desvio > 4)', zorder=5)
-        plt.plot(wins, fusion, 'k-', alpha=0.2)
-        
-        plt.title(f"Análise de Frequência Respiratória - Método: {f.split('_')[1] if '_' in f else f}")
-        plt.xlabel("Janela (30 segundos)")
-        plt.ylabel("Frequência Respiratória (rpm)")
-        plt.ylim(RR_MIN_BPM - 2, RR_MAX_BPM + 2)
-        plt.legend(loc='upper right', fontsize='small')
-        plt.grid(True, linestyle=':', alpha=0.6)
-        plt.tight_layout()
-        plt.show()
+        ax_ref.plot(rpm, psd, color='black', lw=2, label='Impedância Torácica')
+        ax_ref.set_xlim(0, RR_MAX_BPM + 20)
+        ax_ref.set_xlabel("RPM")
+        ax_ref.set_ylabel("Densidade de Potência")
+        ax_ref.axvspan(RR_MIN_BPM, RR_MAX_BPM, color='gray', alpha=0.1, label='Banda Respiratória')
+        ax_ref.grid(True, alpha=0.3)
+        ax_ref.legend()
+        fig_psd_ref.tight_layout()
+
+    # Remover eixos extras
+    for key in plots:
+        fig, axes = plots[key]
+        for j in range(num_methods, len(axes)):
+            fig.delaxes(axes[j])
+        fig.tight_layout()
+
+    print("Exibindo gráficos...")
+    plt.show()
 
 if __name__ == "__main__":
     # Altere para o caminho da sua pasta de sinais BVP
-    TARGET_FOLDER = r"C:\Users\Sophia\Documents\rPPG\preliminary_results\L9\bvp"
-    run_batch_analysis(TARGET_FOLDER)
+    TARGET_FOLDER = r"../preliminary_results/L8/bvp"
+    REF_FILE = r"../get_ground_truth/thoracic_impedance/L8_16-45-38_16-47-38.txt"
+    run_batch_analysis(TARGET_FOLDER, ref_path=REF_FILE)

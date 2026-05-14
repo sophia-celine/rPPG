@@ -24,10 +24,10 @@ def save_gt_data():
     # L7 - 16:22:48 - 16:24:47
     # L8 - 16:45:38 - 16:47:38
     # Substitua pelo caminho do seu arquivo HDF5
-    file_path = "../pilot/ground_truth/10.10.10.140_20251211_16.h5"
-    HORA_INICIO = "16:22:48"
-    HORA_FIM = "16:24:47"
-    LEITO = "L7"
+    file_path = "../pilot/ground_truth/10.10.10.129_20251211_16.h5"
+    HORA_INICIO = "16:45:38"
+    HORA_FIM = "16:47:38"
+    LEITO = "L8"
     n_points = 2997
     hora_inicio = HORA_INICIO.replace(':', '-')
     hora_fim = HORA_FIM.replace(':', '-')
@@ -35,6 +35,7 @@ def save_gt_data():
     save_spo2wave = False
     resample_spo2 = False
     save3lines = False
+    save_rr = True
     sample_rate_ecg = 250
 
     # Definições
@@ -157,6 +158,7 @@ def save_gt_data():
     plt.plot(sig)
     plt.xlabel('Tempo')
     plt.ylabel('Amplitude')
+    plt.show()
 
 
     if save_spo2wave:
@@ -238,7 +240,49 @@ def save_gt_data():
             data_save = np.vstack((spo2wave, hr_resampled, t_new))
             np.savetxt(f"spo2/sp02wave_{LEITO}_{hora_inicio}_{hora_fim}.txt", data_save, fmt='%.7e')
 
-    plt.show()
+        plt.show()
+
+    if save_rr:
+        indices = np.where(ids == idResp)[0]
+        sig = [datas[i] for i in indices]
+        sig = np.concatenate(sig) 
+        seq = [seqs[i] for i in indices]
+        ts = seqsts[indices]
+        Fs = len(datas[indices[0]])/np.median(np.diff(ts))
+        print(f"rr fs :", Fs)
+        dt = 1/Fs
+        dtSeq = dt * len(datas[indices[0]])
+
+        time_vector = []
+        for i, t in enumerate(ts):
+            time_vector.append(t + np.arange(len(datas[indices[i]])) * dt)
+        time_vector = np.concatenate(time_vector)
+
+        dates = [datetime.fromtimestamp(ts) for ts in time_vector]
+
+        dates_np = np.array(dates)
+
+        start_dt = datetime.combine(dates_np[0].date(), datetime.strptime(HORA_INICIO, "%H:%M:%S").time())
+        end_dt = datetime.combine(dates_np[0].date(), datetime.strptime(HORA_FIM, "%H:%M:%S").time())
+
+        mask = (dates_np >= start_dt) & (dates_np <= end_dt)
+
+        sig_m = sig[mask].astype(float)
+        t_m = time_vector[mask]
+        t_m_rel = t_m - t_m[0]
+        np.savetxt(f"thoracic_impedance/{LEITO}_{hora_inicio}_{hora_fim}.txt", sig_m, fmt='%.7e')
+
+        plt.figure(figsize=(12, 4))
+        plt.plot(dates_np[mask], sig_m)
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
+        plt.xlabel('Horário')
+        plt.ylabel('Amplitude')
+        plt.title(f'Impedância Torácica - {LEITO} ({HORA_INICIO} - {HORA_FIM})')
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
+
+
 
 if __name__ == "__main__":
     save_gt_data()
