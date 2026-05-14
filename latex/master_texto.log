@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2026.5.8)  11 MAY 2026 13:38
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2026.5.8)  11 MAY 2026 18:30
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**/home/soph/Documents/mestrado/Qualificação/master_texto.tex
-(/home/soph/Documents/mestrado/Qualificação/master_texto.tex
+**/home/soph/rppg/rPPG/latex/master_texto.tex
+(/home/soph/rppg/rPPG/latex/master_texto.tex
 LaTeX2e <2021-11-15> patch level 1
 L3 programming layer <2022-01-21> (./politex.cls
 Document Class: politex 2013/12/29 POLI-USP LaTeX Class
@@ -1050,39 +1050,40 @@ Overfull \hbox (22.87445pt too wide) in paragraph at lines 65--86
  [][] 
  []
 
-[41] [42]
-<imagens/bw.png, id=824, 722.7pt x 361.35pt>
+[41]
+<imagens/bw.png, id=818, 722.7pt x 361.35pt>
 File: imagens/bw.png Graphic file (type png)
 <use imagens/bw.png>
 Package pdftex.def Info: imagens/bw.png  used on input line 103.
-(pdftex.def)             Requested size: 409.71692pt x 204.85786pt.
-<imagens/am.png, id=826, 722.7pt x 361.35pt>
-File: imagens/am.png Graphic file (type png)
-<use imagens/am.png>
-Package pdftex.def Info: imagens/am.png  used on input line 120.
 (pdftex.def)             Requested size: 409.71692pt x 204.85786pt.
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[43 <./imagens/bw.png>]
-<imagens/fm.png, id=838, 722.7pt x 361.35pt>
+[42]
+<imagens/am.png, id=827, 722.7pt x 361.35pt>
+File: imagens/am.png Graphic file (type png)
+<use imagens/am.png>
+Package pdftex.def Info: imagens/am.png  used on input line 120.
+(pdftex.def)             Requested size: 409.71692pt x 204.85786pt.
+ [43 <./imagens/bw.png> <./imagens/am.png>]
+<imagens/fm.png, id=837, 722.7pt x 361.35pt>
 File: imagens/fm.png Graphic file (type png)
 <use imagens/fm.png>
 Package pdftex.def Info: imagens/fm.png  used on input line 137.
 (pdftex.def)             Requested size: 409.71692pt x 204.85786pt.
- [44 <./imagens/am.png> <./imagens/fm.png>]
-<imagens/ecg_exemplo.png, id=857, 541.3023pt x 440.847pt>
+ [44 <./imagens/fm.png>]
+<imagens/ecg_exemplo.png, id=856, 541.3023pt x 440.847pt>
 File: imagens/ecg_exemplo.png Graphic file (type png)
 <use imagens/ecg_exemplo.png>
 Package pdftex.def Info: imagens/ecg_exemplo.png  used on input line 155.
 (pdftex.def)             Requested size: 204.85846pt x 166.83746pt.
-<imagens/PPG_oximetro_exemplo.png, id=858, 639.5895pt x 487.8225pt>
+<imagens/PPG_oximetro_exemplo.png, id=857, 639.5895pt x 487.8225pt>
 File: imagens/PPG_oximetro_exemplo.png Graphic file (type png)
 <use imagens/PPG_oximetro_exemplo.png>
 Package pdftex.def Info: imagens/PPG_oximetro_exemplo.png  used on input line 161.
 (pdftex.def)             Requested size: 204.85846pt x 156.2478pt.
-<imagens/impedancia_toracica_exemplo.png, id=859, 599.841pt x 451.6875pt>
+<imagens/impedancia_toracica_exemplo.png, id=858, 599.841pt x 451.6875pt>
 File: imagens/impedancia_toracica_exemplo.png Graphic file (type png)
 <use imagens/impedancia_toracica_exemplo.png>
 Package pdftex.def Info: imagens/impedancia_toracica_exemplo.png  used on input line 168.
@@ -1092,14 +1093,14 @@ Package pdftex.def Info: imagens/impedancia_toracica_exemplo.png  used on input 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 [45] [46 <./imagens/ecg_exemplo.png> <./imagens/PPG_oximetro_exemplo.png> <./imagens/impedancia_toracica_exemplo.png>]
-<imagens/snr_ex.png, id=874, 867.24pt x 433.62pt>
+<imagens/snr_ex.png, id=875, 867.24pt x 433.62pt>
 File: imagens/snr_ex.png Graphic file (type png)
 <use imagens/snr_ex.png>
 Package pdftex.def Info: imagens/snr_ex.png  used on input line 224.
 (pdftex.def)             Requested size: 455.24411pt x 227.62082pt.
- [47 <./imagens/snr_ex.png>]) [48] (./paginas/resultados.tex
+) [47 <./imagens/snr_ex.png>] (./paginas/resultados.tex
 Cap\'{\i }tulo 4.
-<imagens/hr_L9.png, id=892, 1232.9262pt x 692.3466pt>
+<imagens/hr_L9.png, id=886, 1232.9262pt x 692.3466pt>
 File: imagens/hr_L9.png Graphic file (type png)
 <use imagens/hr_L9.png>
 Package pdftex.def Info: imagens/hr_L9.png  used on input line 18.
@@ -1107,7 +1108,7 @@ Package pdftex.def Info: imagens/hr_L9.png  used on input line 18.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-<imagens/mean_corr_L9.png, id=893, 1011.78pt x 291.2481pt>
+<imagens/mean_corr_L9.png, id=887, 1011.78pt x 291.2481pt>
 File: imagens/mean_corr_L9.png Graphic file (type png)
 <use imagens/mean_corr_L9.png>
 Package pdftex.def Info: imagens/mean_corr_L9.png  used on input line 26.
@@ -1115,7 +1116,7 @@ Package pdftex.def Info: imagens/mean_corr_L9.png  used on input line 26.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-<imagens/ruido_ecg.png, id=895, 951.0732pt x 244.9953pt>
+<imagens/ruido_ecg.png, id=889, 951.0732pt x 244.9953pt>
 File: imagens/ruido_ecg.png Graphic file (type png)
 <use imagens/ruido_ecg.png>
 Package pdftex.def Info: imagens/ruido_ecg.png  used on input line 37.
@@ -1126,19 +1127,19 @@ LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 Package fancyhdr Warning: \fancyhead's `E' option without twoside option is useless on input line 46.
 
-[49
+[48
 
 ]
 
-LaTeX Warning: Text page 50 contains only floats.
+LaTeX Warning: Text page 49 contains only floats.
 
-[50 <./imagens/hr_L9.png> <./imagens/mean_corr_L9.png> <./imagens/ruido_ecg.png>]
-<imagens/corr_examples_L7.png, id=911, 1084.05pt x 289.08pt>
+[49 <./imagens/hr_L9.png> <./imagens/mean_corr_L9.png> <./imagens/ruido_ecg.png>]
+<imagens/corr_examples_L7.png, id=906, 1084.05pt x 289.08pt>
 File: imagens/corr_examples_L7.png Graphic file (type png)
 <use imagens/corr_examples_L7.png>
 Package pdftex.def Info: imagens/corr_examples_L7.png  used on input line 92.
 (pdftex.def)             Requested size: 409.71692pt x 109.25604pt.
-<imagens/corr_examples_L9.png, id=912, 1084.05pt x 289.08pt>
+<imagens/corr_examples_L9.png, id=907, 1084.05pt x 289.08pt>
 File: imagens/corr_examples_L9.png Graphic file (type png)
 <use imagens/corr_examples_L9.png>
 Package pdftex.def Info: imagens/corr_examples_L9.png  used on input line 101.
@@ -1147,24 +1148,24 @@ Package pdftex.def Info: imagens/corr_examples_L9.png  used on input line 101.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[51] [52 <./imagens/corr_examples_L7.png> <./imagens/corr_examples_L9.png>]
-<imagens/best_specs_L9.png, id=928, 1084.05pt x 289.08pt>
+[50] [51 <./imagens/corr_examples_L7.png> <./imagens/corr_examples_L9.png>]
+<imagens/best_specs_L9.png, id=923, 1084.05pt x 289.08pt>
 File: imagens/best_specs_L9.png Graphic file (type png)
 <use imagens/best_specs_L9.png>
 Package pdftex.def Info: imagens/best_specs_L9.png  used on input line 232.
 (pdftex.def)             Requested size: 455.24411pt x 121.39954pt.
- [53 <./imagens/best_specs_L9.png>]
-<imagens/best_psds_L9.png, id=938, 1084.05pt x 289.08pt>
+ [52 <./imagens/best_specs_L9.png>]
+<imagens/best_psds_L9.png, id=933, 1084.05pt x 289.08pt>
 File: imagens/best_psds_L9.png Graphic file (type png)
 <use imagens/best_psds_L9.png>
 Package pdftex.def Info: imagens/best_psds_L9.png  used on input line 243.
 (pdftex.def)             Requested size: 455.24411pt x 121.39954pt.
-<imagens/best_estimates_L9.png, id=939, 1011.78pt x 289.08pt>
+<imagens/best_estimates_L9.png, id=934, 1011.78pt x 289.08pt>
 File: imagens/best_estimates_L9.png Graphic file (type png)
 <use imagens/best_estimates_L9.png>
 Package pdftex.def Info: imagens/best_estimates_L9.png  used on input line 251.
 (pdftex.def)             Requested size: 455.24411pt x 130.07155pt.
-<imagens/mean_error_per_window_2e3.png, id=941, 1084.05pt x 428.5611pt>
+<imagens/mean_error_per_window_2e3.png, id=936, 1084.05pt x 428.5611pt>
 File: imagens/mean_error_per_window_2e3.png Graphic file (type png)
 <use imagens/mean_error_per_window_2e3.png>
 Package pdftex.def Info: imagens/mean_error_per_window_2e3.png  used on input line 261.
@@ -1173,8 +1174,8 @@ Package pdftex.def Info: imagens/mean_error_per_window_2e3.png  used on input li
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[54 <./imagens/best_psds_L9.png> <./imagens/best_estimates_L9.png>]
-<imagens/ruido_ecg_valid.png, id=952, 823.878pt x 346.896pt>
+[53 <./imagens/best_psds_L9.png> <./imagens/best_estimates_L9.png>]
+<imagens/ruido_ecg_valid.png, id=946, 823.878pt x 346.896pt>
 File: imagens/ruido_ecg_valid.png Graphic file (type png)
 <use imagens/ruido_ecg_valid.png>
 Package pdftex.def Info: imagens/ruido_ecg_valid.png  used on input line 279.
@@ -1183,36 +1184,36 @@ Package pdftex.def Info: imagens/ruido_ecg_valid.png  used on input line 279.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[55 <./imagens/mean_error_per_window_2e3.png>] [56 <./imagens/ruido_ecg_valid.png>]
-<imagens/best_specs_valid.png, id=969, 1084.05pt x 289.08pt>
+[54 <./imagens/mean_error_per_window_2e3.png>] [55 <./imagens/ruido_ecg_valid.png>]
+<imagens/best_specs_valid.png, id=964, 1084.05pt x 289.08pt>
 File: imagens/best_specs_valid.png Graphic file (type png)
 <use imagens/best_specs_valid.png>
 Package pdftex.def Info: imagens/best_specs_valid.png  used on input line 389.
 (pdftex.def)             Requested size: 455.24411pt x 121.39954pt.
-<imagens/best_psd_valid.png, id=970, 1084.05pt x 289.08pt>
+<imagens/best_psd_valid.png, id=965, 1084.05pt x 289.08pt>
 File: imagens/best_psd_valid.png Graphic file (type png)
 <use imagens/best_psd_valid.png>
 Package pdftex.def Info: imagens/best_psd_valid.png  used on input line 397.
 (pdftex.def)             Requested size: 455.24411pt x 121.39954pt.
-<imagens/best_estimates_valid.png, id=971, 1011.78pt x 289.08pt>
+<imagens/best_estimates_valid.png, id=966, 1011.78pt x 289.08pt>
 File: imagens/best_estimates_valid.png Graphic file (type png)
 <use imagens/best_estimates_valid.png>
 Package pdftex.def Info: imagens/best_estimates_valid.png  used on input line 405.
 (pdftex.def)             Requested size: 455.24411pt x 130.07155pt.
- [57 <./imagens/best_specs_valid.png> <./imagens/best_psd_valid.png> <./imagens/best_estimates_valid.png>]
-<imagens/mean_error_per_window_valid.png, id=984, 1084.05pt x 469.755pt>
+ [56 <./imagens/best_specs_valid.png> <./imagens/best_psd_valid.png> <./imagens/best_estimates_valid.png>]
+<imagens/mean_error_per_window_valid.png, id=978, 1084.05pt x 469.755pt>
 File: imagens/mean_error_per_window_valid.png Graphic file (type png)
 <use imagens/mean_error_per_window_valid.png>
 Package pdftex.def Info: imagens/mean_error_per_window_valid.png  used on input line 415.
 (pdftex.def)             Requested size: 455.24411pt x 197.27425pt.
-) [58 <./imagens/mean_error_per_window_valid.png>] (./paginas/discussao.tex
+) [57 <./imagens/mean_error_per_window_valid.png>] (./paginas/discussao.tex
 Cap\'{\i }tulo 5.
 
-Package fancyhdr Warning: \fancyhead's `E' option without twoside option is useless on input line 24.
+Package fancyhdr Warning: \fancyhead's `E' option without twoside option is useless on input line 6.
 
-[59
+[58
 
-]) [60]
+]) [59]
 
 Package fancyhdr Warning: \fancyhead's `E' option without twoside option is useless on input line 154.
 
@@ -1220,28 +1221,28 @@ Package fancyhdr Warning: \fancyhead's `E' option without twoside option is usel
 
 Package fancyhdr Warning: \fancyhead's `E' option without twoside option is useless on input line 84.
 
-[61
+[60
 
 
-] [62] [63] [64] [65] [66] [67] [68] [69] [70]) [71] (./master_texto.aux)
+] [61] [62] [63] [64] [65] [66] [67] [68] [69]) [70] (./master_texto.aux)
 Package rerunfilecheck Info: File `master_texto.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 32093 strings out of 478287
- 629118 string characters out of 5849290
- 914450 words of memory out of 5000000
+ 32092 strings out of 478287
+ 629057 string characters out of 5849290
+ 914471 words of memory out of 5000000
  49427 multiletter control sequences out of 15000+600000
  484621 words of font info for 66 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 99i,12n,103p,1877b,1013s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 99i,12n,103p,1859b,1013s stack positions out of 5000i,500n,10000p,200000b,80000s
 pdfTeX warning (dest): name{chapter.reff.} has been referenced but does not exist, replaced by a fixed one
 
 {/usr/share/texmf/fonts/enc/dvips/cm-super/cm-super-ts1.enc}{/usr/share/texmf/fonts/enc/dvips/cm-super/cm-super-t1.enc}</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmmib8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfbx1200.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfbx1440.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfbx1728.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfrm1095.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfrm1200.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfrm1440.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfti1200.pfb>
-Output written on master_texto.pdf (72 pages, 2936499 bytes).
+Output written on master_texto.pdf (71 pages, 2937367 bytes).
 PDF statistics:
- 1194 PDF objects out of 1200 (max. 8388607)
- 1020 compressed objects within 11 object streams
- 300 named destinations out of 1000 (max. 500000)
+ 1189 PDF objects out of 1200 (max. 8388607)
+ 1016 compressed objects within 11 object streams
+ 299 named destinations out of 1000 (max. 500000)
  148 words of extra memory for PDF output out of 10000 (max. 10000000)
 

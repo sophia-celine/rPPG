@@ -24,7 +24,7 @@ Para realizar a sincronização dos vídeos com os dados de referência, foi rea
 \begin{figure}[h!]
     \centering
         \includegraphics[width=\linewidth]{imagens/mean_corr_L9.png}
-        \caption{Correlação média entre os valores de frequência cardíaca obtidos a partir do ECG de referência e estimados pelos métodos de rPPG para o paciente 2}
+        \caption{Correlação média entre os valores de frequência cardíaca obtidos a partir do ECG de referência e os valores estimados pelos métodos de rPPG para o paciente 2}
         Fonte: autoria própria
         \label{fig:mean-corr-L9}
 \end{figure}
@@ -46,7 +46,7 @@ Os vídeos adquiridos em formato AVI foram utilizados para a extração dos sina
 
 \begin{table*}[h!]
 \centering
-\caption{Coeficientes de correlação entre os sinais de rPPG e o sinal de PPG de referência para os pacientes 1 e 2.}
+\caption{Índices de correlação entre os sinais de rPPG e o sinal de PPG de referência para os pacientes 1 e 2.}
 \resizebox{0.7\textwidth}{!}{
 \begin{tabular}{llcc}
 \hline
@@ -82,7 +82,7 @@ Os vídeos adquiridos em formato AVI foram utilizados para a extração dos sina
 \label{tab:rppg_ppg_correlation}
 \end{table*}
 
-Os sinais de rPPG que resultaram no maior coeficiente de correlação entre os métodos supervisionados foram gerados pelo modelo TSCAN treinado no dataset UBFC-rPPG para o paciente 1 e pelo modelo TSCAN treinado no dataset PURE para o paciente 2. Os sinais obtidos por métodos não supervisionados, por sua vez, que resultaram no maior coeficiente de correlação foram obtidos pelo método Green para o paciente 1 e pelo método POS para o paciente 2, sendo que esses sinais em comparação com a referência são apresentados na \autoref{fig:corr-waves-examples}. Reitera-se que essa análise não foi realizada para o paciente 3 devido à ausência do sinal de referência durante a coleta de dados. 
+Os sinais de rPPG que resultaram no maior coeficiente de correlação entre os métodos supervisionados foram gerados pelo modelo TSCAN treinado no dataset UBFC-rPPG para o paciente 1 e pelo modelo TSCAN treinado no dataset PURE para o paciente 2. Os sinais obtidos por métodos não supervisionados, por sua vez, que resultaram no maior coeficiente de correlação foram obtidos pelo método GREEN para o paciente 1 e pelo método POS para o paciente 2, sendo que esses sinais em comparação com a referência são apresentados na \autoref{fig:corr-waves-examples}. Reitera-se que essa análise não foi realizada para o paciente 3 devido à ausência do sinal de PPG de referência durante a coleta de dados. 
 
 \begin{figure}[h!]
     \centering
@@ -223,7 +223,7 @@ As estimativas de frequência cardíaca a partir dos sinais gerados por cada mé
 \label{tab:rppg_ecg_metrics_all}
 \end{table*}
 
-É possível observar que o método não supervisionado que resultou no menor valor de erro absoluto médio para o paciente 1 foi o método CHROM. Em relação ao sinal do paciente 2, os métodos CHROM, ICA e POS resultaram nos mesmos valores de erro, que são os menores quando comparados ao restante dos métodos. Além disso, os métodos LGI e POS foram os que resultaram nos menores valores de erro para as estimativas de frequência cardíaca a partir dos sinais do paciente 3. No que se refere aos métodos supervisionados, por sua vez, o modelo PhysFormer treinado do dataset PURE foi o que apresentou o melhor resultado para o paciente 1, o modelo TSCAN treinado no dataset PURE resultou no menor valor de erro para as estimativas do paciente 2 e o modelo PhysNet treinado no mesmo dataset foi o que obteve o melhor resultado para o paciente 3. À parte isso, a comparação entre todos os métodos permite analisar que o método POS foi o que resultou na melhor relação sinal-ruído para os sinais dos pacientes 2 e 3. Já para o paciente 1, o sinal gerado pelo modelo PhysFormer treinado na base de dados PURE foi o que apresentou o melhor valor para essa métrica.
+É possível observar que o método não supervisionado que resultou no menor valor de erro absoluto médio para o paciente 1 foi o método CHROM. Em relação ao sinal do paciente 2, os métodos CHROM, ICA e POS resultaram nos menores valores de erro comparados ao restante dos métodos. Além disso, os métodos LGI e POS foram os que resultaram nos menores valores de erro para as estimativas de frequência cardíaca a partir dos sinais do paciente 3. No que se refere aos métodos supervisionados, por sua vez, o modelo PhysFormer treinado do dataset PURE foi o que apresentou o melhor resultado para o paciente 1, o modelo TSCAN treinado no dataset PURE resultou no menor valor de erro para as estimativas do paciente 2 e o modelo PhysNet treinado no mesmo dataset foi o que obteve o melhor resultado para o paciente 3. À parte isso, a comparação entre todos os métodos permite analisar que o método POS foi o que resultou na melhor relação sinal-ruído para os sinais dos pacientes 2 e 3. Já para o paciente 1, o sinal gerado pelo modelo PhysFormer treinado na base de dados PURE foi o que apresentou o melhor valor para essa métrica.
 
 Observa-se, por fim, que os métodos CHROM, ICA e POS aplicados ao sinal do paciente 2 resultaram no menor valor de erro absoluto médio entre todos os algoritmos não supervisionados. Da mesma forma, o modelo TSCAN treinado no dataset PURE também aplicado ao sinal do paciente 2 resultou no menor erro absoluto médio entre os modelos supervisionados. Na \autoref{fig:best-specs-L9}, pode-se analisar os espectrogramas de dois desses sinais, a partir dos quais é possível identificar a região da frequência de maior densidade de potência de forma distinguível ao longo de toda a duração do sinal. 
 

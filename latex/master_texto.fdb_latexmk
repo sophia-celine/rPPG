@@ -1,15 +1,15 @@
 # Fdb version 3
-["bibtex master_texto"] 1778512911 "master_texto.aux" "master_texto.bbl" "master_texto" 1778517518
+["bibtex master_texto"] 1778534024 "master_texto.aux" "master_texto.bbl" "master_texto" 1778535034
   "/usr/share/texlive/texmf-dist/bibtex/bib/abntex2/abntex2-options.bib" 1357081713 5396 4eb260dac60f150ae608d45252853090 ""
   "/usr/share/texlive/texmf-dist/bibtex/bst/abntex2/abntex2-alf.bst" 1543183680 60064 0819ac8568f9a482510a46e3a8a6f605 ""
   "bib/mybib.bib" 1778520560 49405 83dc75ce0f0b5de338729e35409015b8 ""
-  "master_texto.aux" 1778517518 47604 fbdf0270bf9d39990ec93a424bc1516b "pdflatex"
+  "master_texto.aux" 1778535033 47657 619f61c21a41c0e770eebe21bdf808a7 "pdflatex"
   (generated)
   "master_texto.bbl"
   "master_texto.blg"
-["pdflatex"] 1778517514 "/home/soph/Documents/mestrado/Qualificação/master_texto.tex" "master_texto.pdf" "master_texto" 1778517518
+["pdflatex"] 1778535029 "/home/soph/rppg/rPPG/latex/master_texto.tex" "master_texto.pdf" "master_texto" 1778535034
   "/etc/texmf/web2c/texmf.cnf" 1702345792 475 c0e671620eb5563b2130f56340a5fde8 ""
-  "/home/soph/Documents/mestrado/Qualificação/master_texto.tex" 1778509884 7422 6a54d6b57af4579280d6c395227516a8 ""
+  "/home/soph/rppg/rPPG/latex/master_texto.tex" 1778524573 7422 6a54d6b57af4579280d6c395227516a8 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecbx1200.tfm" 1136768653 3584 402da0b29eafbad07963b1224b222f18 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecbx1440.tfm" 1136768653 3584 13049b61b922a28b158a38aeff75ee9b ""
@@ -264,15 +264,15 @@
   "imagens/ruido_ecg_valid.png" 1778520560 38443 6027001a736d398a10f860e4b7ccd68b ""
   "imagens/setup_coleta.png" 1778520560 135780 43d78c0e96c5105fbc6d146ebee4a1c8 ""
   "imagens/snr_ex.png" 1778520560 66145 c5cc7ecb8a3562d2433281b5f5dbd184 ""
-  "master_texto.aux" 1778517518 47604 fbdf0270bf9d39990ec93a424bc1516b "pdflatex"
-  "master_texto.bbl" 1778512911 44472 2ebe1379516ce9b23f47f725c312d835 "bibtex master_texto"
-  "master_texto.out" 1778517515 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
-  "master_texto.tex" 1778509884 7422 6a54d6b57af4579280d6c395227516a8 ""
-  "master_texto.toc" 1778517518 3838 867fd3c27f557e8c35134601ab9020a8 "pdflatex"
-  "paginas/discussao.tex" 1778517514 3110 ca4ebec07794a394db03223681086899 ""
+  "master_texto.aux" 1778535033 47657 619f61c21a41c0e770eebe21bdf808a7 "pdflatex"
+  "master_texto.bbl" 1778534024 44472 2ebe1379516ce9b23f47f725c312d835 "bibtex master_texto"
+  "master_texto.out" 1778535030 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "master_texto.tex" 1778524573 7422 6a54d6b57af4579280d6c395227516a8 ""
+  "master_texto.toc" 1778535033 3849 1606b249ac6d743090b8616b85d18237 "pdflatex"
+  "paginas/discussao.tex" 1778535027 4838 75c0f96cf5e92bdef5271d12df83e787 ""
   "paginas/intro.tex" 1778520560 15170 ec9a20a5e3c4d48e880e57914b43b2f9 ""
-  "paginas/metodologia.tex" 1778520560 23480 d6723e9293e232eaddb51dd17fabfba5 ""
-  "paginas/resultados.tex" 1778510614 21941 0b3c585ff66e907e5d0958927745d8f1 ""
+  "paginas/metodologia.tex" 1778533653 22633 5882fe1726d7a294bca941b36ab07502 ""
+  "paginas/resultados.tex" 1778534020 21928 3514e5d39a039f4d9688545e810df48b ""
   "paginas/revisao.tex" 1778520560 60842 276c54c96cb6889bcfc080e8eb013831 ""
   "politex.cls" 1778520560 41557 c3a90da0871ca35e448d22551139c57a ""
   (generated)

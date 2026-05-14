@@ -1,9 +1,9 @@
-PWD /home/soph/Documents/mestrado/Qualificação
+PWD /home/soph/rppg/rPPG/latex
 INPUT /etc/texmf/web2c/texmf.cnf
 INPUT /usr/share/texmf/web2c/texmf.cnf
 INPUT /usr/share/texlive/texmf-dist/web2c/texmf.cnf
 INPUT /var/lib/texmf/web2c/pdftex/pdflatex.fmt
-INPUT /home/soph/Documents/mestrado/Qualificação/master_texto.tex
+INPUT /home/soph/rppg/rPPG/latex/master_texto.tex
 OUTPUT master_texto.log
 INPUT ./politex.cls
 INPUT ./politex.cls

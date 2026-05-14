@@ -31,13 +31,13 @@
 \contentsline {section}{\numberline {3.2}Processamento de dados de vídeo}{41}{section.3.2}
 \contentsline {section}{\numberline {3.3}Processamento dos dados de referência}{45}{section.3.3}
 \contentsline {section}{\numberline {3.4}Métricas de avaliação}{45}{section.3.4}
-\contentsline {chapter}{\numberline {4}Resultados preliminares}{49}{chapter.4}
-\contentsline {section}{\numberline {4.1}Coleta preliminar}{49}{section.4.1}
-\contentsline {subsection}{\numberline {4.1.1}Sincronização de dados}{49}{subsection.4.1.1}
-\contentsline {subsection}{\numberline {4.1.2}Sinal de rPPG}{51}{subsection.4.1.2}
-\contentsline {subsection}{\numberline {4.1.3}Estimativas de frequência cardíaca}{52}{subsection.4.1.3}
-\contentsline {section}{\numberline {4.2}Coleta de validação}{55}{section.4.2}
-\contentsline {subsection}{\numberline {4.2.1}Sincronização dos dados}{55}{subsection.4.2.1}
-\contentsline {subsection}{\numberline {4.2.2}Estimativas de frequência cardíaca}{55}{subsection.4.2.2}
-\contentsline {chapter}{\numberline {5}Discussão}{59}{chapter.5}
-\contentsline {chapter}{Referências}{61}{chapter.reff.}
+\contentsline {chapter}{\numberline {4}Resultados preliminares}{48}{chapter.4}
+\contentsline {section}{\numberline {4.1}Coleta preliminar}{48}{section.4.1}
+\contentsline {subsection}{\numberline {4.1.1}Sincronização de dados}{48}{subsection.4.1.1}
+\contentsline {subsection}{\numberline {4.1.2}Sinal de rPPG}{50}{subsection.4.1.2}
+\contentsline {subsection}{\numberline {4.1.3}Estimativas de frequência cardíaca}{51}{subsection.4.1.3}
+\contentsline {section}{\numberline {4.2}Coleta de validação}{54}{section.4.2}
+\contentsline {subsection}{\numberline {4.2.1}Sincronização dos dados}{54}{subsection.4.2.1}
+\contentsline {subsection}{\numberline {4.2.2}Estimativas de frequência cardíaca}{54}{subsection.4.2.2}
+\contentsline {chapter}{\numberline {5}Discussão preliminar}{58}{chapter.5}
+\contentsline {chapter}{Referências}{60}{chapter.reff.}
