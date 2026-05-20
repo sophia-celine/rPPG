@@ -376,6 +376,6 @@ def run_batch_analysis(folder_path, ref_path=None):
 
 if __name__ == "__main__":
     # Altere para o caminho da sua pasta de sinais BVP
-    TARGET_FOLDER = r"../preliminary_results/L8/bvp"
+    TARGET_FOLDER = r"../preliminary_results/L8/bvp_dl"
     REF_FILE = r"../get_ground_truth/thoracic_impedance/L8_16-45-38_16-47-38.txt"
     run_batch_analysis(TARGET_FOLDER, ref_path=REF_FILE)
