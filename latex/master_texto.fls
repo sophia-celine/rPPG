@@ -1341,6 +1341,7 @@ INPUT ./paginas/intro.tex
 INPUT ./paginas/intro.tex
 INPUT paginas/intro.tex
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecrm1095.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecti1200.tfm
 INPUT ./imagens/PPGwaveAllen2007.png
 INPUT ./imagens/PPGwaveAllen2007.png
 INPUT imagens/PPGwaveAllen2007.png
@@ -1351,7 +1352,6 @@ INPUT ./imagens/rPPGschematic.png
 INPUT imagens/rPPGschematic.png
 INPUT ./imagens/rPPGschematic.png
 INPUT ./imagens/rPPGschematic.png
-INPUT /usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecti1200.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/tcrm1200.tfm
 INPUT ./paginas/revisao.tex
 INPUT ./paginas/revisao.tex

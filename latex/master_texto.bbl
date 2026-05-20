@@ -13,6 +13,15 @@
   Electrical Engineers, Savoy Pl. London WC 2 R 0 BL UK, v.~44, n.~12, p.
   1031--1051, 2006.}
 
+\bibitem[Aguiar et al. 2021]{aguiar2021perfil}
+\abntrefinfo{Aguiar et al.}{AGUIAR et al.}{2021}
+{AGUIAR, L. M.~M.; MARTINS, G. d.~S.; VALDUGA, R.; GEREZ, A.~P.; CARMO, E.
+  C.~d.; CUNHA, K. d.~C.; CIPRIANO, G. F.~B.; SILVA, M. L.~d. Perfil de
+  unidades de terapia intensiva adulto no brasil: revis{\~a}o sistem{\'a}tica
+  de estudos observacionais.
+\textbf{Revista Brasileira de Terapia Intensiva}, SciELO Brasil, v.~33, n.~4,
+  p. 624--634, 2021.}
+
 \bibitem[Al-Naji et al. 2017]{al2017remote}
 \abntrefinfo{Al-Naji et al.}{AL-NAJI et al.}{2017}
 {AL-NAJI, A.; PERERA, A.~G.; CHAHL, J. Remote monitoring of cardiorespiratory
@@ -149,6 +158,14 @@
   HALL, B. Detection of atrial fibrillation using contactless facial video
   monitoring.
 \textbf{Heart rhythm}, Elsevier, v.~12, n.~1, p. 195--201, 2015.}
+
+\bibitem[Daltro-Oliveira et al. 2025]{daltro2025global}
+\abntrefinfo{Daltro-Oliveira et al.}{DALTRO-OLIVEIRA et al.}{2025}
+{DALTRO-OLIVEIRA, R.; QUINTAIROS, A.; SANTOS, L.; AMADO, F.; SALLUH, J.; JR, A.
+  N. Global disparities in scientific publications: A 5-year analysis of 10
+  critical care journals.
+\textbf{Critical Care and Resuscitation}, Elsevier, v.~27, n.~4, p. 100137,
+  2025.}
 
 \bibitem[Dosovitskiy et al. 2021]{dosovitskiy2021imageworth16x16words}
 \abntrefinfo{Dosovitskiy et al.}{DOSOVITSKIY et al.}{2021}
@@ -310,6 +327,13 @@ Dispon{\'\i}vel em:
 \textbf{NPJ digital medicine}, Nature Publishing Group UK London, v.~5, n.~1,
   p.~4, 2022.}
 
+\bibitem[Khan e Mostafa 2025]{khan2025representation}
+\abntrefinfo{Khan e Mostafa}{KHAN; MOSTAFA}{2025}
+{KHAN, S.~S.; MOSTAFA, N. Representation biases in remote photoplethysmography
+  datasets--a narrative review.
+\textbf{Applied Computing and Informatics}, Emerald Publishing Limited, p.
+  1--16, 2025.}
+
 \bibitem[Khanam et al. 2019]{khanam2019clinicalnonclinicalReview}
 \abntrefinfo{Khanam et al.}{KHANAM et al.}{2019}
 {KHANAM, F.-T.-Z.; AL-NAJI, A.; CHAHL, J. Remote monitoring of vital signs in
@@ -375,6 +399,13 @@ Dispon{\'\i}vel em:
 {LEE, H.; LEE, J.; KWON, Y.; KWON, J.; PARK, S.; SOHN, R.; PARK, C. Multitask
   siamese network for remote photoplethysmography and respiration estimation.
 \textbf{Sensors}, MDPI, v.~22, n.~14, p.~5101, 2022.}
+
+\bibitem[Lee et al. 2024]{lee2024review}
+\abntrefinfo{Lee et al.}{LEE et al.}{2024}
+{LEE, R.~J.; SIVAKUMAR, S.; LIM, K.~H. Review on remote heart rate measurements
+  using photoplethysmography.
+\textbf{Multimedia Tools and Applications}, Springer, v.~83, n.~15, p.
+  44699--44728, 2024.}
 
 \bibitem[Lewandowska e Nowak 2012]{lewandowska2012measuring}
 \abntrefinfo{Lewandowska e Nowak}{LEWANDOWSKA; NOWAK}{2012}

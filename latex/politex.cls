@@ -1105,7 +1105,7 @@
 	\vspace{2cm}
     {\tituloformat \ABNTuppercasetitulodata}
     
-	{\vspace{2cm}Versão \versaotipo\vspace{2cm}}
+	% {\vspace{2cm}Versão \versaotipo\vspace{2cm}}
     % comentário
     \vspace{2cm}
     \hspace{.5\textwidth} % posicionando a minipage 
@@ -1163,6 +1163,15 @@
 \newcommand{\dissertacao}[1]{%
   \renewcommand{\PoliTipoDocData}{Dissertação (Mestrado)}
   \comentario{Dissertação apresentada à Escola
+    Politécnica da Universidade de
+    São Paulo para obtenção do
+    Título de Mestre em #1.}%
+}
+
+%% Texto de qualificação
+\newcommand{\qualificacao}[1]{%
+  \renewcommand{\PoliTipoDocData}{Qualificacao}
+  \comentario{Texto de Qualificação apresentado à Escola
     Politécnica da Universidade de
     São Paulo para obtenção do
     Título de Mestre em #1.}%
