@@ -235,7 +235,7 @@ def get_spectrum(df, lowcut, highcut, filter_order=4, fps=30):
 
     return r, g, b, r_fft, g_fft, b_fft, freqs
 
-def getSNR(fft_mag, freqs, lowcut, highcut, signal_window_hz=0.2):
+def getSNR(fft_mag, freqs, lowcut, highcut, signal_window_hz=0.1):
     """
     Calculates the Signal-to-Noise Ratio (SNR) of a signal from its FFT spectrum.
 
@@ -266,14 +266,14 @@ def getSNR(fft_mag, freqs, lowcut, highcut, signal_window_hz=0.2):
     peak_index = band_indices[peak_index_in_band]
     fundamental_freq = freqs[peak_index]
 
-    fund_window_low = fundamental_freq - signal_window_hz / 2
-    fund_window_high = fundamental_freq + signal_window_hz / 2
+    fund_window_low = fundamental_freq - signal_window_hz
+    fund_window_high = fundamental_freq + signal_window_hz
     fund_indices = np.where((freqs >= fund_window_low) & (freqs <= fund_window_high))[0]
 
     harmonic_freq = 2 * fundamental_freq
-    harmonic_window_hz = 2 * signal_window_hz
-    harm_window_low = harmonic_freq - harmonic_window_hz / 2
-    harm_window_high = harmonic_freq + harmonic_window_hz / 2
+    harmonic_window_hz = signal_window_hz
+    harm_window_low = harmonic_freq - harmonic_window_hz
+    harm_window_high = harmonic_freq + harmonic_window_hz
     harm_indices = np.where((freqs >= harm_window_low) & (freqs <= harm_window_high))[0]
 
     signal_indices = np.union1d(fund_indices, harm_indices)

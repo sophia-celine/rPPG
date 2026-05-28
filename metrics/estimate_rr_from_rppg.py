@@ -10,7 +10,7 @@ from scipy.interpolate import interp1d
 FS_RPPG = 25.0        # Frequência de amostragem original (Câmera)
 FS_REF = 125.0        # Frequência de amostragem do sinal de referência (Impedância)
 FS_RESAMP = 4.0       # Frequência de re-amostragem das modulações (Hz)
-WINDOW_SEC = 30       # Tamanho da janela de análise (Segundos)
+WINDOW_SEC = 60       # Tamanho da janela de análise (Segundos)
 RR_MIN_BPM = 4.0      # Frequência respiratória mínima (BPM)
 RR_MAX_BPM = 65.0     # Frequência respiratória máxima (BPM)
 SD_THRESHOLD = 4.0    # Limite de desvio padrão para fusão robusta (BPM)
@@ -21,10 +21,10 @@ PLOT_CONFIG = {
     'sig_bw': False,        # Sinal temporal da modulação BW
     'sig_am': False,        # Sinal temporal da modulação AM
     'sig_fm': False,        # Sinal temporal da modulação FM
-    'psd_bw': True,        # Espectro de potência (PSD) da modulação BW
-    'psd_am': True,        # Espectro de potência (PSD) da modulação AM
-    'psd_fm': True,        # Espectro de potência (PSD) da modulação FM
-    'error_per_window': True, # Erro absoluto por janela comparando modulações
+    'psd_bw': False,        # Espectro de potência (PSD) da modulação BW
+    'psd_am': False,        # Espectro de potência (PSD) da modulação AM
+    'psd_fm': False,        # Espectro de potência (PSD) da modulação FM
+    'error_per_window': False, # Erro absoluto por janela comparando modulações
     'psd_ref': True        # Espectro de potência (PSD) do sinal de referência
 }
 
@@ -38,7 +38,7 @@ def butter_bandpass(data, lowcut, highcut, fs, order=4):
 
 def get_bvp_features(segment, fs):
     """Detecta picos e vales no sinal rPPG para extração de modulações."""
-    # Filtro para realçar o sinal de pulso (0.7 a 3.5 Hz)
+    # Filtro para realçar o sinal de pulso
     clean_sig = butter_bandpass(segment, 0.7, 3.5, fs)
     
     # Distância mínima entre picos baseada em fisiologia (~130 BPM)
@@ -90,6 +90,8 @@ def estimate_rr_fft(sig, fs):
 
 def calculate_metrics(y_true, y_pred):
     """Calcula MAE, RMSE e MAPE ignorando NaNs."""
+    print(y_true)
+    print(y_pred)
     mask = ~np.isnan(y_true) & ~np.isnan(y_pred)
     y_t = np.array(y_true)[mask]
     y_p = np.array(y_pred)[mask]
@@ -101,7 +103,7 @@ def calculate_metrics(y_true, y_pred):
     return mae, rmse, mape
 
 def process_reference_signal(file_path, fs_ref):
-    """Lê o arquivo de referência e calcula RR por janelas de 30s."""
+    """Lê o arquivo de referência e calcula RR por janelas."""
     try:
         sig = np.loadtxt(file_path)
         if sig.ndim > 1:
@@ -109,7 +111,8 @@ def process_reference_signal(file_path, fs_ref):
     except Exception as e:
         print(f"Erro ao ler referência {file_path}: {e}")
         return None, None
-
+    plt.plot(sig)
+    plt.show()
     win_samples = int(WINDOW_SEC * fs_ref)
     n_windows = len(sig) // win_samples
     ref_rr = [estimate_rr_fft(sig[i*win_samples : (i+1)*win_samples], fs_ref) 
@@ -217,6 +220,8 @@ def run_batch_analysis(folder_path, ref_path=None):
         print(f"Processando sinal de referência: {ref_path}")
         ref_rr, ref_sig = process_reference_signal(ref_path, FS_REF)
 
+    final_stats = []
+
     num_methods = len(all_results)
     cols = 2
     rows = int(np.ceil(num_methods / cols))
@@ -262,6 +267,15 @@ def run_batch_analysis(folder_path, ref_path=None):
                 
                 mae, rmse, mape = calculate_metrics(ref_rr[:min_len], fusion[:min_len])
                 title_metrics = f"\nMAE:{mae:.1f} RMSE:{rmse:.1f} MAPE:{mape:.1f}%"
+
+                # Adicionar às estatísticas finais para exportação
+                final_stats.append({
+                    'method': method_name,
+                    'mae': mae,
+                    'rmse': rmse,
+                    'mape': mape,
+                    'n': min_len
+                })
 
             ax1.set_title(f"RR: {method_name}{title_metrics}")
             ax1.set_ylabel("RPM")
@@ -352,7 +366,8 @@ def run_batch_analysis(folder_path, ref_path=None):
         
         # Usando Welch no sinal completo para ver a frequência respiratória dominante
         fs = FS_REF
-        freqs, psd = welch(ref_sig - np.mean(ref_sig), fs=fs, nperseg=int(WINDOW_SEC * fs), nfft=4096)
+        nfft = 4096 if WINDOW_SEC * fs < 4096 else WINDOW_SEC * fs
+        freqs, psd = welch(ref_sig - np.mean(ref_sig), fs=fs, nperseg=int(WINDOW_SEC * fs), nfft=nfft)
         rpm = freqs * 60
         
         ax_ref.plot(rpm, psd, color='black', lw=2, label='Impedância Torácica')
@@ -371,11 +386,26 @@ def run_batch_analysis(folder_path, ref_path=None):
             fig.delaxes(axes[j])
         fig.tight_layout()
 
+    # Salvar resultados em arquivo txt
+    if final_stats:
+        output_path = os.path.join(os.path.dirname(folder_path), "metrics_rr.txt")
+        try:
+            with open(output_path, 'w', encoding='utf-8') as f:
+                header = f"{'MÉTODO':<20} | {'MAE (RPM)':<10} | {'RMSE (RPM)':<10} | {'MAPE (%)':<10} | {'N'}"
+                f.write(header + "\n")
+                f.write("-" * len(header) + "\n")
+                for s in final_stats:
+                    line = f"{s['method']:<20} | {s['mae']:<10.2f} | {s['rmse']:<10.2f} | {s['mape']:<10.2f} | {s['n']}"
+                    f.write(line + "\n")
+            print(f"\n[INFO] Métricas de erro exportadas para: {output_path}")
+        except Exception as e:
+            print(f"Erro ao salvar arquivo de métricas: {e}")
+
     print("Exibindo gráficos...")
     plt.show()
 
 if __name__ == "__main__":
     # Altere para o caminho da sua pasta de sinais BVP
-    TARGET_FOLDER = r"../preliminary_results/L8/bvp_dl"
-    REF_FILE = r"../get_ground_truth/thoracic_impedance/L8_16-45-38_16-47-38.txt"
+    TARGET_FOLDER = r"../preliminary_results/L7/bvp_dl"
+    REF_FILE = r"../get_ground_truth/thoracic_impedance/L7_16-22-48_16-24-47.txt"
     run_batch_analysis(TARGET_FOLDER, ref_path=REF_FILE)
