@@ -327,6 +327,12 @@ Dispon{\'\i}vel em:
 \textbf{NPJ digital medicine}, Nature Publishing Group UK London, v.~5, n.~1,
   p.~4, 2022.}
 
+\bibitem[Kartynnik et al. 2019]{kartynnik2019real}
+\abntrefinfo{Kartynnik et al.}{KARTYNNIK et al.}{2019}
+{KARTYNNIK, Y.; ABLAVATSKI, A.; GRISHCHENKO, I.; GRUNDMANN, M. Real-time facial
+  surface geometry from monocular video on mobile gpus.
+\textbf{arXiv preprint arXiv:1907.06724}, 2019.}
+
 \bibitem[Khan e Mostafa 2025]{khan2025representation}
 \abntrefinfo{Khan e Mostafa}{KHAN; MOSTAFA}{2025}
 {KHAN, S.~S.; MOSTAFA, N. Representation biases in remote photoplethysmography
@@ -490,6 +496,13 @@ Dispon{\'\i}vel em:
   physiological measurement. In:  \textbf{Proceedings of the IEEE/CVF
   Conference on Computer Vision and Pattern Recognition (CVPR)}. [S.l.: s.n.],
   2021. p. 12404--12413.}
+
+\bibitem[Lugaresi et al. 2019]{lugaresi2019mediapipe}
+\abntrefinfo{Lugaresi et al.}{LUGARESI et al.}{2019}
+{LUGARESI, C.; TANG, J.; NASH, H.; MCCLANAHAN, C.; UBOWEJA, E.; HAYS, M.;
+  ZHANG, F.; CHANG, C.-L.; YONG, M.~G.; LEE, J. et al. Mediapipe: A framework
+  for building perception pipelines.
+\textbf{arXiv preprint arXiv:1906.08172}, 2019.}
 
 \bibitem[Luguern et al. 2020]{luguern2020assessment}
 \abntrefinfo{Luguern et al.}{LUGUERN et al.}{2020}

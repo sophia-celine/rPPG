@@ -1,9 +1,9 @@
 \chapter{Resultados preliminares}
 \label{cap:results}
 
-\section{Coleta preliminar}
+\section{Coleta 1}
 
-Na coleta preliminar, foram adquiridos vídeos e os sinais correspondentes provenientes de monitores multiparamétricos de três pacientes admitidos na UTI. Em um dos casos, o oxímetro de pulso não estava conectado no momento da aquisição, impossibilitando a obtenção do sinal de fotopletismografia de referência. Entre os dois pacientes restantes, um encontrava-se sob suporte ventilatório mecânico e sedação, enquanto o outro estava em estado ativo e sem suporte ventilatório. A seguir, são expostos os resultados do processamento dos sinais obtidos. 
+Na coleta 1, foram adquiridos vídeos e os sinais correspondentes provenientes de monitores multiparâmetros de três pacientes admitidos na UTI. Em um dos casos, o oxímetro de pulso não estava conectado no momento da aquisição, impossibilitando a obtenção do sinal de fotopletismografia de referência. Entre os dois pacientes restantes, um encontrava-se sob suporte ventilatório mecânico e sedação, enquanto o outro estava em estado ativo e sem suporte ventilatório. A seguir, são expostos os resultados do processamento dos sinais obtidos. 
 
 % L7 - paciente 1
 % L9 - paciente 2
@@ -30,7 +30,7 @@ Para realizar a sincronização dos vídeos com os dados de referência, foi rea
 \end{figure}
 
 
-Para o paciente 3, foi realizada a sincronização de forma similar à utilizada na coleta de validação, de forma que foi gerado um ruído no eletrocardiograma causado pela desconexão e reconexão de um dos eletrodos. Esse ruído insere um pico na forma de onda do ECG, conforme a \autoref{fig:ruido-ecg-L8}, sendo que considera-se o sinal no intervalo que se inicia 5 segundos após o momento respectivo a esse pico. Da mesma forma, o vídeo referente a esse paciente é cortado 5 segundos após o quadro em que se identifica a desconexão do eletrodo. 
+Para o paciente 3, foi realizada a sincronização por meio da geração de um ruído no eletrocardiograma causado pela desconexão e reconexão de um dos eletrodos. Foi possível visualizar o momento de geração desse ruído por um pico na forma de onda do ECG, a qual é apresentada na \autoref{fig:ruido-ecg-L8}. 
 
 \begin{figure}[h!]
     \centering
@@ -42,7 +42,7 @@ Para o paciente 3, foi realizada a sincronização de forma similar à utilizada
 
 \subsection{Sinal de rPPG}
 
-Os vídeos adquiridos em formato AVI foram utilizados para a extração dos sinais de pulso de volume sanguíneo por meio dos diferentes modelos e algoritmos supervisionados e não supervisionados de rPPG. A partir disso, a comparação da onda de fotopletismografia obtida remotamente com a onda de referência foi realizada por correlação cruzada, de forma a, primeiramente, sincronizar os dois sinais com base no atraso temporal que resulta no maior valor de correlação. Desse modo, foi calculada a correlação de Pearson entre os sinais sincronizados e os resultados para os pacientes 1 e 2 são apresentados na \autoref{tab:rppg_ppg_correlation}, em que os termos entre parênteses representam as bases de dados nas quais foram treinados cada modelo. 
+A correlação entre os sinais de rPPG e os sinais de fotopletismografia de referência dos vídeos da Coleta 1 foi analisada pelos respectivos índices de correlação de Pearson. Os valores resultantes para os pacientes 1 e 2 são apresentados na \autoref{tab:rppg_ppg_correlation}, em que os termos entre parênteses representam as bases de dados nas quais foram treinados cada modelo. 
 
 \begin{table*}[h!]
 \centering
@@ -112,7 +112,7 @@ Os sinais de rPPG que resultaram no maior coeficiente de correlação entre os m
 
 \subsection{Estimativas de frequência cardíaca}
 
-As estimativas de frequência cardíaca a partir dos sinais gerados por cada método de rPPG foram realizadas considerando o pico do espectro de potência obtido em janelas subsequentes de 15 segundos desses sinais. A partir disso, essas estimativas foram comparadas com as realizadas a partir do sinal de referência de ECG em janelas subsequentes de 15 segundos e foram calculados o erro médio absoluto e o erro médio quadrático em batimentos por minuto, assim como o erro médio percentual. Os resultados referentes aos pacientes 1, 2 e 3 são exibidos na \autoref{tab:rppg_ecg_metrics_all}.
+O erro médio absoluto, o erro médio quadrático em batimentos por minuto e o erro médio percentual entre as estimativas de frequência cardíaca obtidas a partir dos sinais gerados por cada método de rPPG e as obtidas pelo ECG referentes aos pacientes 1, 2 e 3 são exibidos na \autoref{tab:rppg_ecg_metrics_all}.
 
 
 \begin{table*}[htbp]
@@ -225,7 +225,9 @@ As estimativas de frequência cardíaca a partir dos sinais gerados por cada mé
 
 É possível observar que o método não supervisionado que resultou no menor valor de erro absoluto médio para o paciente 1 foi o método CHROM. Em relação ao sinal do paciente 2, os métodos CHROM, ICA e POS resultaram nos menores valores de erro comparados ao restante dos métodos. Além disso, os métodos LGI e POS foram os que resultaram nos menores valores de erro para as estimativas de frequência cardíaca a partir dos sinais do paciente 3. No que se refere aos métodos supervisionados, por sua vez, o modelo PhysFormer treinado do dataset PURE foi o que apresentou o melhor resultado para o paciente 1, o modelo TSCAN treinado no dataset PURE resultou no menor valor de erro para as estimativas do paciente 2 e o modelo PhysNet treinado no mesmo dataset foi o que obteve o melhor resultado para o paciente 3. À parte isso, a comparação entre todos os métodos permite analisar que o método POS foi o que resultou na melhor relação sinal-ruído para os sinais dos pacientes 2 e 3. Já para o paciente 1, o sinal gerado pelo modelo PhysFormer treinado na base de dados PURE foi o que apresentou o melhor valor para essa métrica.
 
-Observa-se, por fim, que os métodos CHROM, ICA e POS aplicados ao sinal do paciente 2 resultaram no menor valor de erro absoluto médio entre todos os algoritmos não supervisionados. Da mesma forma, o modelo TSCAN treinado no dataset PURE também aplicado ao sinal do paciente 2 resultou no menor erro absoluto médio entre os modelos supervisionados. Na \autoref{fig:best-specs-L9}, pode-se analisar os espectrogramas de dois desses sinais, a partir dos quais é possível identificar a região da frequência de maior densidade de potência de forma distinguível ao longo de toda a duração do sinal. 
+Observa-se, por fim, que os métodos CHROM, ICA e POS aplicados ao sinal do paciente 2 resultaram no menor valor de erro absoluto médio entre todos os algoritmos não supervisionados. Da mesma forma, o modelo TSCAN treinado no dataset PURE também aplicado ao sinal do paciente 2 resultou no menor erro absoluto médio entre os modelos supervisionados. Na \autoref{fig:best-specs-L9}, pode-se analisar os espectrogramas de dois desses sinais, nos quais é possível identificar, de forma distinguível, uma região de maior densidade espectral de potência persistente ao longo da maior parte da janela temporal analisada. 
+
+Similarmente, os espectros de potência desses sinais apresentados na \autoref{fig:best-psd-L9} permitem a identificação do pico referente à essa frequência, a partir da qual pode ser realizada a estimativa do valor de frequência cardíaca. Nesse caso, a análise em frequência foi realizada no sinal completo com duração próxima a dois minutos. Em comparação, as estimativas de frequência cardíaca por janela são apresentadas na \autoref{fig:best-estimates-L9}. 
 
 \begin{figure}[h!]
     \centering
@@ -234,9 +236,6 @@ Observa-se, por fim, que os métodos CHROM, ICA e POS aplicados ao sinal do paci
     Fonte: autoria própria
     \label{fig:best-specs-L9}
 \end{figure}
-
-Similarmente, os espectros de potência desses sinais apresentados na \autoref{fig:best-psd-L9} permitem a identificação do pico referente à essa frequência, a partir da qual pode ser realizada a estimativa do valor de frequência cardíaca. Nesse caso, a análise em frequência foi realizada no sinal completo com duração próxima a dois minutos. Em comparação, as estimativas de frequência cardíaca por janela são apresentadas na \autoref{fig:best-estimates-L9}. 
-
 
 \begin{figure}[h!]
     \centering
@@ -258,7 +257,7 @@ Ademais, é possível observar o erro absoluto médio entre todos os métodos n�
 
 \begin{figure}[h!]
     \centering
-\includegraphics[width=1\linewidth]{imagens/mean_error_per_window_2e3.png}
+\includegraphics[width=0.8\linewidth]{imagens/mean_error_per_window_2e3.png}
     \caption{Erro absoluto médio por janela das estimativas de frequência cardíaca realizadas a partir dos métodos supervisionados e não supervisionados para os pacientes 2 e 3.}
     Fonte: autoria própria
     \label{fig:mean-error-per-window-preliminar}
@@ -266,33 +265,148 @@ Ademais, é possível observar o erro absoluto médio entre todos os métodos n�
 
 
 % \clearpage
-\section{Coleta de validação}
+\subsection{Estimativas de frequência respiratória}
 
-Na coleta de validação, foram extraídos dois vídeos de um indivíduo saudável e os sinais de eletrocardiograma correspondentes. No primeiro vídeo coletado, o indivíduo apresentou pouca movimentação, enquanto no vídeo subsequente houve maior movimentação do rosto causada por fala, riso e rotações sutis da cabeça.
+O erro médio absoluto em batimentos por minuto, o erro médio quadrático e o erro médio percentual entre as estimativas de frequência respiratória obtidas a partir dos sinais gerados por cada método de rPPG e as obtidas pelo sinal de referência para os pacientes 1, 2 e 3 são exibidos na \autoref{tab:rppg_rr_metrics_all}.
+
+
+\begin{table*}[h!]
+\centering
+\caption{Métricas de erro da estimativa de frequência respiratória por meio de cada método de rPPG em comparação com as obtidas a partir do sinal de referência para os pacientes 1, 2 e 3.}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{llccccccccc}
+\hline
+\textbf{Categoria} & \textbf{Método} 
+& \multicolumn{3}{c}{\textbf{Paciente 1}} 
+& \multicolumn{3}{c}{\textbf{Paciente 2}} 
+& \multicolumn{3}{c}{\textbf{Paciente 3}} \\
+
+\cline{3-11}
+
+&
+& MAE & RMSE & MAPE
+& MAE & RMSE & MAPE
+& MAE & RMSE & MAPE \\
+
+\hline
+
+\multirow{7}{*}{Não supervisionado}
+
+& CHROM 
+& 10.53 & 11.21 & 41.08
+& 7.04 & 7.76 & 32.51
+& 8.64 & 10.41 & 66.66 \\
+
+& GREEN 
+& 12.77 & 13.21 & 49.82
+& 11.57 & 11.84 & 54.25
+& 5.72 & 7.54 & 26.09 \\
+
+& ICA 
+& 10.37 & 11.20 & 40.47
+& 5.33 & 5.95 & 24.54
+& \textbf{2.79} & \textbf{2.97} & \textbf{20.29} \\
+
+& LGI 
+& 12.09 & 12.25 & 47.17
+& 6.31 & 6.48 & 29.43
+& 9.36 & 9.48 & 64.38 \\
+
+& OMIT 
+& 12.77 & 12.97 & 49.82
+& 7.61 & 7.92 & 36.00
+& 11.02 & 12.10 & 81.79 \\
+
+& PBV 
+& 12.72 & 12.86 & 49.61
+& \textbf{4.65} & \textbf{6.05} & \textbf{21.40}
+& 12.27 & 12.32 & 80.51 \\
+
+& POS 
+& \textbf{9.38} & \textbf{9.89} & \textbf{36.61}
+& 5.28 & 5.37 & 24.67
+& 8.42 & 9.25 & 44.87 \\
+
+\hline
+
+\multirow{10}{*}{Supervisionado}
+
+& DeepPhys (PURE) 
+& 10.58 & 11.72 & 41.28
+& 4.90 & 5.31 & 22.60
+& 6.96 & 8.32 & 35.99 \\
+
+& DeepPhys (UBFC) 
+& 12.46 & 12.98 & 48.60
+& 2.13 & 2.24 & 10.06
+& 7.48 & 7.61 & 47.60 \\
+
+& EfficientPhys (PURE) 
+& 13.81 & 13.89 & 53.88
+& 1.30 & 1.84 & 6.33
+& 10.51 & 10.82 & 78.09 \\
+
+& EfficientPhys (UBFC) 
+& 8.13 & 8.40 & 31.73
+& 5.42 & 6.70 & 24.77
+& 4.94 & 7.15 & 24.64 \\
+
+& PhysFormer (PURE) 
+& 11.00 & 11.21 & 42.91
+& \textbf{1.26} & \textbf{2.04} & \textbf{5.75}
+& 10.56 & 11.47 & 75.31 \\
+
+& PhysFormer (UBFC) 
+& 11.57 & 11.93 & 45.14
+& 6.94 & 8.50 & 31.61
+& 7.64 & 8.36 & 58.11 \\
+
+& PhysNet (PURE) 
+& \textbf{7.29} & \textbf{8.51} & \textbf{28.46}
+& 5.58 & 6.50 & 26.73
+& 11.13 & 13.69 & 98.42 \\
+
+& PhysNet (UBFC) 
+& 9.38 & 10.66 & 36.61
+& 7.31 & 8.83 & 33.57
+& 7.33 & 7.41 & 51.77 \\
+
+& TSCAN (PURE) 
+& 11.52 & 11.64 & 44.94
+& 10.41 & 11.00 & 48.22
+& 9.20 & 10.73 & 68.56 \\
+
+& TSCAN (UBFC) 
+& 8.92 & 10.02 & 34.78
+& 10.58 & 11.74 & 48.84
+& \textbf{3.52} & \textbf{3.85} & \textbf{26.50} \\
+
+\hline
+\end{tabular}
+}
+\label{tab:rppg_rr_metrics_all}
+\end{table*}
+
+
+\section{Coleta 2}
+
+Na coleta 2, foram extraídos dois vídeos de um indivíduo saudável e os sinais de eletrocardiograma correspondentes. No primeiro vídeo coletado, o indivíduo apresentou pouca movimentação, enquanto no vídeo subsequente houve maior movimentação do rosto causada por fala, riso e rotações sutis da cabeça.
 
 \subsection{Sincronização dos dados}
 
-A sincronização entre os dados de vídeo e o sinal de referência foi realizada por meio da geração de um ruído no ECG devido a um impacto no eletrodo utilizado. Esse impacto é visível no sinal, conforme demonstra a \autoref{fig:ruido-ecg-valid}, sendo que foi considerado o sinal 5 segundos após o pico observado. Da mesma forma, são considerados os quadros do vídeo a partir de 5 segundos após o primeiro quadro em que é identificada a interferência no eletrodo.
+A sincronização entre os dados de vídeo e o sinal de referência foi realizada por meio da geração de um ruído no ECG devido a um impacto no eletrodo utilizado. Foi possível visualizar essa interferência de forma distinguível, conforme demonstra a \autoref{fig:ruido-ecg-valid}.
 
 \begin{figure}[h!]
     \centering
 \includegraphics[width=0.7\linewidth]{imagens/ruido_ecg_valid.png}
-    \caption{Exemplo do ruído gerado no eletrocardiograma para sincronização de dados da coleta de validação}
+    \caption{Visualização do instante em que foi gerado o ruído no eletrocardiograma para sincronização de dados da Coleta 2}
     Fonte: autoria própria
     \label{fig:ruido-ecg-valid}
 \end{figure}
 
 \subsection{Estimativas de frequência cardíaca}
 
-% \begin{figure}[h!]
-%     \centering
-% \includegraphics[width=1\linewidth]{imagens/waves_examples.png}
-%     \caption{Exemplos de sinais resultantes extraídos a partir do primeiro vídeo da coleta de validação}
-%     Fonte: autoria própria
-%     \label{fig:waves-valid}
-% \end{figure}
-
-A partir dos sinais de pulso de volume sanguíneo obtidos por meio de cada um dos métodos e modelos de fotopletismografia remota aplicados aos dois vídeos adquiridos durante a coleta de validação, foram realizadas as estimativas de frequência cardíaca por meio da análise espectral desses sinais baseada na Transformada Rápida de Fourier em janelas subsequentes de 15 segundos. Essas estimativas foram comparadas com as obtidas a partir do ECG também em janelas subsequentes de 15 segundos. Os resultados dessas comparações são dispostos na \autoref{tab:rppg_ecg_metrics_valid}. 
+A partir dos sinais de pulso de volume sanguíneo obtidos por meio de cada um dos métodos e modelos de fotopletismografia remota aplicados aos dois vídeos adquiridos durante a coleta 2, foram realizadas as estimativas de frequência cardíaca. Essas estimativas foram comparadas com as obtidas a partir do ECG e os resultados são dispostos na \autoref{tab:rppg_ecg_metrics_valid}. 
 
 \begin{table*}[h!]
 \centering
@@ -384,7 +498,7 @@ frequência com maior densidade de potência pode ser identificada de forma dist
 Nesse caso, a análise espectral foi realizada no sinal em sua completude. Complementarmente, as estimativas de frequência cardíaca realizadas por janela são 
 dispostas na \autoref{fig:best-estimates-valid}.
 
-\begin{figure}[h!]
+\begin{figure}[h]
     \centering
 \includegraphics[width=1\linewidth]{imagens/best_specs_valid.png}
     \caption{Espectrogramas dos sinais cujas estimativas de frequência cardíaca resultaram no menor erro médio absoluto.}
@@ -392,7 +506,7 @@ dispostas na \autoref{fig:best-estimates-valid}.
     \label{fig:specs-valid}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[h]
     \centering
 \includegraphics[width=1\linewidth]{imagens/best_psd_valid.png}
     \caption{Espectros de potência dos sinais cujas estimativas de frequência cardíaca resultaram no menor erro médio absoluto.}
@@ -400,7 +514,7 @@ dispostas na \autoref{fig:best-estimates-valid}.
     \label{fig:best-psd-valid}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[h]
     \centering
 \includegraphics[width=1\linewidth]{imagens/best_estimates_valid.png}
     \caption{Estimativas de frequência cardíaca por janela dos sinais que resultaram no menor erro médio absoluto.}
@@ -408,12 +522,12 @@ dispostas na \autoref{fig:best-estimates-valid}.
     \label{fig:best-estimates-valid}
 \end{figure}
 
-Ademais, são apresentadas as curvas de erro absoluto médio dos métodos não supervisionados em comparação com os métodos supervisionados para os dois vídeos na \autoref{fig:mean-error-window-valid}. Pode-se observar como essas curvas de erro exibem comportamentos temporalmente semelhantes entre os dois grupos de métodos, com ocorrências coincidentes de aumento e redução do erro em múltiplas janelas consecutivas.
+Ademais, são apresentadas as curvas de erro absoluto médio dos métodos não supervisionados em comparação com os métodos supervisionados por janela para os dois vídeos na \autoref{fig:mean-error-window-valid}. Pode-se observar como essas curvas de erro exibem comportamentos temporalmente semelhantes entre os dois grupos de métodos, com ocorrências coincidentes de aumento e redução do erro em múltiplas janelas consecutivas.
 
-\begin{figure}[h!]
+\begin{figure}[h]
     \centering
 \includegraphics[width=1\linewidth]{imagens/mean_error_per_window_valid.png}
-    \caption{Erro absoluto médio por janela dos métodos supervisionados e não supervisionados de cada vídeo da coleta de validação.}
+    \caption{Erro absoluto médio por janela dos métodos supervisionados e não supervisionados de cada vídeo da coleta 2.}
     Fonte: autoria própria
     \label{fig:mean-error-window-valid}
 \end{figure}
