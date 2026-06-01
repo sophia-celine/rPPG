@@ -9,37 +9,6 @@ Na coleta 1, foram adquiridos vídeos e os sinais correspondentes provenientes d
 % L9 - paciente 2
 % L8 - paciente 3
 
-\subsection{Sincronização de dados}
-
-Para realizar a sincronização dos vídeos com os dados de referência, foi realizada uma análise de correlação baseada no índice de correlação de Pearson entre estimativas de frequência cardíaca realizadas a partir do eletrocardiograma e as estimativas realizadas a partir do sinal de rPPG extraído por cada um dos métodos não supervisionados citados na \autoref{tab:metodos_rppg}, conforme exemplifica a \autoref{fig:sinc-L9}. Com isso, foi obtido o gráfico de correlação média entre todos os métodos para cada paciente, como pode ser observado no exemplo da \autoref{fig:mean-corr-L9}. A partir do ponto de maior correlação em cada caso, foi obtido o intervalo a ser considerado para a extração dos dados de referência. 
-
-\begin{figure}[h!]
-    \centering
-\includegraphics[width=1\linewidth]{imagens/hr_L9.png}
-    \caption{Etapas de definição do intervalo considerado para os dados de referência do paciente 2}
-    Fonte: autoria própria
-    \label{fig:sinc-L9}
-\end{figure}
-
-\begin{figure}[h!]
-    \centering
-        \includegraphics[width=\linewidth]{imagens/mean_corr_L9.png}
-        \caption{Correlação média entre os valores de frequência cardíaca obtidos a partir do ECG de referência e os valores estimados pelos métodos de rPPG para o paciente 2}
-        Fonte: autoria própria
-        \label{fig:mean-corr-L9}
-\end{figure}
-
-
-Para o paciente 3, foi realizada a sincronização por meio da geração de um ruído no eletrocardiograma causado pela desconexão e reconexão de um dos eletrodos. Foi possível visualizar o momento de geração desse ruído por um pico na forma de onda do ECG, a qual é apresentada na \autoref{fig:ruido-ecg-L8}. 
-
-\begin{figure}[h!]
-    \centering
-\includegraphics[width=1\linewidth]{imagens/ruido_ecg.png}
-    \caption{Ruído gerado no eletrocardiograma do paciente 3 para sincronização dos dados de referência com o vídeo.}
-    Fonte: autoria própria.
-    \label{fig:ruido-ecg-L8}
-\end{figure}
-
 \subsection{Sinal de rPPG}
 
 A correlação entre os sinais de rPPG e os sinais de fotopletismografia de referência dos vídeos da Coleta 1 foi analisada pelos respectivos índices de correlação de Pearson. Os valores resultantes para os pacientes 1 e 2 são apresentados na \autoref{tab:rppg_ppg_correlation}, em que os termos entre parênteses representam as bases de dados nas quais foram treinados cada modelo. 
@@ -82,7 +51,7 @@ A correlação entre os sinais de rPPG e os sinais de fotopletismografia de refe
 \label{tab:rppg_ppg_correlation}
 \end{table*}
 
-Os sinais de rPPG que resultaram no maior coeficiente de correlação entre os métodos supervisionados foram gerados pelo modelo TSCAN treinado no dataset UBFC-rPPG para o paciente 1 e pelo modelo TSCAN treinado no dataset PURE para o paciente 2. Os sinais obtidos por métodos não supervisionados, por sua vez, que resultaram no maior coeficiente de correlação foram obtidos pelo método GREEN para o paciente 1 e pelo método POS para o paciente 2, sendo que esses sinais em comparação com a referência são apresentados na \autoref{fig:corr-waves-examples}. Reitera-se que essa análise não foi realizada para o paciente 3 devido à ausência do sinal de PPG de referência durante a coleta de dados. 
+Os sinais de rPPG que resultaram no maior coeficiente de correlação entre os métodos supervisionados foram gerados pelo modelo TSCAN treinado no \textit{dataset} UBFC-rPPG para o paciente 1 e pelo modelo TSCAN treinado no \textit{dataset} PURE para o paciente 2. Os sinais obtidos por métodos não supervisionados, por sua vez, que resultaram no maior coeficiente de correlação foram obtidos pelo método GREEN para o paciente 1 e pelo método POS para o paciente 2, sendo que esses sinais em comparação com a referência são apresentados na \autoref{fig:corr-waves-examples}. Reitera-se que essa análise não foi realizada para o paciente 3 devido à ausência do sinal de PPG de referência durante a coleta de dados. 
 
 \begin{figure}[h!]
     \centering
@@ -223,9 +192,9 @@ O erro médio absoluto, o erro médio quadrático em batimentos por minuto e o e
 \label{tab:rppg_ecg_metrics_all}
 \end{table*}
 
-É possível observar que o método não supervisionado que resultou no menor valor de erro absoluto médio para o paciente 1 foi o método CHROM. Em relação ao sinal do paciente 2, os métodos CHROM, ICA e POS resultaram nos menores valores de erro comparados ao restante dos métodos. Além disso, os métodos LGI e POS foram os que resultaram nos menores valores de erro para as estimativas de frequência cardíaca a partir dos sinais do paciente 3. No que se refere aos métodos supervisionados, por sua vez, o modelo PhysFormer treinado do dataset PURE foi o que apresentou o melhor resultado para o paciente 1, o modelo TSCAN treinado no dataset PURE resultou no menor valor de erro para as estimativas do paciente 2 e o modelo PhysNet treinado no mesmo dataset foi o que obteve o melhor resultado para o paciente 3. À parte isso, a comparação entre todos os métodos permite analisar que o método POS foi o que resultou na melhor relação sinal-ruído para os sinais dos pacientes 2 e 3. Já para o paciente 1, o sinal gerado pelo modelo PhysFormer treinado na base de dados PURE foi o que apresentou o melhor valor para essa métrica.
+É possível observar que o método não supervisionado que resultou no menor valor de erro absoluto médio para o paciente 1 foi o método CHROM. Em relação ao sinal do paciente 2, os métodos CHROM, ICA e POS resultaram nos menores valores de erro comparados ao restante dos métodos. Além disso, os métodos LGI e POS foram os que resultaram nos menores valores de erro para as estimativas de frequência cardíaca a partir dos sinais do paciente 3. No que se refere aos métodos supervisionados, por sua vez, o modelo PhysFormer treinado da base de dados PURE foi o que apresentou o melhor resultado para o paciente 1, o modelo TSCAN treinado na base de dados PURE resultou no menor valor de erro para as estimativas do paciente 2 e o modelo PhysNet treinado no mesmo \textit{dataset} foi o que obteve o melhor resultado para o paciente 3. À parte isso, a comparação entre todos os métodos permite analisar que o método POS foi o que resultou na melhor relação sinal-ruído para os sinais dos pacientes 2 e 3. Já para o paciente 1, o sinal gerado pelo modelo PhysFormer treinado na base de dados PURE foi o que apresentou o melhor valor para essa métrica.
 
-Observa-se, por fim, que os métodos CHROM, ICA e POS aplicados ao sinal do paciente 2 resultaram no menor valor de erro absoluto médio entre todos os algoritmos não supervisionados. Da mesma forma, o modelo TSCAN treinado no dataset PURE também aplicado ao sinal do paciente 2 resultou no menor erro absoluto médio entre os modelos supervisionados. Na \autoref{fig:best-specs-L9}, pode-se analisar os espectrogramas de dois desses sinais, nos quais é possível identificar, de forma distinguível, uma região de maior densidade espectral de potência persistente ao longo da maior parte da janela temporal analisada. 
+Observa-se, por fim, que os métodos CHROM, ICA e POS aplicados ao sinal do paciente 2 resultaram no menor valor de erro absoluto médio entre todos os algoritmos não supervisionados. Da mesma forma, o modelo TSCAN treinado na base de dados PURE também aplicado ao sinal do paciente 2 resultou no menor erro absoluto médio entre os modelos supervisionados. Na \autoref{fig:best-specs-L9}, pode-se analisar os espectrogramas de dois desses sinais, nos quais é possível identificar, de forma distinguível, uma região de maior densidade espectral de potência persistente ao longo da maior parte da janela temporal analisada. 
 
 Similarmente, os espectros de potência desses sinais apresentados na \autoref{fig:best-psd-L9} permitem a identificação do pico referente à essa frequência, a partir da qual pode ser realizada a estimativa do valor de frequência cardíaca. Nesse caso, a análise em frequência foi realizada no sinal completo com duração próxima a dois minutos. Em comparação, as estimativas de frequência cardíaca por janela são apresentadas na \autoref{fig:best-estimates-L9}. 
 
@@ -387,22 +356,23 @@ O erro médio absoluto em batimentos por minuto, o erro médio quadrático e o e
 \label{tab:rppg_rr_metrics_all}
 \end{table*}
 
+Pode-ser verificar que as estimativas de frequência respiratória realizadas a partir do sinal gerado pelo método POS foram as que resultaram no menor erro médio absoluto entre os métodos não supervisionados, assim como as estimativas obtidas a partir do sinal gerado pelo modelo PhysNet treinado na base de dados PURE foram as que resultaram no menor erro médio absoluto entre os métodos supervisionados. Para o paciente 2, os métodos que resultaram no menor erro absoluto médio para as estimativas de frequência respiratória foram o PBV, entre os não supervisionados, e o modelo PhysFormer treinado na base de dados PURE, entre os supervisionados. Por fim, para o paciente 3, o método ICA foi o que resultou no menor MAE entre os métodos não supervisionados, ao passo que o modelo TSCAN treinado na base de dados UBFC foi o que resultou no menor MAE entre os supervisionados.
 
 \section{Coleta 2}
 
 Na coleta 2, foram extraídos dois vídeos de um indivíduo saudável e os sinais de eletrocardiograma correspondentes. No primeiro vídeo coletado, o indivíduo apresentou pouca movimentação, enquanto no vídeo subsequente houve maior movimentação do rosto causada por fala, riso e rotações sutis da cabeça.
 
-\subsection{Sincronização dos dados}
+% \subsection{Sincronização dos dados}
 
-A sincronização entre os dados de vídeo e o sinal de referência foi realizada por meio da geração de um ruído no ECG devido a um impacto no eletrodo utilizado. Foi possível visualizar essa interferência de forma distinguível, conforme demonstra a \autoref{fig:ruido-ecg-valid}.
+% A sincronização entre os dados de vídeo e o sinal de referência foi realizada por meio da geração de um ruído no ECG devido a um impacto no eletrodo utilizado. Foi possível visualizar essa interferência de forma distinguível, conforme demonstra a \autoref{fig:ruido-ecg-valid}.
 
-\begin{figure}[h!]
-    \centering
-\includegraphics[width=0.7\linewidth]{imagens/ruido_ecg_valid.png}
-    \caption{Visualização do instante em que foi gerado o ruído no eletrocardiograma para sincronização de dados da Coleta 2}
-    Fonte: autoria própria
-    \label{fig:ruido-ecg-valid}
-\end{figure}
+% \begin{figure}[h!]
+%     \centering
+% \includegraphics[width=0.7\linewidth]{imagens/ruido_ecg_valid.png}
+%     \caption{Visualização do instante em que foi gerado o ruído no eletrocardiograma para sincronização de dados da Coleta 2}
+%     Fonte: autoria própria
+%     \label{fig:ruido-ecg-valid}
+% \end{figure}
 
 \subsection{Estimativas de frequência cardíaca}
 

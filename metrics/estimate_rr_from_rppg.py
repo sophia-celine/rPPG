@@ -10,7 +10,7 @@ from scipy.interpolate import interp1d
 FS_RPPG = 25.0        # Frequência de amostragem original (Câmera)
 FS_REF = 125.0        # Frequência de amostragem do sinal de referência (Impedância)
 FS_RESAMP = 4.0       # Frequência de re-amostragem das modulações (Hz)
-WINDOW_SEC = 60       # Tamanho da janela de análise (Segundos)
+WINDOW_SEC = 30       # Tamanho da janela de análise (Segundos)
 RR_MIN_BPM = 4.0      # Frequência respiratória mínima (BPM)
 RR_MAX_BPM = 65.0     # Frequência respiratória máxima (BPM)
 SD_THRESHOLD = 4.0    # Limite de desvio padrão para fusão robusta (BPM)
@@ -106,12 +106,16 @@ def process_reference_signal(file_path, fs_ref):
     """Lê o arquivo de referência e calcula RR por janelas."""
     try:
         sig = np.loadtxt(file_path)
+        t = np.linspace(0, len(sig)/fs_ref, len(sig))
         if sig.ndim > 1:
             sig = sig[0, :] if sig.shape[0] < sig.shape[1] else sig[:, 0]
+            t = np.linspace(0, len(sig)/fs_ref, len(sig))
     except Exception as e:
         print(f"Erro ao ler referência {file_path}: {e}")
         return None, None
-    plt.plot(sig)
+    plt.plot(t, sig)
+    plt.ylabel('Amplitude')
+    plt.xlabel('Tempo (s)')
     plt.show()
     win_samples = int(WINDOW_SEC * fs_ref)
     n_windows = len(sig) // win_samples
@@ -406,6 +410,6 @@ def run_batch_analysis(folder_path, ref_path=None):
 
 if __name__ == "__main__":
     # Altere para o caminho da sua pasta de sinais BVP
-    TARGET_FOLDER = r"../preliminary_results/L7/bvp_dl"
-    REF_FILE = r"../get_ground_truth/thoracic_impedance/L7_16-22-48_16-24-47.txt"
+    TARGET_FOLDER = r"../preliminary_results/L9/bvp_dl"
+    REF_FILE = r"../get_ground_truth/thoracic_impedance/L9_16-05-26_16-07-25.txt"
     run_batch_analysis(TARGET_FOLDER, ref_path=REF_FILE)

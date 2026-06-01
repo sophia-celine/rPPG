@@ -1,6 +1,14 @@
 \chapter{Materiais e métodos}
 
-Este projeto adota um delineamento observacional, prospectivo e analítico, com o objetivo de validar algoritmos de rPPG para extração de sinais fisiológicos em pacientes críticos internados na UTI do Hospital Universitário da Universidade de São Paulo. O estudo foi aprovado pelo Comitê de Ética em Pesquisa da instituição sob o número Certificado de Apresentação de Apreciação Ética (CAAE) 86650625.3.0000.0076. Todos os dados foram coletados com permissão explícita dos indivíduos envolvidos ou de seus representantes, de modo que as coletas ocorreram apenas após a leitura e assinatura do Termo de Consentimento Livre e Esclarecido  (TCLE) pelo participante ou seu representante legal.
+Este projeto adota um delineamento observacional, prospectivo e analítico, com o objetivo de validar algoritmos de rPPG para extração de sinais fisiológicos em pacientes críticos internados na UTI do Hospital Universitário da Universidade de São Paulo. O fluxo metodológico utilizado é apresentado na \autoref{fig:methods} e compreende a aquisição sincronizada de vídeos faciais e sinais fisiológicos de referência, o processamento dos vídeos para obtenção dos sinais de rPPG, a estimação dos parâmetros fisiológicos de interesse e a comparação dos resultados obtidos com as respectivas medidas de referência. O estudo foi aprovado pelo Comitê de Ética em Pesquisa da instituição sob o número Certificado de Apresentação de Apreciação Ética (CAAE) 86650625.3.0000.0076. Todos os dados foram coletados com permissão explícita dos indivíduos envolvidos ou de seus representantes, de modo que as coletas ocorreram apenas após a leitura e assinatura do Termo de Consentimento Livre e Esclarecido  (TCLE) pelo participante ou seu representante legal.
+
+\begin{figure}[h]
+    \centering
+\includegraphics[width=0.8\linewidth]{imagens/methods.png}
+    \caption{Fluxo metodológico empregado para a validação dos algoritmos de fotopletismografia remota. (1) Aquisição de vídeos faciais e sinais fisiológicos de referência; (2) detecção da ROI a partir das imagens e extração do sinal bruto de rPPG por meio de cada algoritmo a ser validado; (3) estimação dos parâmetros de frequência cardíaca e de frequência respiratória; e (4) comparação das estimativas com os sinais de referência por meio de métricas de avaliação.}
+    Fonte: autoria própria
+    \label{fig:methods}
+\end{figure}
 
 \section{Aquisição de dados}
 
@@ -32,7 +40,7 @@ Em seguida, foi realizada a aquisição de dois vídeos em formato AVI sem compr
 
 \subsection{Coletas futuras}
 
-Em etapas futuras, serão realizadas outras coletas de dados no ambiente da UTI, distribuídas em diferentes momentos de forma a considerar condições de iluminação distintas, tanto no período diurno, quanto no período noturno. Essas coletas se darão por meio da gravação de vídeos da face de pacientes, bem como da aquisição dos sinais de referência dos monitores multiparâmetros. Antes de cada gravação, serão registradas as condições de iluminação próximas à face do paciente por meio de um luxímetro digital (Fluke 941, Fluke Corporation, EUA). Também será realizada a estimativa do fototipo cutâneo, de acordo com a escala de Fitzpatrick, utilizando um Analisador de Fototipo de Pele Digital (\textit{Skinup Beauty Devices}, Brasil), posicionado na região da testa. 
+Em etapas futuras, serão realizadas outras coletas de dados no ambiente da UTI, contemplando diferentes condições clínicas e condições de iluminação. Pretende-se realizar a gravação de vídeos da face de ao menos dez pacientes, bem como a aquisição dos respectivos sinais de referência dos monitores multiparâmetros. Antes de cada gravação, serão registradas as condições de iluminação próximas à face do paciente por meio de um luxímetro digital (Fluke 941, Fluke Corporation, EUA). Também será realizada a estimativa do fototipo cutâneo, de acordo com a escala de Fitzpatrick, utilizando um Analisador de Fototipo de Pele Digital (\textit{Skinup Beauty Devices}, Brasil), posicionado na região da testa. 
 
 Para cada paciente, serão adquiridos dois vídeos em formato AVI sem compressão de 2 minutos e 5 segundos de duração, com uma câmera do modelo VCXU.2-57C (Baumer, Suíça) com comunicação USB 3.0 configurada com 50 quadros por segundo, com uma resolução fixa de 1056x1076 e tempo de exposição fixo em 19500 milissegundos. O ganho, foco e abertura do sensor foram configurados de forma a maximizar a qualidade visual das imagens, reduzindo regiões de baixa iluminância causadas por subexposição e evitando saturação de pixels. Além disso, a distância entre o indivíduo e a câmera será definida de acordo com a posição do paciente no ambiente de internação. Caso o paciente esteja deitado no leito, a câmera será posicionada ao pé da cama hospitalar. Caso o paciente esteja sentado na poltrona disponível no ambiente, a câmera será posicionada a uma distância fixa de 180 cm da face.  
 
@@ -40,7 +48,7 @@ Simultaneamente à gravação de cada vídeo, serão adquiridos sinais fisiológ
 
 \section{Processamento de dados de vídeo}
 
-Os dados de vídeo foram processados com o uso do conjunto de ferramentas de código aberto denominado rPPG-Toolbox \cite{liu2022rppg}, o qual disponibiliza implementações dos principais métodos não supervisionados de extração de sinais por fotopletismografia remota. Além disso, esse recurso inclui modelos supervisionados para treinamento e teste em bases de dados de acesso livre, além de permitir a inclusão de modelos e bases customizados. Com isso, propõe-se a validação dos algoritmos mostrados na \autoref{tab:metodos_rppg} nos dados coletados dos pacientes de UTI, por meio da inserção de um dataset customizado e da adaptação do conjunto de ferramentas citado.
+Para a avaliação dos algoritmos de fotopletismografia remota nos dados coletados, os vídeos adquiridos foram processados por meio de um fluxo de análise implementado com o auxílio da ferramenta de código aberto rPPG-Toolbox \cite{liu2022rppg}. Essa plataforma disponibiliza implementações dos principais métodos não supervisionados de extração de sinais por fotopletismografia remota, além de modelos supervisionados para treinamento e avaliação em bases de dados públicas. Adicionalmente, o ambiente permite a incorporação de conjuntos de dados e algoritmos customizados. Com isso, propõe-se a validação dos algoritmos mostrados na \autoref{tab:metodos_rppg} nos dados coletados dos pacientes de UTI, por meio da inserção de um dataset customizado e da adaptação do conjunto de ferramentas citado.
 
 \begin{table}[ht]
 \centering
@@ -140,7 +148,7 @@ No que se refere ao processamento dos dados de referência, foi extraído o sina
 
 \section{Métricas de avaliação}
 
-Para avaliação das estimativas de frequência cardíaca e frequência respiratória obtidas remotamente, foram calculados o Erro Absoluto Médio (\textit{Mean Absolute Error} - MAE), o Erro Quadrático Médio (\textit{Root Mean Square Error} -  RMSE) e o Erro Percentual Absoluto Médio (\textit{Mean Absolute Percentage Error} - MAPE), de forma que os valores de frequência cardíaca estimados a partir do sinal de rPPG foram comparados janela a janela com os valores estimados a partir do ECG. Os valores de frequência respiratória estimados a partir do sinal obtido remotamente, por sua vez, foram comparados janela a janela com os valores estimados a partir do sinal respiratório de referência. Ademais, foi calculada a relação sinal-ruído da onda de rPPG, considerando a frequência cardíaca obtida por meio do ECG como referência. Também foi calculado o Índice de Correlação de Pearson para comparação entre a onda de rPPG e a onda fotopletismogtáfica obtida com o oxímetro de pulso.  Nesse sentido, é definido a seguir o cálculo de cada métrica aplicada.
+Para avaliação das estimativas de frequência cardíaca e frequência respiratória obtidas remotamente, foram calculados o Erro Absoluto Médio (\textit{Mean Absolute Error} - MAE), o Erro Quadrático Médio (\textit{Root Mean Square Error} -  RMSE) e o Erro Percentual Absoluto Médio (\textit{Mean Absolute Percentage Error} - MAPE), de forma que os valores de frequência cardíaca estimados a partir do sinal de rPPG foram comparados janela a janela com os valores estimados a partir do ECG. Os valores de frequência respiratória estimados a partir do sinal obtido remotamente, por sua vez, foram comparados janela a janela com os valores estimados a partir do sinal respiratório de referência. Ademais, foi calculada a relação sinal-ruído (\textit{Signal-to-Noise Ratio} - SNR) da onda de rPPG, considerando a frequência cardíaca obtida por meio do ECG como referência. Também foi calculado o Índice de Correlação de Pearson para comparação entre a onda de rPPG e a onda fotopletismogtáfica obtida com o oxímetro de pulso.  Nesse sentido, é definido a seguir o cálculo de cada métrica aplicada.
 
 \textbf{Erro Absoluto Médio (MAE)} 
 \begin{equation}
@@ -174,19 +182,19 @@ Em todas as equações, \(R_g\) é o valor de referência, \(R_p\) é o valor es
 
 \textbf{Relação Sinal-Ruído (SNR)}
 
-A relação sinal-ruído é obtida pela razão entre a energia espectral associada à frequência fundamental do sinal de referência e ao seu primeiro harmônico e a energia espectral remanescente considerando a banda de busca entre 36 bpm e 198 bpm, ou 0,6 Hz e 3,3 Hz, de acordo com a equação:
+A relação sinal-ruído é obtida pela razão entre a energia espectral associada à frequência fundamental do sinal de referência e ao seu primeiro harmônico e a energia espectral remanescente, de acordo com a equação:
 
 \begin{equation}
 SNR = 10 \log_{10} \left(
 \frac{
-\sum_{f=36}^{198} \left( U_t(f) S(f) \right)^2
+\sum_{f=f_{min}}^{f_{max}} \left( U_t(f) S(f) \right)^2
 }{
-\sum_{f=36}^{198} \left( (1 - U_t(f)) S(f) \right)^2
+\sum_{f=f_{min}}^{f_{max}} \left( (1 - U_t(f)) S(f) \right)^2
 }
 \right)
 \end{equation}
 
-Nesse caso, \(S\) é o espectro de frequência do sinal de rPPG, \(f\) é a frequência em batimentos por minuto e \(U_t(f)\) representa uma máscara binária centrada na frequência fundamental e no primeiro harmônico do sinal de referência. Essa máscara foi considerada de forma a assumir valor unitário nas bandas de interesse delimitadas por uma tolerância de \(\pm\) 0,1 Hz em torno dessas frequências e valor nulo nas demais componentes espectrais, conforme exemplifica a \autoref{fig:snr}.
+Nesse caso, \(S\) é o espectro de frequência do sinal de rPPG, \(f\) é a frequência em batimentos por minuto, \(f_{min}\) e \(f_{max}\) são as frequências mínima e máxima consideradas na banda analisada e \(U_t(f)\) representa uma máscara binária centrada na frequência fundamental e no primeiro harmônico do sinal de referência. Essa máscara foi considerada de forma a assumir valor unitário nas bandas de interesse delimitadas por uma tolerância de \(\pm\) 0,1 Hz em torno dessas frequências e valor nulo nas demais componentes espectrais, conforme exemplifica a \autoref{fig:snr}.
 
 \begin{figure}[h]
     \centering
