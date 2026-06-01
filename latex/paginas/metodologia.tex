@@ -12,11 +12,11 @@ Este projeto adota um delineamento observacional, prospectivo e analítico, com 
 
 \section{Aquisição de dados}
 
-A aquisição de dados foi realizada em dois experimentos diferentes, denominados Coleta 1 e Coleta 2. Em etapas futuras, serão realizadas outras coletas de dados distribuídas durante o período de desenvolvimento deste trabalho.
+A aquisição de dados foi realizada em dois experimentos diferentes, denominados Coleta Preliminar 1 e Coleta Preliminar 2. Em etapas futuras, serão realizadas outras coletas de dados distribuídas durante o período de desenvolvimento deste trabalho.
 
-\subsection{Coleta 1}
+\subsection{Coleta Preliminar 1}
 
-O primeiro experimento realizado, denominado Coleta 1, se deu por meio da aquisição de vídeos da face de pacientes internados na UTI, sob condições de iluminação ambiente do leito, sem interferência na conduta clínica e sem imposição de restrições ao paciente durante o período de monitoramento. Inicialmente, após a inclusão do participante no estudo, foi definida a posição de monitoramento de acordo com a condição do paciente no momento da coleta. Quando o paciente estava deitado no leito, a câmera foi posicionada ao pé da cama hospitalar, conforme ilustrado na \autoref{fig:setupcoleta}. Quando o paciente estava sentado na poltrona disponível no ambiente de internação, a câmera foi posicionada a uma distância fixa aproximada de 180 cm da face.
+O primeiro experimento realizado, denominado Coleta Preliminar 1, se deu por meio da aquisição de vídeos da face de pacientes internados na UTI, sob condições de iluminação ambiente do leito, sem interferência na conduta clínica e sem imposição de restrições ao paciente durante o período de monitoramento. Inicialmente, após a inclusão do participante no estudo, foi definida a posição de monitoramento de acordo com a condição do paciente no momento da coleta. Quando o paciente estava deitado no leito, a câmera foi posicionada ao pé da cama hospitalar, conforme ilustrado na \autoref{fig:setupcoleta}. Quando o paciente estava sentado na poltrona disponível no ambiente de internação, a câmera foi posicionada a uma distância fixa aproximada de 180 cm da face.
 
 \begin{figure}[h!]
     \centering
@@ -32,9 +32,9 @@ Simultaneamente à gravação do vídeo, foram adquiridos sinais fisiológicos d
 
 No que se refere à sincronização dos dados de vídeo com os sinais de referência, foram utilizadas duas estratégias. A primeira considerou a análise por correlação entre as estimativas de frequência cardíaca obtidas a partir do sinal de rPPG e das obtidas por meio do ECG adquirido de forma contínua, de forma que o ponto de maior correlação foi considerado para o alinhamento temporal desses sinais. A segunda estratégia foi baseada na inserção de um ruído no eletrocardiograma por meio de uma interferência física em um dos eletrodos visível no enquadramento do vídeo.
 
-\subsection{Coleta 2}
+\subsection{Coleta Preliminar 2}
 
-O segundo experimento realizado, denominado Coleta 2, se deu por meio da gravação de vídeos da face de um indivíduo saudável não hospitalizado para a validação do \textit{setup} experimental. Antes de cada gravação, foram registradas as condições de iluminação próximas à face do paciente por meio de um luxímetro digital (Fluke 941, Fluke Corporation, EUA). Também foi realizada a estimativa do fototipo cutâneo, de acordo com a escala de Fitzpatrick, utilizando um Analisador de Fototipo de Pele Digital (\textit{Skinup Beauty Devices}, Brasil), posicionado na região da testa. 
+O segundo experimento realizado, denominado Coleta Preliminar 2, se deu por meio da gravação de vídeos da face de um indivíduo saudável não hospitalizado para a validação do \textit{setup} experimental. Antes de cada gravação, foram registradas as condições de iluminação próximas à face do paciente por meio de um luxímetro digital (Fluke 941, Fluke Corporation, EUA). Também foi realizada a estimativa do fototipo cutâneo, de acordo com a escala de Fitzpatrick, utilizando um Analisador de Fototipo de Pele Digital (\textit{Skinup Beauty Devices}, Brasil), posicionado na região da testa. 
 
 Em seguida, foi realizada a aquisição de dois vídeos em formato AVI sem compressão de 2 minutos e 5 segundos de duração, com uma câmera industrial do modelo VCXU.2-57C (Baumer, Suíça) com comunicação USB 3.0 configurada com 50 quadros por segundo, com uma resolução fixa de 1056x1076 e tempo de exposição fixo em 19500 milissegundos. O ganho, foco e abertura do sensor foram configurados de forma a maximizar a qualidade visual das imagens, reduzindo regiões de baixa iluminância causadas por subexposição e evitando saturação de pixels. Além disso, a distância entre o indivíduo e a câmera foi definida como 140 centímetros. Nesse caso, foi adquirido o sinal de eletrocardiograma, correspondente à derivação II, com um equipamento de eletromiografia e registro de potenciais evocados (MEB-2300K, Nihon Koden, Japão) com frequência de amostragem de 1000 Hz. A sincronização de dados foi realizada por meio do alinhamento temporal baseado na inserção de um ruído no eletrocardiograma por meio de uma interferência física em um dos eletrodos visível no enquadramento do vídeo.
 
@@ -110,6 +110,7 @@ A partir do sinal inicial de rPPG, a demodulação da componente BW foi obtida p
     \end{subfigure}
 
     \caption{Estratégias de extração de cada modulação gerada pela respiração a partir do sinal de rPPG}
+    Fonte: autoria própria
     \label{fig:resp-mods-algorithms}
 \end{figure}
 

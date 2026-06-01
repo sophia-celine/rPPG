@@ -137,13 +137,13 @@ if __name__ == "__main__":
     # Para usar duas pastas: FOLDERS = ["/caminho/pasta1", "/caminho/pasta2"]
     
     FOLDERS = [
-        "/home/soph/rppg/rPPG/preliminary_results/examples",
+        "../preliminary_results/L9/bvp",
         # "/home/soph/rppg/rPPG/preliminary_results/L9/bvp"
         # "/home/soph/rppg/rPPG/preliminary_results/L9/outra_pasta" # Exemplo de segunda pasta
     ]
     
     # Frequência de amostragem da câmera
-    SAMPLING_RATE = 50 
+    SAMPLING_RATE = 25 
     
     # Banda de interesse (0.6 a 3.3 Hz corresponde a ~36 a 198 BPM)
     LOW_HZ = 0.6

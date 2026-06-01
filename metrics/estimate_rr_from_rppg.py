@@ -11,9 +11,10 @@ FS_RPPG = 25.0        # Frequência de amostragem original (Câmera)
 FS_REF = 125.0        # Frequência de amostragem do sinal de referência (Impedância)
 FS_RESAMP = 4.0       # Frequência de re-amostragem das modulações (Hz)
 WINDOW_SEC = 30       # Tamanho da janela de análise (Segundos)
-RR_MIN_BPM = 4.0      # Frequência respiratória mínima (BPM)
-RR_MAX_BPM = 65.0     # Frequência respiratória máxima (BPM)
-SD_THRESHOLD = 4.0    # Limite de desvio padrão para fusão robusta (BPM)
+RR_MIN_BPM = 4.0      # Frequência respiratória mínima (RPM)
+RR_MAX_BPM = 65.0     # Frequência respiratória máxima (RPM)
+SD_THRESHOLD = 4.0    # Limite de desvio padrão para fusão robusta (RPM)
+SAVE_TXT = False        
 
 # Configurações de visualização
 PLOT_CONFIG = {
@@ -24,7 +25,7 @@ PLOT_CONFIG = {
     'psd_bw': False,        # Espectro de potência (PSD) da modulação BW
     'psd_am': False,        # Espectro de potência (PSD) da modulação AM
     'psd_fm': False,        # Espectro de potência (PSD) da modulação FM
-    'error_per_window': False, # Erro absoluto por janela comparando modulações
+    'error_per_window': True, # Erro absoluto por janela comparando modulações
     'psd_ref': True        # Espectro de potência (PSD) do sinal de referência
 }
 
@@ -41,7 +42,7 @@ def get_bvp_features(segment, fs):
     # Filtro para realçar o sinal de pulso
     clean_sig = butter_bandpass(segment, 0.7, 3.5, fs)
     
-    # Distância mínima entre picos baseada em fisiologia (~130 BPM)
+    # Distância mínima entre picos baseada em fisiologia (~130 RPM)
     min_dist = int(fs * 0.45)
     peaks, _ = find_peaks(clean_sig, distance=min_dist)
     troughs, _ = find_peaks(-clean_sig, distance=min_dist)
@@ -227,24 +228,25 @@ def run_batch_analysis(folder_path, ref_path=None):
     final_stats = []
 
     num_methods = len(all_results)
-    cols = 2
+    cols = 1
     rows = int(np.ceil(num_methods / cols))
 
     plots = {}
-    def setup_fig(key, title):
+    def setup_fig(key, title=""):
         if PLOT_CONFIG.get(key):
             fig, axes = plt.subplots(rows, cols, figsize=(16, 4 * rows), squeeze=False)
-            fig.suptitle(title, fontsize=16)
+            if title: 
+                fig.suptitle(title, fontsize=16)
             plots[key] = (fig, axes.flatten())
 
-    setup_fig('rr_estimates', 'Estimativas de Frequência Respiratória (RR) por Janela')
+    setup_fig('rr_estimates')
     setup_fig('sig_bw', 'Sequências de Modulação de Linha de Base (BW)')
     setup_fig('sig_am', 'Sequências de Modulação de Amplitude (AM)')
     setup_fig('sig_fm', 'Sequências de Modulação de Frequência (FM)')
     setup_fig('psd_bw', 'Espectro de Potência (PSD) - Modulação BW')
     setup_fig('psd_am', 'Espectro de Potência (PSD) - Modulação AM')
     setup_fig('psd_fm', 'Espectro de Potência (PSD) - Modulação FM')
-    setup_fig('error_per_window', 'Erro Absoluto por Janela (BPM) - Comparação de Modulações')
+    setup_fig('error_per_window')
 
     for i, (filename, res) in enumerate(all_results):
         method_name = filename.split('_')[1] if '_' in filename else filename
@@ -258,10 +260,10 @@ def run_batch_analysis(folder_path, ref_path=None):
             ax1.plot(wins, res['fm'], 'r--', alpha=0.4, label='FM')
 
             fusion = np.array(res['fusion'])
-            reliable = np.array(res['is_reliable'], dtype=bool)
-            ax1.scatter(wins[reliable], fusion[reliable], color='black', s=30, label='Fusão (OK)')
-            ax1.scatter(wins[~reliable], fusion[~reliable], color='red', marker='x', label='Fusão (Instável)')
-            ax1.plot(wins, fusion, 'k-', alpha=0.2)
+            # reliable = np.array(res['is_reliable'], dtype=bool)
+            # ax1.scatter(wins[reliable], fusion[reliable], color='black', s=30, label='Fusão (OK)')
+            # ax1.scatter(wins[~reliable], fusion[~reliable], color='red', marker='x', label='Fusão (Instável)')
+            ax1.plot(wins, fusion, color='orange', label='Fusão')
 
             # Plot da Referência e Cálculo de Métricas
             title_metrics = ""
@@ -281,8 +283,9 @@ def run_batch_analysis(folder_path, ref_path=None):
                     'n': min_len
                 })
 
-            ax1.set_title(f"RR: {method_name}{title_metrics}")
+            ax1.set_title(f"{method_name}{title_metrics}")
             ax1.set_ylabel("RPM")
+            ax1.set_xlabel("Janela")
             ax1.set_ylim(RR_MIN_BPM - 5, RR_MAX_BPM + 5)
             ax1.legend(loc='upper right', fontsize='x-small', ncol=2)
             ax1.grid(True, alpha=0.3)
@@ -357,8 +360,8 @@ def run_batch_analysis(folder_path, ref_path=None):
             ax_err.plot(wins, err_fm, 'r--', alpha=0.5, label='Erro FM')
             ax_err.plot(wins, err_fusion, 'k-', linewidth=1.5, label='Erro Fusão')
             
-            ax_err.set_title(f"Erro: {method_name}")
-            ax_err.set_ylabel("Erro (BPM)")
+            ax_err.set_title(f"{method_name}")
+            ax_err.set_ylabel("Erro (RPM)")
             ax_err.set_xlabel("Janela")
             ax_err.legend(loc='upper right', fontsize='x-small', ncol=2)
             ax_err.grid(True, alpha=0.3)
@@ -366,7 +369,7 @@ def run_batch_analysis(folder_path, ref_path=None):
     # Plot do Espectro de Referência (Figura Independente)
     if PLOT_CONFIG.get('psd_ref') and ref_sig is not None:
         fig_psd_ref, ax_ref = plt.subplots(figsize=(10, 6))
-        fig_psd_ref.suptitle('Espectro de Potência (PSD) - Sinal de Referência (GT)', fontsize=16)
+        # fig_psd_ref.suptitle('Espectro de Potência (PSD) - Sinal de Referência (GT)', fontsize=16)
         
         # Usando Welch no sinal completo para ver a frequência respiratória dominante
         fs = FS_REF
@@ -391,7 +394,7 @@ def run_batch_analysis(folder_path, ref_path=None):
         fig.tight_layout()
 
     # Salvar resultados em arquivo txt
-    if final_stats:
+    if SAVE_TXT and final_stats:
         output_path = os.path.join(os.path.dirname(folder_path), "metrics_rr.txt")
         try:
             with open(output_path, 'w', encoding='utf-8') as f:
@@ -410,6 +413,6 @@ def run_batch_analysis(folder_path, ref_path=None):
 
 if __name__ == "__main__":
     # Altere para o caminho da sua pasta de sinais BVP
-    TARGET_FOLDER = r"../preliminary_results/L9/bvp_dl"
-    REF_FILE = r"../get_ground_truth/thoracic_impedance/L9_16-05-26_16-07-25.txt"
+    TARGET_FOLDER = r"../preliminary_results/examples"
+    REF_FILE = r"../get_ground_truth/thoracic_impedance/L8_16-45-38_16-47-38.txt"
     run_batch_analysis(TARGET_FOLDER, ref_path=REF_FILE)

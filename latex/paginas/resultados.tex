@@ -1,9 +1,9 @@
 \chapter{Resultados preliminares}
 \label{cap:results}
 
-\section{Coleta 1}
+\section{Coleta Preliminar 1}
 
-Na coleta 1, foram adquiridos vídeos e os sinais correspondentes provenientes de monitores multiparâmetros de três pacientes admitidos na UTI. Em um dos casos, o oxímetro de pulso não estava conectado no momento da aquisição, impossibilitando a obtenção do sinal de fotopletismografia de referência. Entre os dois pacientes restantes, um encontrava-se sob suporte ventilatório mecânico e sedação, enquanto o outro estava em estado ativo e sem suporte ventilatório. A seguir, são expostos os resultados do processamento dos sinais obtidos. 
+Na Coleta Preliminar 1, foram adquiridos vídeos e os sinais correspondentes provenientes de monitores multiparâmetros de três pacientes admitidos na UTI. Em um dos casos, o oxímetro de pulso não estava conectado no momento da aquisição, impossibilitando a obtenção do sinal de fotopletismografia de referência. Entre os dois pacientes restantes, um encontrava-se sob suporte ventilatório mecânico e sedação, enquanto o outro estava em estado ativo e sem suporte ventilatório. A seguir, são expostos os resultados do processamento dos sinais obtidos. 
 
 % L7 - paciente 1
 % L9 - paciente 2
@@ -11,7 +11,7 @@ Na coleta 1, foram adquiridos vídeos e os sinais correspondentes provenientes d
 
 \subsection{Sinal de rPPG}
 
-A correlação entre os sinais de rPPG e os sinais de fotopletismografia de referência dos vídeos da Coleta 1 foi analisada pelos respectivos índices de correlação de Pearson. Os valores resultantes para os pacientes 1 e 2 são apresentados na \autoref{tab:rppg_ppg_correlation}, em que os termos entre parênteses representam as bases de dados nas quais foram treinados cada modelo. 
+A correlação entre os sinais de rPPG e os sinais de fotopletismografia de referência dos vídeos da Coleta Preliminar 1 foi analisada pelos respectivos índices de correlação de Pearson. Os valores resultantes para os pacientes 1 e 2 são apresentados na \autoref{tab:rppg_ppg_correlation}, em que os termos entre parênteses representam as bases de dados nas quais foram treinados cada modelo. 
 
 \begin{table*}[h!]
 \centering
@@ -236,8 +236,7 @@ Ademais, é possível observar o erro absoluto médio entre todos os métodos n�
 % \clearpage
 \subsection{Estimativas de frequência respiratória}
 
-O erro médio absoluto em batimentos por minuto, o erro médio quadrático e o erro médio percentual entre as estimativas de frequência respiratória obtidas a partir dos sinais gerados por cada método de rPPG e as obtidas pelo sinal de referência para os pacientes 1, 2 e 3 são exibidos na \autoref{tab:rppg_rr_metrics_all}.
-
+O erro médio absoluto, o erro médio quadrático, medidos em respirações por minuto (RPM), e o erro médio percentual entre as estimativas de frequência respiratória obtidas a partir dos sinais gerados por cada método de rPPG e as obtidas pelo sinal de referência para os pacientes 1, 2 e 3 são exibidos na \autoref{tab:rppg_rr_metrics_all}.
 
 \begin{table*}[h!]
 \centering
@@ -356,11 +355,21 @@ O erro médio absoluto em batimentos por minuto, o erro médio quadrático e o e
 \label{tab:rppg_rr_metrics_all}
 \end{table*}
 
-Pode-ser verificar que as estimativas de frequência respiratória realizadas a partir do sinal gerado pelo método POS foram as que resultaram no menor erro médio absoluto entre os métodos não supervisionados, assim como as estimativas obtidas a partir do sinal gerado pelo modelo PhysNet treinado na base de dados PURE foram as que resultaram no menor erro médio absoluto entre os métodos supervisionados. Para o paciente 2, os métodos que resultaram no menor erro absoluto médio para as estimativas de frequência respiratória foram o PBV, entre os não supervisionados, e o modelo PhysFormer treinado na base de dados PURE, entre os supervisionados. Por fim, para o paciente 3, o método ICA foi o que resultou no menor MAE entre os métodos não supervisionados, ao passo que o modelo TSCAN treinado na base de dados UBFC foi o que resultou no menor MAE entre os supervisionados.
+Pode-ser verificar que, para os dados do paciente 1, as estimativas de frequência respiratória realizadas a partir do sinal gerado pelo método POS foram as que resultaram no menor erro médio absoluto entre os métodos não supervisionados, assim como as estimativas obtidas a partir do sinal gerado pelo modelo PhysNet treinado na base de dados PURE foram as que resultaram no menor erro médio absoluto entre os métodos supervisionados. Para o paciente 2, os métodos que resultaram no menor erro médio absoluto para as estimativas de frequência respiratória foram o PBV, entre os não supervisionados, e o modelo PhysFormer treinado na base de dados PURE, entre os supervisionados. Por fim, para o paciente 3, o método ICA foi o que resultou no menor MAE entre os métodos não supervisionados, ao passo que o modelo TSCAN treinado na base de dados UBFC foi o que resultou no menor MAE entre os supervisionados.
 
-\section{Coleta 2}
+Entre os métodos não supervisionados, para todos os pacientes, o método ICA aplicado ao vídeo do paciente 3 foi o que gerou estimativas de frequência respiratória com o menor erro médio absoluto. Já entre os métodos supervisionados, o modelo PhysFormer treinado na base de dados PURE aplicado no vídeo do paciente 2 foi o que resultou no sinal cujas estimativas de frequência respiratória tiveram o menor MAE. As estimativas por janela obtidas por meio de cada um dos tipos de demodulação e por meio da fusão das demodulações desses sinais são apresentadas na \autoref{fig:rr-best}, bem como o erro por janela. Nessa figura, é possível observar, ainda, que as estimativas obtidas por meio da fusão dos três tipos de demodulação apresentam, na maioria dos pontos, um erro menor do que o erro das estimativas obtidas pelas demodulações individuais.
 
-Na coleta 2, foram extraídos dois vídeos de um indivíduo saudável e os sinais de eletrocardiograma correspondentes. No primeiro vídeo coletado, o indivíduo apresentou pouca movimentação, enquanto no vídeo subsequente houve maior movimentação do rosto causada por fala, riso e rotações sutis da cabeça.
+\begin{figure}[h!]
+    \centering
+\includegraphics[width=1\linewidth]{imagens/rr_best.png}
+    \caption{Estimativas de frequência respiratória por janela e respectivos erros absolutos para os casos de melhor desempenho: método ICA (Paciente 3) e modelo PhysFormer treinado na base de dados PURE (Paciente 2). Os gráficos detalham os valores obtidos via demodulações de linha de base (BW), amplitude (AM) e frequência (FM), além da estimativa final resultante da fusão das três demodulações, em comparação com o sinal de referência.}
+    Fonte: autoria própria
+    \label{fig:rr-best}
+\end{figure}
+
+\section{Coleta Preliminar 2}
+
+Na Coleta Preliminar 2, foram extraídos dois vídeos de um indivíduo saudável e os sinais de eletrocardiograma correspondentes. No primeiro vídeo coletado, o indivíduo apresentou pouca movimentação, enquanto no vídeo subsequente houve maior movimentação do rosto causada por fala, riso e rotações sutis da cabeça.
 
 % \subsection{Sincronização dos dados}
 
@@ -376,7 +385,7 @@ Na coleta 2, foram extraídos dois vídeos de um indivíduo saudável e os sinai
 
 \subsection{Estimativas de frequência cardíaca}
 
-A partir dos sinais de pulso de volume sanguíneo obtidos por meio de cada um dos métodos e modelos de fotopletismografia remota aplicados aos dois vídeos adquiridos durante a coleta 2, foram realizadas as estimativas de frequência cardíaca. Essas estimativas foram comparadas com as obtidas a partir do ECG e os resultados são dispostos na \autoref{tab:rppg_ecg_metrics_valid}. 
+A partir dos sinais de pulso de volume sanguíneo obtidos por meio de cada um dos métodos e modelos de fotopletismografia remota aplicados aos dois vídeos adquiridos durante a Coleta Preliminar 2, foram realizadas as estimativas de frequência cardíaca. Essas estimativas foram comparadas com as obtidas a partir do ECG e os resultados são dispostos na \autoref{tab:rppg_ecg_metrics_valid}. 
 
 \begin{table*}[h!]
 \centering
@@ -497,7 +506,7 @@ Ademais, são apresentadas as curvas de erro absoluto médio dos métodos não s
 \begin{figure}[h]
     \centering
 \includegraphics[width=1\linewidth]{imagens/mean_error_per_window_valid.png}
-    \caption{Erro absoluto médio por janela dos métodos supervisionados e não supervisionados de cada vídeo da coleta 2.}
+    \caption{Erro absoluto médio por janela dos métodos supervisionados e não supervisionados de cada vídeo da Coleta Preliminar 2.}
     Fonte: autoria própria
     \label{fig:mean-error-window-valid}
 \end{figure}
