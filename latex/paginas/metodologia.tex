@@ -90,14 +90,14 @@ A partir do sinal inicial de rPPG, a demodulação da componente BW foi obtida p
     \begin{subfigure}{0.7\textwidth}
         \centering
         \includegraphics[width=\linewidth]{imagens/bw.png}
-        \caption{Demodulação da componente BW}
+        \caption{Demodulação da componente BW.}
         \label{fig:bw-algorithm}
     \end{subfigure}
 
     \begin{subfigure}{0.7\textwidth}
         \centering
         \includegraphics[width=\linewidth]{imagens/am.png}
-        \caption{Demodulação da componente AM}
+        \caption{Demodulação da componente AM.}
         \label{fig:am-algorithm}
     \end{subfigure}
 
@@ -105,11 +105,11 @@ A partir do sinal inicial de rPPG, a demodulação da componente BW foi obtida p
     \begin{subfigure}{0.7\textwidth}
         \centering
         \includegraphics[width=\linewidth]{imagens/fm.png}
-        \caption{Demodulação da componente FM}
+        \caption{Demodulação da componente FM.}
         \label{fig:fm-algorithm}
     \end{subfigure}
 
-    \caption{Estratégias de extração de cada modulação gerada pela respiração a partir do sinal de rPPG}
+    \caption{Estratégias de extração de cada modulação gerada pela respiração a partir do sinal de rPPG.}
     Fonte: autoria própria
     \label{fig:resp-mods-algorithms}
 \end{figure}
@@ -207,4 +207,4 @@ Nesse caso, \(S\) é o espectro de frequência do sinal de rPPG, \(f\) é a freq
 
 \section{Construção da base de dados pública}
 
-Serão disponibilizados os vídeos e os sinais de referência adquiridos de modo anonimizado em forma de uma base de dados pública, a fim de fomentar desenvolvimentos futuros de aplicações de fotopletismografia remota baseadas em dados de condições clínicas reais. Para isso, cada vídeo será anonimizado por meio da inserção de uma máscara sobre os olhos e a boca dos pacientes em cada quadro. Para que esse procedimento de anonimização não prejudique a detecção de regiões de interesse, será disponibilizada uma malha com a estimativas de 478 pontos da face em cada quadro do vídeo gerada com o modelo de malha facial \cite{kartynnik2019real} da biblioteca MediaPipe \cite{lugaresi2019mediapipe}. Além disso, será disponibilizada uma versão simplificada da detecção da face que corresponde à região retangular gerada com a ferramenta Yolo5Face \cite{qi2022yolo5face}. Em relação ao sinais de referência, serão disponibilizados os sinais referentes ao ECG, ao sinal respiratório e à onda de fotopletismografia obtida com oxímetro de pulso respectivos a cada vídeo. 
+Serão disponibilizados os vídeos e os sinais de referência adquiridos de modo anonimizado em forma de uma base de dados pública, a fim de fomentar desenvolvimentos futuros de aplicações de fotopletismografia remota baseadas em dados de condições clínicas reais. Para isso, cada vídeo será anonimizado por meio da inserção de uma máscara sobre os olhos e a boca dos pacientes em cada quadro. Para que esse procedimento de anonimização não prejudique a detecção de regiões de interesse, será disponibilizada uma malha com estimativas de 478 pontos da face em cada quadro do vídeo gerada com o modelo de malha facial \cite{kartynnik2019real} da biblioteca MediaPipe \cite{lugaresi2019mediapipe}. Além disso, será disponibilizada uma versão simplificada da detecção da face que corresponde à região retangular gerada com a ferramenta Yolo5Face \cite{qi2022yolo5face}. Em relação ao sinais de referência, serão disponibilizados os sinais referentes ao ECG, ao sinal respiratório e à onda de fotopletismografia obtida com oxímetro de pulso respectivos a cada vídeo. Por fim, serão disponibilizadas características do paciente referente a cada vídeo como idade, gênero e informações epidemiológicas. 

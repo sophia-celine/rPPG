@@ -7,65 +7,95 @@
 
 \bibitem[Acharya et al. 2006]{acharya2006heart}
 \abntrefinfo{Acharya et al.}{ACHARYA et al.}{2006}
-{ACHARYA, U.~R.; JOSEPH, P.~K.; KANNATHAL, N.; LIM, C.~M.; SURI, J.~S. Heart rate variability: a review.
-\textbf{Medical \& biological engineering \& computing}, Institution of Electrical Engineers, Savoy Pl. London WC 2 R 0 BL UK, v.~44, n.~12, p. 1031--1051, 2006.}
+{ACHARYA, U.~R.; JOSEPH, P.~K.; KANNATHAL, N.; LIM, C.~M.; SURI, J.~S. Heart
+  rate variability: a review.
+\textbf{Medical \& biological engineering \& computing}, Institution of
+  Electrical Engineers, Savoy Pl. London WC 2 R 0 BL UK, v.~44, n.~12, p.
+  1031--1051, 2006.}
 
 \bibitem[Aguiar et al. 2021]{aguiar2021perfil}
 \abntrefinfo{Aguiar et al.}{AGUIAR et al.}{2021}
-{AGUIAR, L. M.~M.; MARTINS, G. d.~S.; VALDUGA, R.; GEREZ, A.~P.; CARMO, E. C.~d.; CUNHA, K. d.~C.; CIPRIANO, G. F.~B.; SILVA, M. L.~d. Perfil de unidades de terapia intensiva adulto no brasil: revis{\~a}o sistem{\'a}tica de estudos observacionais.
-\textbf{Revista Brasileira de Terapia Intensiva}, SciELO Brasil, v.~33, n.~4, p. 624--634, 2021.}
+{AGUIAR, L. M.~M.; MARTINS, G. d.~S.; VALDUGA, R.; GEREZ, A.~P.; CARMO, E.
+  C.~d.; CUNHA, K. d.~C.; CIPRIANO, G. F.~B.; SILVA, M. L.~d. Perfil de
+  unidades de terapia intensiva adulto no brasil: revis{\~a}o sistem{\'a}tica
+  de estudos observacionais.
+\textbf{Revista Brasileira de Terapia Intensiva}, SciELO Brasil, v.~33, n.~4,
+  p. 624--634, 2021.}
 
 \bibitem[Al-Naji et al. 2017]{al2017remote}
 \abntrefinfo{Al-Naji et al.}{AL-NAJI et al.}{2017}
-{AL-NAJI, A.; PERERA, A.~G.; CHAHL, J. Remote monitoring of cardiorespiratory signals from a hovering unmanned aerial vehicle.
+{AL-NAJI, A.; PERERA, A.~G.; CHAHL, J. Remote monitoring of cardiorespiratory
+  signals from a hovering unmanned aerial vehicle.
 \textbf{Biomedical engineering online}, Springer, v.~16, n.~1, p.~101, 2017.}
 
 \bibitem[Allen 2007]{allen2007photoplethysmography}
 \abntrefinfo{Allen}{ALLEN}{2007}
-{ALLEN, J. Photoplethysmography and its application in clinical physiological measurement.
+{ALLEN, J. Photoplethysmography and its application in clinical physiological
+  measurement.
 \textbf{Physiological measurement}, IoP Publishing, v.~28, n.~3, p.~R1, 2007.}
 
 \bibitem[Bautista et al. 2023]{bautista2023clinical}
 \abntrefinfo{Bautista et al.}{BAUTISTA et al.}{2023}
-{BAUTISTA, M.~J.; KOWAL, M.; CAVE, D.~G.; DOWNEY, C.; JAYNE, D.~G. Clinical applications of contactless photoplethysmography for monitoring in adults: A systematic review and meta-analysis.
-\textbf{Journal of Clinical and Translational Science}, Cambridge University Press, v.~7, n.~1, p.~e129, 2023.}
+{BAUTISTA, M.~J.; KOWAL, M.; CAVE, D.~G.; DOWNEY, C.; JAYNE, D.~G. Clinical
+  applications of contactless photoplethysmography for monitoring in adults: A
+  systematic review and meta-analysis.
+\textbf{Journal of Clinical and Translational Science}, Cambridge University
+  Press, v.~7, n.~1, p.~e129, 2023.}
 
 \bibitem[Berger et al. 1986]{berger1986efficient}
 \abntrefinfo{Berger et al.}{BERGER et al.}{1986}
-{BERGER, R.~D.; AKSELROD, S.; GORDON, D.; COHEN, R.~J. An efficient algorithm for spectral analysis of heart rate variability.
-\textbf{IEEE Transactions on biomedical engineering}, IEEE, n.~9, p. 900--904, 1986.}
+{BERGER, R.~D.; AKSELROD, S.; GORDON, D.; COHEN, R.~J. An efficient algorithm
+  for spectral analysis of heart rate variability.
+\textbf{IEEE Transactions on biomedical engineering}, IEEE, n.~9, p. 900--904,
+  1986.}
 
 \bibitem[Bian et al. 2019]{bian2019accurate}
 \abntrefinfo{Bian et al.}{BIAN et al.}{2019}
-{BIAN, M.; PENG, B.; WANG, W.; DONG, J. An accurate lstm based video heart rate estimation method. In:  SPRINGER. \textbf{Chinese Conference on Pattern Recognition and Computer Vision (PRCV)}. [S.l.], 2019. p. 409--417.}
+{BIAN, M.; PENG, B.; WANG, W.; DONG, J. An accurate lstm based video heart rate
+  estimation method. In:  SPRINGER. \textbf{Chinese Conference on Pattern
+  Recognition and Computer Vision (PRCV)}. [S.l.], 2019. p. 409--417.}
 
 \bibitem[Blackford e Estepp 2015]{blackford2015effects}
 \abntrefinfo{Blackford e Estepp}{BLACKFORD; ESTEPP}{2015}
-{BLACKFORD, E.~B.; ESTEPP, J.~R. Effects of frame rate and image resolution on pulse rate measured using multiple camera imaging photoplethysmography. In:  SPIE. \textbf{Medical Imaging 2015: Biomedical Applications in Molecular, Structural, and Functional Imaging}. [S.l.], 2015. v.~9417, p. 639--652.}
+{BLACKFORD, E.~B.; ESTEPP, J.~R. Effects of frame rate and image resolution on
+  pulse rate measured using multiple camera imaging photoplethysmography. In:
+  SPIE. \textbf{Medical Imaging 2015: Biomedical Applications in Molecular,
+  Structural, and Functional Imaging}. [S.l.], 2015. v.~9417, p. 639--652.}
 
 \bibitem[Bobbia et al. 2019]{bobbia2019unsupervised}
 \abntrefinfo{Bobbia et al.}{BOBBIA et al.}{2019}
-{BOBBIA, S.; MACWAN, R.; BENEZETH, Y.; MANSOURI, A.; DUBOIS, J. Unsupervised skin tissue segmentation for remote photoplethysmography.
+{BOBBIA, S.; MACWAN, R.; BENEZETH, Y.; MANSOURI, A.; DUBOIS, J. Unsupervised
+  skin tissue segmentation for remote photoplethysmography.
 \textbf{Pattern recognition letters}, Elsevier, v.~124, p. 82--90, 2019.}
 
 \bibitem[Boccignone et al. 2023]{boccignone2023evaluation}
 \abntrefinfo{Boccignone et al.}{BOCCIGNONE et al.}{2023}
-{BOCCIGNONE, G.; D’AMELIO, A.; GHEZZI, O.; GROSSI, G.; LANZAROTTI, R. An evaluation of non-contact photoplethysmography-based methods for remote respiratory rate estimation.
+{BOCCIGNONE, G.; D’AMELIO, A.; GHEZZI, O.; GROSSI, G.; LANZAROTTI, R. An
+  evaluation of non-contact photoplethysmography-based methods for remote
+  respiratory rate estimation.
 \textbf{Sensors}, MDPI, v.~23, n.~7, p.~3387, 2023.}
 
 \bibitem[Bondarenko et al. 2025]{bondarenko2025role}
 \abntrefinfo{Bondarenko et al.}{BONDARENKO et al.}{2025}
-{BONDARENKO, M.; MENON, C.; ELGENDI, M. The role of face regions in remote photoplethysmography for contactless heart rate monitoring.
-\textbf{npj Digital Medicine}, Nature Publishing Group UK London, v.~8, n.~1, p.~479, 2025.}
+{BONDARENKO, M.; MENON, C.; ELGENDI, M. The role of face regions in remote
+  photoplethysmography for contactless heart rate monitoring.
+\textbf{npj Digital Medicine}, Nature Publishing Group UK London, v.~8, n.~1,
+  p.~479, 2025.}
 
 \bibitem[Botina-Monsalve et al. 2020]{botina2020long}
 \abntrefinfo{Botina-Monsalve et al.}{BOTINA-MONSALVE et al.}{2020}
-{BOTINA-MONSALVE, D.; BENEZETH, Y.; MACWAN, R.; PIERRART, P.; PARRA, F.; NAKAMURA, K.; GOMEZ, R.; MITERAN, J. Long short-term memory deep-filter in remote photoplethysmography. In:  \textbf{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops}. [S.l.: s.n.], 2020. p. 306--307.}
+{BOTINA-MONSALVE, D.; BENEZETH, Y.; MACWAN, R.; PIERRART, P.; PARRA, F.;
+  NAKAMURA, K.; GOMEZ, R.; MITERAN, J. Long short-term memory deep-filter in
+  remote photoplethysmography. In:  \textbf{Proceedings of the IEEE/CVF
+  Conference on Computer Vision and Pattern Recognition Workshops}. [S.l.:
+  s.n.], 2020. p. 306--307.}
 
 \bibitem[Bousefsaf et al. 2017]{bousefsaf2017automatic}
 \abntrefinfo{Bousefsaf et al.}{BOUSEFSAF et al.}{2017}
-{BOUSEFSAF, F.; MAAOUI, C.; PRUSKI, A. Automatic selection of webcam photoplethysmographic pixels based on lightness criteria.
-\textbf{Journal of Medical and Biological Engineering}, Springer, v.~37, n.~3, p. 374--385, 2017.}
+{BOUSEFSAF, F.; MAAOUI, C.; PRUSKI, A. Automatic selection of webcam
+  photoplethysmographic pixels based on lightness criteria.
+\textbf{Journal of Medical and Biological Engineering}, Springer, v.~37, n.~3,
+  p. 374--385, 2017.}
 
 \bibitem[Cardoso 1999]{cardoso1999high}
 \abntrefinfo{Cardoso}{CARDOSO}{1999}
@@ -74,459 +104,693 @@
 
 \bibitem[Casado e L{\'o}pez 2023]{casado2023face2ppg}
 \abntrefinfo{Casado e L{\'o}pez}{CASADO; L{\'O}PEZ}{2023}
-{CASADO, C.~A.; L{\'O}PEZ, M.~B. Face2ppg: An unsupervised pipeline for blood volume pulse extraction from faces.
-\textbf{IEEE Journal of Biomedical and Health Informatics}, IEEE, v.~27, n.~11, p. 5530--5541, 2023.}
+{CASADO, C.~A.; L{\'O}PEZ, M.~B. Face2ppg: An unsupervised pipeline for blood
+  volume pulse extraction from faces.
+\textbf{IEEE Journal of Biomedical and Health Informatics}, IEEE, v.~27, n.~11,
+  p. 5530--5541, 2023.}
 
 \bibitem[Casalino et al. 2020]{casalino2020mhealth}
 \abntrefinfo{Casalino et al.}{CASALINO et al.}{2020}
-{CASALINO, G.; CASTELLANO, G.; ZAZA, G. A mhealth solution for contact-less self-monitoring of blood oxygen saturation. In:  IEEE. \textbf{2020 IEEE Symposium on Computers and Communications (ISCC)}. [S.l.], 2020. p.~1--7.}
+{CASALINO, G.; CASTELLANO, G.; ZAZA, G. A mhealth solution for contact-less
+  self-monitoring of blood oxygen saturation. In:  IEEE. \textbf{2020 IEEE
+  Symposium on Computers and Communications (ISCC)}. [S.l.], 2020. p.~1--7.}
 
 \bibitem[Charlton et al. 2016]{charlton2016assessment}
 \abntrefinfo{Charlton et al.}{CHARLTON et al.}{2016}
-{CHARLTON, P.~H.; BONNICI, T.; TARASSENKO, L.; CLIFTON, D.~A.; BEALE, R.; WATKINSON, P.~J. An assessment of algorithms to estimate respiratory rate from the electrocardiogram and photoplethysmogram.
-\textbf{Physiological measurement}, IOP Publishing, v.~37, n.~4, p. 610--626, 2016.}
+{CHARLTON, P.~H.; BONNICI, T.; TARASSENKO, L.; CLIFTON, D.~A.; BEALE, R.;
+  WATKINSON, P.~J. An assessment of algorithms to estimate respiratory rate
+  from the electrocardiogram and photoplethysmogram.
+\textbf{Physiological measurement}, IOP Publishing, v.~37, n.~4, p. 610--626,
+  2016.}
 
 \bibitem[Chen e McDuff 2018]{chen2018deepphys}
 \abntrefinfo{Chen e McDuff}{CHEN; MCDUFF}{2018}
-{CHEN, W.; MCDUFF, D. Deepphys: Video-based physiological measurement using convolutional attention networks. In:  \textbf{Proceedings of the european conference on computer vision (ECCV)}. [S.l.: s.n.], 2018. p. 349--365.}
+{CHEN, W.; MCDUFF, D. Deepphys: Video-based physiological measurement using
+  convolutional attention networks. In:  \textbf{Proceedings of the european
+  conference on computer vision (ECCV)}. [S.l.: s.n.], 2018. p. 349--365.}
 
 \bibitem[Chen et al. 2024]{chen2024deep}
 \abntrefinfo{Chen et al.}{CHEN et al.}{2024}
-{CHEN, W.; YI, Z.; LIM, L. J.~R.; LIM, R. Q.~R.; ZHANG, A.; QIAN, Z.; HUANG, J.; HE, J.; LIU, B. Deep learning and remote photoplethysmography powered advancements in contactless physiological measurement.
-\textbf{Frontiers in bioengineering and biotechnology}, Frontiers Media SA, v.~12, p. 1420100, 2024.}
+{CHEN, W.; YI, Z.; LIM, L. J.~R.; LIM, R. Q.~R.; ZHANG, A.; QIAN, Z.; HUANG,
+  J.; HE, J.; LIU, B. Deep learning and remote photoplethysmography powered
+  advancements in contactless physiological measurement.
+\textbf{Frontiers in bioengineering and biotechnology}, Frontiers Media SA,
+  v.~12, p. 1420100, 2024.}
 
 \bibitem[Cheng et al. 2021]{cheng2021deep}
 \abntrefinfo{Cheng et al.}{CHENG et al.}{2021}
-{CHENG, C.-H.; WONG, K.-L.; CHIN, J.-W.; CHAN, T.-T.; SO, R.~H. Deep learning methods for remote heart rate measurement: A review and future research agenda.
+{CHENG, C.-H.; WONG, K.-L.; CHIN, J.-W.; CHAN, T.-T.; SO, R.~H. Deep learning
+  methods for remote heart rate measurement: A review and future research
+  agenda.
 \textbf{sensors}, MDPI, v.~21, n.~18, p.~6296, 2021.}
 
 \bibitem[Cheng et al. 2016]{cheng2016illumination}
 \abntrefinfo{Cheng et al.}{CHENG et al.}{2016}
-{CHENG, J.; CHEN, X.; XU, L.; WANG, Z.~J. Illumination variation-resistant video-based heart rate measurement using joint blind source separation and ensemble empirical mode decomposition.
-\textbf{IEEE journal of biomedical and health informatics}, IEEE, v.~21, n.~5, p. 1422--1433, 2016.}
+{CHENG, J.; CHEN, X.; XU, L.; WANG, Z.~J. Illumination variation-resistant
+  video-based heart rate measurement using joint blind source separation and
+  ensemble empirical mode decomposition.
+\textbf{IEEE journal of biomedical and health informatics}, IEEE, v.~21, n.~5,
+  p. 1422--1433, 2016.}
 
 \bibitem[Couderc et al. 2015]{couderc2015detection}
 \abntrefinfo{Couderc et al.}{COUDERC et al.}{2015}
-{COUDERC, J.-P.; KYAL, S.; MESTHA, L.~K.; XU, B.; PETERSON, D.~R.; XIA, X.; HALL, B. Detection of atrial fibrillation using contactless facial video monitoring.
+{COUDERC, J.-P.; KYAL, S.; MESTHA, L.~K.; XU, B.; PETERSON, D.~R.; XIA, X.;
+  HALL, B. Detection of atrial fibrillation using contactless facial video
+  monitoring.
 \textbf{Heart rhythm}, Elsevier, v.~12, n.~1, p. 195--201, 2015.}
 
 \bibitem[Daltro-Oliveira et al. 2025]{daltro2025global}
 \abntrefinfo{Daltro-Oliveira et al.}{DALTRO-OLIVEIRA et al.}{2025}
-{DALTRO-OLIVEIRA, R.; QUINTAIROS, A.; SANTOS, L.; AMADO, F.; SALLUH, J.; JR, A. N. Global disparities in scientific publications: A 5-year analysis of 10 critical care journals.
-\textbf{Critical Care and Resuscitation}, Elsevier, v.~27, n.~4, p. 100137, 2025.}
+{DALTRO-OLIVEIRA, R.; QUINTAIROS, A.; SANTOS, L.; AMADO, F.; SALLUH, J.; JR, A.
+  N. Global disparities in scientific publications: A 5-year analysis of 10
+  critical care journals.
+\textbf{Critical Care and Resuscitation}, Elsevier, v.~27, n.~4, p. 100137,
+  2025.}
 
 \bibitem[Dosovitskiy et al. 2021]{dosovitskiy2021imageworth16x16words}
 \abntrefinfo{Dosovitskiy et al.}{DOSOVITSKIY et al.}{2021}
-{DOSOVITSKIY, A.; BEYER, L.; KOLESNIKOV, A.; WEISSENBORN, D.; ZHAI, X.; UNTERTHINER, T.; DEHGHANI, M.; MINDERER, M.; HEIGOLD, G.; GELLY, S.; USZKOREIT, J.; HOULSBY, N. \textbf{An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale}. 2021.
+{DOSOVITSKIY, A.; BEYER, L.; KOLESNIKOV, A.; WEISSENBORN, D.; ZHAI, X.;
+  UNTERTHINER, T.; DEHGHANI, M.; MINDERER, M.; HEIGOLD, G.; GELLY, S.;
+  USZKOREIT, J.; HOULSBY, N. \textbf{An Image is Worth 16x16 Words:
+  Transformers for Image Recognition at Scale}. 2021.
 Dispon{\'\i}vel em: \url{https://arxiv.org/abs/2010.11929}.}
 
 \bibitem[Ede et al. 2021]{ede2021ICUhumanfactors}
 \abntrefinfo{Ede et al.}{EDE et al.}{2021}
-{EDE, J.; VOLLAM, S.; DARBYSHIRE, J.~L.; GIBSON, O.; TARASSENKO, L.; WATKINSON, P. Non-contact vital sign monitoring of patients in an intensive care unit: A human factors analysis of staff expectations.
+{EDE, J.; VOLLAM, S.; DARBYSHIRE, J.~L.; GIBSON, O.; TARASSENKO, L.; WATKINSON,
+  P. Non-contact vital sign monitoring of patients in an intensive care unit: A
+  human factors analysis of staff expectations.
 \textbf{Applied Ergonomics}, Elsevier, v.~90, p. 103149, 2021.}
 
 \bibitem[Elliott e Coventry 2012]{elliott2012vitalsigns}
 \abntrefinfo{Elliott e Coventry}{ELLIOTT; COVENTRY}{2012}
-{ELLIOTT, M.; COVENTRY, A. Critical care: the eight vital signs of patient monitoring.
-\textbf{British Journal of Nursing}, MA Healthcare London, v.~21, n.~10, p. 621--625, 2012.}
+{ELLIOTT, M.; COVENTRY, A. Critical care: the eight vital signs of patient
+  monitoring.
+\textbf{British Journal of Nursing}, MA Healthcare London, v.~21, n.~10, p.
+  621--625, 2012.}
 
 \bibitem[Esch et al. 2025]{van2025camera}
 \abntrefinfo{Esch et al.}{ESCH et al.}{2025}
-{ESCH, R.~J. van; CRAMER, I.~C.; VERSTAPPEN, C.; KLOEZE, C.; BOUWMAN, R.~A.; DEKKER, L.; MONTENIJ, L.; BERGMANS, J.; STUIJK, S.; ZINGER, S. Camera-based continuous heart and respiration rate monitoring in the icu.
+{ESCH, R.~J. van; CRAMER, I.~C.; VERSTAPPEN, C.; KLOEZE, C.; BOUWMAN, R.~A.;
+  DEKKER, L.; MONTENIJ, L.; BERGMANS, J.; STUIJK, S.; ZINGER, S. Camera-based
+  continuous heart and respiration rate monitoring in the icu.
 \textbf{Applied Sciences}, MDPI, v.~15, n.~7, p.~3422, 2025.}
 
 \bibitem[Fallow et al. 2013]{fallow2013influence}
 \abntrefinfo{Fallow et al.}{FALLOW et al.}{2013}
-{FALLOW, B.~A.; TARUMI, T.; TANAKA, H. Influence of skin type and wavelength on light wave reflectance.
-\textbf{Journal of clinical monitoring and computing}, Springer, v.~27, n.~3, p. 313--317, 2013.}
+{FALLOW, B.~A.; TARUMI, T.; TANAKA, H. Influence of skin type and wavelength on
+  light wave reflectance.
+\textbf{Journal of clinical monitoring and computing}, Springer, v.~27, n.~3,
+  p. 313--317, 2013.}
 
 \bibitem[Fan et al. 2024]{fan2024remote}
 \abntrefinfo{Fan et al.}{FAN et al.}{2024}
-{FAN, X.; LIU, F.; ZHANG, J.; GAO, T.; FAN, Z.; HUANG, Z.; XUE, W.; ZHANG, J. Remote photoplethysmography based on reflected light angle estimation.
-\textbf{Physiological Measurement}, IOP Publishing, v.~45, n.~3, p. 035005, 2024.}
+{FAN, X.; LIU, F.; ZHANG, J.; GAO, T.; FAN, Z.; HUANG, Z.; XUE, W.; ZHANG, J.
+  Remote photoplethysmography based on reflected light angle estimation.
+\textbf{Physiological Measurement}, IOP Publishing, v.~45, n.~3, p. 035005,
+  2024.}
 
 \bibitem[Fan et al. 2020]{fan2020robust}
 \abntrefinfo{Fan et al.}{FAN et al.}{2020}
-{FAN, X.; YE, Q.; YANG, X.; CHOUDHURY, S.~D. Robust blood pressure estimation using an rgb camera.
-\textbf{Journal of Ambient Intelligence and Humanized Computing}, Springer, v.~11, n.~11, p. 4329--4336, 2020.}
+{FAN, X.; YE, Q.; YANG, X.; CHOUDHURY, S.~D. Robust blood pressure estimation
+  using an rgb camera.
+\textbf{Journal of Ambient Intelligence and Humanized Computing}, Springer,
+  v.~11, n.~11, p. 4329--4336, 2020.}
 
 \bibitem[Feng et al. 2014]{feng2014motion}
 \abntrefinfo{Feng et al.}{FENG et al.}{2014}
-{FENG, L.; PO, L.-M.; XU, X.; LI, Y.; MA, R. Motion-resistant remote imaging photoplethysmography based on the optical properties of skin.
-\textbf{IEEE Transactions on Circuits and Systems for Video Technology}, IEEE, v.~25, n.~5, p. 879--891, 2014.}
+{FENG, L.; PO, L.-M.; XU, X.; LI, Y.; MA, R. Motion-resistant remote imaging
+  photoplethysmography based on the optical properties of skin.
+\textbf{IEEE Transactions on Circuits and Systems for Video Technology}, IEEE,
+  v.~25, n.~5, p. 879--891, 2014.}
 
 \bibitem[Fitzpatrick 1988]{fitzpatrick1988validity}
 \abntrefinfo{Fitzpatrick}{FITZPATRICK}{1988}
-{FITZPATRICK, T.~B. The validity and practicality of sun-reactive skin types i through vi.
-\textbf{Archives of dermatology}, American Medical Association, v.~124, n.~6, p. 869--871, 1988.}
+{FITZPATRICK, T.~B. The validity and practicality of sun-reactive skin types i
+  through vi.
+\textbf{Archives of dermatology}, American Medical Association, v.~124, n.~6,
+  p. 869--871, 1988.}
 
 \bibitem[Gent et al. 2018]{heartpy}
 \abntrefinfo{Gent et al.}{GENT et al.}{2018}
-{GENT, P. van; FARAH, H.; NES, N.; AREM, B. Heart rate analysis for human factors: Development and validation of an open source toolkit for noisy naturalistic heart rate data. In:  . [S.l.: s.n.], 2018.}
+{GENT, P. van; FARAH, H.; NES, N.; AREM, B. Heart rate analysis for human
+  factors: Development and validation of an open source toolkit for noisy
+  naturalistic heart rate data. In:  . [S.l.: s.n.], 2018.}
 
 \bibitem[GS et al. 2024]{gs2024remote}
 \abntrefinfo{GS et al.}{GS et al.}{2024}
-{GS, Y.~K.; BHATTACHARYA, S.; AISHWARYA, N. Remote photoplethysmography (rppg) for contactless blood oxygen saturation monitoring. In:  IEEE. \textbf{2024 IEEE International Conference on Electronics, Computing and Communication Technologies (CONECCT)}. [S.l.], 2024. p.~1--6.}
+{GS, Y.~K.; BHATTACHARYA, S.; AISHWARYA, N. Remote photoplethysmography (rppg)
+  for contactless blood oxygen saturation monitoring. In:  IEEE. \textbf{2024
+  IEEE International Conference on Electronics, Computing and Communication
+  Technologies (CONECCT)}. [S.l.], 2024. p.~1--6.}
 
 \bibitem[Guazzi et al. 2015]{guazzi2015non}
 \abntrefinfo{Guazzi et al.}{GUAZZI et al.}{2015}
-{GUAZZI, A.~R.; VILLARROEL, M.; JORGE, J.; DALY, J.; FRISE, M.~C.; ROBBINS, P.~A.; TARASSENKO, L. Non-contact measurement of oxygen saturation with an rgb camera.
-\textbf{Biomedical optics express}, Optical Society of America, v.~6, n.~9, p. 3320--3338, 2015.}
+{GUAZZI, A.~R.; VILLARROEL, M.; JORGE, J.; DALY, J.; FRISE, M.~C.; ROBBINS,
+  P.~A.; TARASSENKO, L. Non-contact measurement of oxygen saturation with an
+  rgb camera.
+\textbf{Biomedical optics express}, Optical Society of America, v.~6, n.~9, p.
+  3320--3338, 2015.}
 
 \bibitem[Guler et al. 2022]{guler2022effects}
 \abntrefinfo{Guler et al.}{GULER et al.}{2022}
-{GULER, S.; OZTURK, O.; GOLPARVAR, A.; DOGAN, H.; YAPICI, M.~K. Effects of illuminance intensity on the green channel of remote photoplethysmography (rppg) signals.
-\textbf{Physical and Engineering Sciences in Medicine}, Springer, v.~45, n.~4, p. 1317--1323, 2022.}
+{GULER, S.; OZTURK, O.; GOLPARVAR, A.; DOGAN, H.; YAPICI, M.~K. Effects of
+  illuminance intensity on the green channel of remote photoplethysmography
+  (rppg) signals.
+\textbf{Physical and Engineering Sciences in Medicine}, Springer, v.~45, n.~4,
+  p. 1317--1323, 2022.}
 
 \bibitem[Haan e Jeanne 2013]{de2013robust}
 \abntrefinfo{Haan e Jeanne}{HAAN; JEANNE}{2013}
 {HAAN, G. D.; JEANNE, V. Robust pulse rate from chrominance-based rppg.
-\textbf{IEEE transactions on biomedical engineering}, IEEE, v.~60, n.~10, p. 2878--2886, 2013.}
+\textbf{IEEE transactions on biomedical engineering}, IEEE, v.~60, n.~10, p.
+  2878--2886, 2013.}
 
 \bibitem[Haan e Leest 2014]{de2014improved}
 \abntrefinfo{Haan e Leest}{HAAN; LEEST}{2014}
-{HAAN, G. D.; LEEST, A. V. Improved motion robustness of remote-ppg by using the blood volume pulse signature.
-\textbf{Physiological measurement}, IOP Publishing, v.~35, n.~9, p. 1913--1926, 2014.}
+{HAAN, G. D.; LEEST, A. V. Improved motion robustness of remote-ppg by using
+  the blood volume pulse signature.
+\textbf{Physiological measurement}, IOP Publishing, v.~35, n.~9, p. 1913--1926,
+  2014.}
 
 \bibitem[Hamoud et al. 2023]{hamoud2023neural}
 \abntrefinfo{Hamoud et al.}{HAMOUD et al.}{2023}
-{HAMOUD, B.; KASHEVNIK, A.; OTHMAN, W.; SHILOV, N. Neural network model combination for video-based blood pressure estimation: New approach and evaluation.
+{HAMOUD, B.; KASHEVNIK, A.; OTHMAN, W.; SHILOV, N. Neural network model
+  combination for video-based blood pressure estimation: New approach and
+  evaluation.
 \textbf{Sensors}, MDPI, v.~23, n.~4, p.~1753, 2023.}
 
 \bibitem[Harford et al. 2019]{harford2019availability}
 \abntrefinfo{Harford et al.}{HARFORD et al.}{2019}
-{HARFORD, M.; CATHERALL, J.; GERRY, S.; YOUNG, J.~D.; WATKINSON, P. Availability and performance of image-based, non-contact methods of monitoring heart rate, blood pressure, respiratory rate, and oxygen saturation: a systematic review.
-\textbf{Physiological measurement}, IOP Publishing, v.~40, n.~6, p. 06TR01, 2019.}
+{HARFORD, M.; CATHERALL, J.; GERRY, S.; YOUNG, J.~D.; WATKINSON, P.
+  Availability and performance of image-based, non-contact methods of
+  monitoring heart rate, blood pressure, respiratory rate, and oxygen
+  saturation: a systematic review.
+\textbf{Physiological measurement}, IOP Publishing, v.~40, n.~6, p. 06TR01,
+  2019.}
 
 \bibitem[Hassan et al. 2017]{hassan2017effect}
 \abntrefinfo{Hassan et al.}{HASSAN et al.}{2017}
-{HASSAN, M.~A.; MALIK, A.~S.; SAAD, N.; FOFI, D.; MERIAUDEAU, F. Effect of motion artifact on digital camera based heart rate measurement. In:  IEEE. \textbf{2017 39th Annual International Conference of the IEEE Engineering in Medicine and Biology Society (EMBC)}. [S.l.], 2017. p. 2851--2854.}
+{HASSAN, M.~A.; MALIK, A.~S.; SAAD, N.; FOFI, D.; MERIAUDEAU, F. Effect of
+  motion artifact on digital camera based heart rate measurement. In:  IEEE.
+  \textbf{2017 39th Annual International Conference of the IEEE Engineering in
+  Medicine and Biology Society (EMBC)}. [S.l.], 2017. p. 2851--2854.}
 
 \bibitem[Hu et al. 2021]{hu2021eta}
 \abntrefinfo{Hu et al.}{HU et al.}{2021}
-{HU, M.; QIAN, F.; GUO, D.; WANG, X.; HE, L.; REN, F. Eta-rppgnet: Effective time-domain attention network for remote heart rate measurement.
-\textbf{IEEE Transactions on Instrumentation and Measurement}, IEEE, v.~70, p. 1--12, 2021.}
+{HU, M.; QIAN, F.; GUO, D.; WANG, X.; HE, L.; REN, F. Eta-rppgnet: Effective
+  time-domain attention network for remote heart rate measurement.
+\textbf{IEEE Transactions on Instrumentation and Measurement}, IEEE, v.~70, p.
+  1--12, 2021.}
 
 \bibitem[Huang et al. 2021]{huang2021novel}
 \abntrefinfo{Huang et al.}{HUANG et al.}{2021}
-{HUANG, B.; LIN, C.-L.; CHEN, W.; JUANG, C.-F.; WU, X. A novel one-stage framework for visual pulse rate estimation using deep neural networks.
+{HUANG, B.; LIN, C.-L.; CHEN, W.; JUANG, C.-F.; WU, X. A novel one-stage
+  framework for visual pulse rate estimation using deep neural networks.
 \textbf{Biomedical Signal Processing and Control}, v.~66, p. 102387, 2021.
 ISSN 1746-8094.
-Dispon{\'\i}vel em: \url{https://www.sciencedirect.com/science/article/pii/S1746809420304936}.}
+Dispon{\'\i}vel em:
+  \url{https://www.sciencedirect.com/science/article/pii/S1746809420304936}.}
 
 \bibitem[Iozzia et al. 2017]{iozzia2017respiratory}
 \abntrefinfo{Iozzia et al.}{IOZZIA et al.}{2017}
-{IOZZIA, L.; L{\'A}ZARO, J.; GIL, E.; CERINA, L.; MAINARDI, L.; LAGUNA, P. Respiratory rate detection using a camera as contactless sensor. In:  IEEE. \textbf{2017 Computing in Cardiology (CinC)}. [S.l.], 2017. p.~1--4.}
+{IOZZIA, L.; L{\'A}ZARO, J.; GIL, E.; CERINA, L.; MAINARDI, L.; LAGUNA, P.
+  Respiratory rate detection using a camera as contactless sensor. In:  IEEE.
+  \textbf{2017 Computing in Cardiology (CinC)}. [S.l.], 2017. p.~1--4.}
 
 \bibitem[Iuchi et al. 2022]{iuchi2022blood}
 \abntrefinfo{Iuchi et al.}{IUCHI et al.}{2022}
-{IUCHI, K.; MIYAZAKI, R.; CARDOSO, G.~C.; OGAWA-OCHIAI, K.; TSUMURA, N. Blood pressure estimation by spatial pulse-wave dynamics in a facial video.
-\textbf{Biomedical Optics Express}, Optica Publishing Group, v.~13, n.~11, p. 6035--6047, 2022.}
+{IUCHI, K.; MIYAZAKI, R.; CARDOSO, G.~C.; OGAWA-OCHIAI, K.; TSUMURA, N. Blood
+  pressure estimation by spatial pulse-wave dynamics in a facial video.
+\textbf{Biomedical Optics Express}, Optica Publishing Group, v.~13, n.~11, p.
+  6035--6047, 2022.}
 
 \bibitem[Jorge et al. 2022]{jorge2022postOpICU}
 \abntrefinfo{Jorge et al.}{JORGE et al.}{2022}
-{JORGE, J.; VILLARROEL, M.; TOMLINSON, H.; GIBSON, O.; DARBYSHIRE, J.~L.; EDE, J.; HARFORD, M.; YOUNG, J.~D.; TARASSENKO, L.; WATKINSON, P. Non-contact physiological monitoring of post-operative patients in the intensive care unit.
-\textbf{NPJ digital medicine}, Nature Publishing Group UK London, v.~5, n.~1, p.~4, 2022.}
+{JORGE, J.; VILLARROEL, M.; TOMLINSON, H.; GIBSON, O.; DARBYSHIRE, J.~L.; EDE,
+  J.; HARFORD, M.; YOUNG, J.~D.; TARASSENKO, L.; WATKINSON, P. Non-contact
+  physiological monitoring of post-operative patients in the intensive care
+  unit.
+\textbf{NPJ digital medicine}, Nature Publishing Group UK London, v.~5, n.~1,
+  p.~4, 2022.}
 
 \bibitem[Kartynnik et al. 2019]{kartynnik2019real}
 \abntrefinfo{Kartynnik et al.}{KARTYNNIK et al.}{2019}
-{KARTYNNIK, Y.; ABLAVATSKI, A.; GRISHCHENKO, I.; GRUNDMANN, M. Real-time facial surface geometry from monocular video on mobile gpus.
+{KARTYNNIK, Y.; ABLAVATSKI, A.; GRISHCHENKO, I.; GRUNDMANN, M. Real-time facial
+  surface geometry from monocular video on mobile gpus.
 \textbf{arXiv preprint arXiv:1907.06724}, 2019.}
 
 \bibitem[Khan e Mostafa 2025]{khan2025representation}
 \abntrefinfo{Khan e Mostafa}{KHAN; MOSTAFA}{2025}
-{KHAN, S.~S.; MOSTAFA, N. Representation biases in remote photoplethysmography datasets--a narrative review.
-\textbf{Applied Computing and Informatics}, Emerald Publishing Limited, p. 1--16, 2025.}
+{KHAN, S.~S.; MOSTAFA, N. Representation biases in remote photoplethysmography
+  datasets--a narrative review.
+\textbf{Applied Computing and Informatics}, Emerald Publishing Limited, p.
+  1--16, 2025.}
 
 \bibitem[Khanam et al. 2019]{khanam2019clinicalnonclinicalReview}
 \abntrefinfo{Khanam et al.}{KHANAM et al.}{2019}
-{KHANAM, F.-T.-Z.; AL-NAJI, A.; CHAHL, J. Remote monitoring of vital signs in diverse non-clinical and clinical scenarios using computer vision systems: A review.
+{KHANAM, F.-T.-Z.; AL-NAJI, A.; CHAHL, J. Remote monitoring of vital signs in
+  diverse non-clinical and clinical scenarios using computer vision systems: A
+  review.
 \textbf{Applied Sciences}, MDPI, v.~9, n.~20, p.~4474, 2019.}
 
 \bibitem[Kim et al. 2021]{kim2021assessment}
 \abntrefinfo{Kim et al.}{KIM et al.}{2021}
-{KIM, D.-Y.; LEE, K.; SOHN, C.-B. Assessment of roi selection for facial video-based rppg.
+{KIM, D.-Y.; LEE, K.; SOHN, C.-B. Assessment of roi selection for facial
+  video-based rppg.
 \textbf{Sensors}, MDPI, v.~21, n.~23, p.~7923, 2021.}
 
 \bibitem[Klinker et al. 1988]{klinker1988measurement}
 \abntrefinfo{Klinker et al.}{KLINKER et al.}{1988}
-{KLINKER, G.~J.; SHAFER, S.~A.; KANADE, T. The measurement of highlights in color images.
-\textbf{International Journal of Computer Vision}, Springer, v.~2, n.~1, p. 7--32, 1988.}
+{KLINKER, G.~J.; SHAFER, S.~A.; KANADE, T. The measurement of highlights in
+  color images.
+\textbf{International Journal of Computer Vision}, Springer, v.~2, n.~1, p.
+  7--32, 1988.}
 
 \bibitem[Kong et al. 2013]{kong2013non}
 \abntrefinfo{Kong et al.}{KONG et al.}{2013}
-{KONG, L.; ZHAO, Y.; DONG, L.; JIAN, Y.; JIN, X.; LI, B.; FENG, Y.; LIU, M.; LIU, X.; WU, H. Non-contact detection of oxygen saturation based on visible light imaging device using ambient light.
-\textbf{Optics express}, Optical Society of America, v.~21, n.~15, p. 17464--17471, 2013.}
+{KONG, L.; ZHAO, Y.; DONG, L.; JIAN, Y.; JIN, X.; LI, B.; FENG, Y.; LIU, M.;
+  LIU, X.; WU, H. Non-contact detection of oxygen saturation based on visible
+  light imaging device using ambient light.
+\textbf{Optics express}, Optical Society of America, v.~21, n.~15, p.
+  17464--17471, 2013.}
 
 \bibitem[Kumar et al. 2015]{kumar2015distanceppg}
 \abntrefinfo{Kumar et al.}{KUMAR et al.}{2015}
-{KUMAR, M.; VEERARAGHAVAN, A.; SABHARWAL, A. Distanceppg: Robust non-contact vital signs monitoring using a camera.
-\textbf{Biomedical optics express}, Optical Society of America, v.~6, n.~5, p. 1565--1588, 2015.}
+{KUMAR, M.; VEERARAGHAVAN, A.; SABHARWAL, A. Distanceppg: Robust non-contact
+  vital signs monitoring using a camera.
+\textbf{Biomedical optics express}, Optical Society of America, v.~6, n.~5, p.
+  1565--1588, 2015.}
 
 \bibitem[Kwon et al. 2015]{kwon2015roi}
 \abntrefinfo{Kwon et al.}{KWON et al.}{2015}
-{KWON, S.; KIM, J.; LEE, D.; PARK, K. Roi analysis for remote photoplethysmography on facial video. In:  IEEE. \textbf{2015 37th Annual international conference of the ieee engineering in medicine and biology society (EMBC)}. [S.l.], 2015. p. 4938--4941.}
+{KWON, S.; KIM, J.; LEE, D.; PARK, K. Roi analysis for remote
+  photoplethysmography on facial video. In:  IEEE. \textbf{2015 37th Annual
+  international conference of the ieee engineering in medicine and biology
+  society (EMBC)}. [S.l.], 2015. p. 4938--4941.}
 
 \bibitem[Lam e Kuno 2015]{lam2015robust}
 \abntrefinfo{Lam e Kuno}{LAM; KUNO}{2015}
-{LAM, A.; KUNO, Y. Robust heart rate measurement from video using select random patches. In:  \textbf{Proceedings of the IEEE international conference on computer vision}. [S.l.: s.n.], 2015. p. 3640--3648.}
+{LAM, A.; KUNO, Y. Robust heart rate measurement from video using select random
+  patches. In:  \textbf{Proceedings of the IEEE international conference on
+  computer vision}. [S.l.: s.n.], 2015. p. 3640--3648.}
 
 \bibitem[Laurie et al. 2020]{laurie2020dedicated}
 \abntrefinfo{Laurie et al.}{LAURIE et al.}{2020}
-{LAURIE, J.; HIGGINS, N.; PEYNOT, T.; ROBERTS, J. Dedicated exposure control for remote photoplethysmography.
+{LAURIE, J.; HIGGINS, N.; PEYNOT, T.; ROBERTS, J. Dedicated exposure control
+  for remote photoplethysmography.
 \textbf{IEEE Access}, IEEE, v.~8, p. 116642--116652, 2020.}
 
 \bibitem[Lee et al. 2020]{lee2020meta}
 \abntrefinfo{Lee et al.}{LEE et al.}{2020}
-{LEE, E.; CHEN, E.; LEE, C.-Y. Meta-rppg: Remote heart rate estimation using a transductive meta-learner. In:  SPRINGER. \textbf{European conference on computer vision}. [S.l.], 2020. p. 392--409.}
+{LEE, E.; CHEN, E.; LEE, C.-Y. Meta-rppg: Remote heart rate estimation using a
+  transductive meta-learner. In:  SPRINGER. \textbf{European conference on
+  computer vision}. [S.l.], 2020. p. 392--409.}
 
 \bibitem[Lee et al. 2022]{lee2022multitask}
 \abntrefinfo{Lee et al.}{LEE et al.}{2022}
-{LEE, H.; LEE, J.; KWON, Y.; KWON, J.; PARK, S.; SOHN, R.; PARK, C. Multitask siamese network for remote photoplethysmography and respiration estimation.
+{LEE, H.; LEE, J.; KWON, Y.; KWON, J.; PARK, S.; SOHN, R.; PARK, C. Multitask
+  siamese network for remote photoplethysmography and respiration estimation.
 \textbf{Sensors}, MDPI, v.~22, n.~14, p.~5101, 2022.}
 
 \bibitem[Lee et al. 2024]{lee2024review}
 \abntrefinfo{Lee et al.}{LEE et al.}{2024}
-{LEE, R.~J.; SIVAKUMAR, S.; LIM, K.~H. Review on remote heart rate measurements using photoplethysmography.
-\textbf{Multimedia Tools and Applications}, Springer, v.~83, n.~15, p. 44699--44728, 2024.}
+{LEE, R.~J.; SIVAKUMAR, S.; LIM, K.~H. Review on remote heart rate measurements
+  using photoplethysmography.
+\textbf{Multimedia Tools and Applications}, Springer, v.~83, n.~15, p.
+  44699--44728, 2024.}
 
 \bibitem[Lewandowska e Nowak 2012]{lewandowska2012measuring}
 \abntrefinfo{Lewandowska e Nowak}{LEWANDOWSKA; NOWAK}{2012}
 {LEWANDOWSKA, M.; NOWAK, J. Measuring pulse rate with a webcam.
-\textbf{Journal of Medical Imaging and Health Informatics}, American Scientific Publishers, v.~2, n.~1, p. 87--92, 2012.}
+\textbf{Journal of Medical Imaging and Health Informatics}, American Scientific
+  Publishers, v.~2, n.~1, p. 87--92, 2012.}
 
 \bibitem[Li et al. 2020]{li2020video}
 \abntrefinfo{Li et al.}{LI et al.}{2020}
-{LI, P.; BENEZETH, Y.; MACWAN, R.; NAKAMURA, K.; GOMEZ, R.; LI, C.; YANG, F. Video-based pulse rate variability measurement using periodic variance maximization and adaptive two-window peak detection.
+{LI, P.; BENEZETH, Y.; MACWAN, R.; NAKAMURA, K.; GOMEZ, R.; LI, C.; YANG, F.
+  Video-based pulse rate variability measurement using periodic variance
+  maximization and adaptive two-window peak detection.
 \textbf{Sensors}, MDPI, v.~20, n.~10, p.~2752, 2020.}
 
 \bibitem[Li et al. 2014]{li2014remote}
 \abntrefinfo{Li et al.}{LI et al.}{2014}
-{LI, X.; CHEN, J.; ZHAO, G.; PIETIKAINEN, M. Remote heart rate measurement from face videos under realistic situations. In:  \textbf{Proceedings of the IEEE conference on computer vision and pattern recognition}. [S.l.: s.n.], 2014. p. 4264--4271.}
+{LI, X.; CHEN, J.; ZHAO, G.; PIETIKAINEN, M. Remote heart rate measurement from
+  face videos under realistic situations. In:  \textbf{Proceedings of the IEEE
+  conference on computer vision and pattern recognition}. [S.l.: s.n.], 2014.
+  p. 4264--4271.}
 
 \bibitem[Li et al. 2025]{li2025improving}
 \abntrefinfo{Li et al.}{LI et al.}{2025}
-{LI, Y.; WANG, J.; PAN, C.; PANG, J.; CHEN, Y.; LI, K. Improving signal quality for remote photoplethysmography by suppression of motion and lighting effects. In:  IEEE. \textbf{2025 47th Annual International Conference of the IEEE Engineering in Medicine and Biology Society (EMBC)}. [S.l.], 2025. p.~1--6.}
+{LI, Y.; WANG, J.; PAN, C.; PANG, J.; CHEN, Y.; LI, K. Improving signal quality
+  for remote photoplethysmography by suppression of motion and lighting
+  effects. In:  IEEE. \textbf{2025 47th Annual International Conference of the
+  IEEE Engineering in Medicine and Biology Society (EMBC)}. [S.l.], 2025.
+  p.~1--6.}
 
 \bibitem[Lin e Lin 2017]{lin2017study}
 \abntrefinfo{Lin e Lin}{LIN; LIN}{2017}
-{LIN, Y.-C.; LIN, Y.-H. A study of color illumination effect on the snr of rppg signals. In:  IEEE. \textbf{2017 39th Annual International Conference of the IEEE Engineering in Medicine and Biology Society (EMBC)}. [S.l.], 2017. p. 4301--4304.}
+{LIN, Y.-C.; LIN, Y.-H. A study of color illumination effect on the snr of rppg
+  signals. In:  IEEE. \textbf{2017 39th Annual International Conference of the
+  IEEE Engineering in Medicine and Biology Society (EMBC)}. [S.l.], 2017. p.
+  4301--4304.}
 
 \bibitem[Liu e Yuen 2020]{liu2020general}
 \abntrefinfo{Liu e Yuen}{LIU; YUEN}{2020}
-{LIU, S.-Q.; YUEN, P.~C. A general remote photoplethysmography estimator with spatiotemporal convolutional network. In:  IEEE. \textbf{2020 15th IEEE international conference on automatic face and gesture recognition (FG 2020)}. [S.l.], 2020. p. 481--488.}
+{LIU, S.-Q.; YUEN, P.~C. A general remote photoplethysmography estimator with
+  spatiotemporal convolutional network. In:  IEEE. \textbf{2020 15th IEEE
+  international conference on automatic face and gesture recognition (FG
+  2020)}. [S.l.], 2020. p. 481--488.}
 
 \bibitem[Liu et al. 2020]{liu2020multi}
 \abntrefinfo{Liu et al.}{LIU et al.}{2020}
-{LIU, X.; FROMM, J.; PATEL, S.; MCDUFF, D. Multi-task temporal shift attention networks for on-device contactless vitals measurement.
-\textbf{Advances in Neural Information Processing Systems}, v.~33, p. 19400--19411, 2020.}
+{LIU, X.; FROMM, J.; PATEL, S.; MCDUFF, D. Multi-task temporal shift attention
+  networks for on-device contactless vitals measurement.
+\textbf{Advances in Neural Information Processing Systems}, v.~33, p.
+  19400--19411, 2020.}
 
 \bibitem[Liu et al. 2023]{liu2023efficientphys}
 \abntrefinfo{Liu et al.}{LIU et al.}{2023}
-{LIU, X.; HILL, B.; JIANG, Z.; PATEL, S.; MCDUFF, D. Efficientphys: Enabling simple, fast and accurate camera-based cardiac measurement. In:  \textbf{Proceedings of the IEEE/CVF winter conference on applications of computer vision}. [S.l.: s.n.], 2023. p. 5008--5017.}
+{LIU, X.; HILL, B.; JIANG, Z.; PATEL, S.; MCDUFF, D. Efficientphys: Enabling
+  simple, fast and accurate camera-based cardiac measurement. In:
+  \textbf{Proceedings of the IEEE/CVF winter conference on applications of
+  computer vision}. [S.l.: s.n.], 2023. p. 5008--5017.}
 
 \bibitem[Liu et al. 2022]{liu2022rppg}
 \abntrefinfo{Liu et al.}{LIU et al.}{2022}
-{LIU, X.; NARAYANSWAMY, G.; PARUCHURI, A.; ZHANG, X.; TANG, J.; ZHANG, Y.; WANG, Y.; SENGUPTA, S.; PATEL, S.; MCDUFF, D. rppg-toolbox: Deep remote ppg toolbox.
+{LIU, X.; NARAYANSWAMY, G.; PARUCHURI, A.; ZHANG, X.; TANG, J.; ZHANG, Y.;
+  WANG, Y.; SENGUPTA, S.; PATEL, S.; MCDUFF, D. rppg-toolbox: Deep remote ppg
+  toolbox.
 \textbf{arXiv preprint arXiv:2210.00716}, 2022.}
 
 \bibitem[Liu et al. 2021]{liu2021manet}
 \abntrefinfo{Liu et al.}{LIU et al.}{2021}
-{LIU, X.; YANG, X.; MENG, Z.; WANG, Y.; ZHANG, J.; WONG, A. Manet: A motion-driven attention network for detecting the pulse from a facial video with drastic motions. In:  \textbf{Proceedings of the IEEE/CVF International Conference on Computer Vision}. [S.l.: s.n.], 2021. p. 2385--2390.}
+{LIU, X.; YANG, X.; MENG, Z.; WANG, Y.; ZHANG, J.; WONG, A. Manet: A
+  motion-driven attention network for detecting the pulse from a facial video
+  with drastic motions. In:  \textbf{Proceedings of the IEEE/CVF International
+  Conference on Computer Vision}. [S.l.: s.n.], 2021. p. 2385--2390.}
 
 \bibitem[Lu e Han 2021]{lu2021hr}
 \abntrefinfo{Lu e Han}{LU; HAN}{2021}
-{LU, H.; HAN, H. Nas-hr: Neural architecture search for heart rate estimation from face videos.
-\textbf{Virtual Reality \& Intelligent Hardware}, Elsevier, v.~3, n.~1, p. 33--42, 2021.}
+{LU, H.; HAN, H. Nas-hr: Neural architecture search for heart rate estimation
+  from face videos.
+\textbf{Virtual Reality \& Intelligent Hardware}, Elsevier, v.~3, n.~1, p.
+  33--42, 2021.}
 
 \bibitem[Lu et al. 2021]{Lu2021dualgan}
 \abntrefinfo{Lu et al.}{LU et al.}{2021}
-{LU, H.; HAN, H.; ZHOU, S.~K. Dual-gan: Joint bvp and noise modeling for remote physiological measurement. In:  \textbf{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)}. [S.l.: s.n.], 2021. p. 12404--12413.}
+{LU, H.; HAN, H.; ZHOU, S.~K. Dual-gan: Joint bvp and noise modeling for remote
+  physiological measurement. In:  \textbf{Proceedings of the IEEE/CVF
+  Conference on Computer Vision and Pattern Recognition (CVPR)}. [S.l.: s.n.],
+  2021. p. 12404--12413.}
 
 \bibitem[Lugaresi et al. 2019]{lugaresi2019mediapipe}
 \abntrefinfo{Lugaresi et al.}{LUGARESI et al.}{2019}
-{LUGARESI, C.; TANG, J.; NASH, H.; MCCLANAHAN, C.; UBOWEJA, E.; HAYS, M.; ZHANG, F.; CHANG, C.-L.; YONG, M.~G.; LEE, J. et al. Mediapipe: A framework for building perception pipelines.
+{LUGARESI, C.; TANG, J.; NASH, H.; MCCLANAHAN, C.; UBOWEJA, E.; HAYS, M.;
+  ZHANG, F.; CHANG, C.-L.; YONG, M.~G.; LEE, J. et al. Mediapipe: A framework
+  for building perception pipelines.
 \textbf{arXiv preprint arXiv:1906.08172}, 2019.}
 
 \bibitem[Luguern et al. 2020]{luguern2020assessment}
 \abntrefinfo{Luguern et al.}{LUGUERN et al.}{2020}
-{LUGUERN, D.; PERCHE, S.; BENEZETH, Y.; MOSER, V.; DUNBAR, L.~A.; BRAUN, F.; LEMKADDEM, A.; NAKAMURA, K.; GOMEZ, R.; DUBOIS, J. An assessment of algorithms to estimate respiratory rate from the remote photoplethysmogram. In:  \textbf{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops}. [S.l.: s.n.], 2020. p. 304--305.}
+{LUGUERN, D.; PERCHE, S.; BENEZETH, Y.; MOSER, V.; DUNBAR, L.~A.; BRAUN, F.;
+  LEMKADDEM, A.; NAKAMURA, K.; GOMEZ, R.; DUBOIS, J. An assessment of
+  algorithms to estimate respiratory rate from the remote photoplethysmogram.
+  In:  \textbf{Proceedings of the IEEE/CVF Conference on Computer Vision and
+  Pattern Recognition Workshops}. [S.l.: s.n.], 2020. p. 304--305.}
 
 \bibitem[Maki et al. 2019]{maki2019inter}
 \abntrefinfo{Maki et al.}{MAKI et al.}{2019}
-{MAKI, Y.; MONNO, Y.; YOSHIZAKI, K.; TANAKA, M.; OKUTOMI, M. Inter-beat interval estimation from facial video based on reliability of bvp signals. In:  IEEE. \textbf{2019 41st Annual International Conference of the IEEE Engineering in Medicine and Biology Society (EMBC)}. [S.l.], 2019. p. 6525--6528.}
+{MAKI, Y.; MONNO, Y.; YOSHIZAKI, K.; TANAKA, M.; OKUTOMI, M. Inter-beat
+  interval estimation from facial video based on reliability of bvp signals.
+  In:  IEEE. \textbf{2019 41st Annual International Conference of the IEEE
+  Engineering in Medicine and Biology Society (EMBC)}. [S.l.], 2019. p.
+  6525--6528.}
 
 \bibitem[Malik et al. 1996]{malik1996heart}
 \abntrefinfo{Malik et al.}{MALIK et al.}{1996}
-{MALIK, M.; BIGGER, J.~T.; CAMM, A.~J.; KLEIGER, R.~E.; MALLIANI, A.; MOSS, A.~J.; SCHWARTZ, P.~J. Heart rate variability: Standards of measurement, physiological interpretation, and clinical use.
-\textbf{European heart journal}, Oxford University Press, v.~17, n.~3, p. 354--381, 1996.}
+{MALIK, M.; BIGGER, J.~T.; CAMM, A.~J.; KLEIGER, R.~E.; MALLIANI, A.; MOSS,
+  A.~J.; SCHWARTZ, P.~J. Heart rate variability: Standards of measurement,
+  physiological interpretation, and clinical use.
+\textbf{European heart journal}, Oxford University Press, v.~17, n.~3, p.
+  354--381, 1996.}
 
 \bibitem[McDuff et al. 2017]{mcduff2017impact}
 \abntrefinfo{McDuff et al.}{MCDUFF et al.}{2017}
-{MCDUFF, D.~J.; BLACKFORD, E.~B.; ESTEPP, J.~R. The impact of video compression on remote cardiac pulse measurement using imaging photoplethysmography. In:  IEEE. \textbf{2017 12th IEEE International Conference on Automatic Face \& Gesture Recognition (FG 2017)}. [S.l.], 2017. p. 63--70.}
+{MCDUFF, D.~J.; BLACKFORD, E.~B.; ESTEPP, J.~R. The impact of video compression
+  on remote cardiac pulse measurement using imaging photoplethysmography. In:
+  IEEE. \textbf{2017 12th IEEE International Conference on Automatic Face \&
+  Gesture Recognition (FG 2017)}. [S.l.], 2017. p. 63--70.}
 
 \bibitem[McDuff et al. 2015]{mcduff2015survey}
 \abntrefinfo{McDuff et al.}{MCDUFF et al.}{2015}
-{MCDUFF, D.~J.; ESTEPP, J.~R.; PIASECKI, A.~M.; BLACKFORD, E.~B. A survey of remote optical photoplethysmographic imaging methods. In:  IEEE. \textbf{2015 37th annual international conference of the IEEE engineering in medicine and biology society (EMBC)}. [S.l.], 2015. p. 6398--6404.}
+{MCDUFF, D.~J.; ESTEPP, J.~R.; PIASECKI, A.~M.; BLACKFORD, E.~B. A survey of
+  remote optical photoplethysmographic imaging methods. In:  IEEE. \textbf{2015
+  37th annual international conference of the IEEE engineering in medicine and
+  biology society (EMBC)}. [S.l.], 2015. p. 6398--6404.}
 
 \bibitem[Mo{\c{c}}o e Verkruysse 2021]{mocco2021pulse}
 \abntrefinfo{Mo{\c{c}}o e Verkruysse}{MO{\c{C}}O; VERKRUYSSE}{2021}
-{MO{\c{C}}O, A.; VERKRUYSSE, W. Pulse oximetry based on photoplethysmography imaging with red and green light: Calibratability and challenges.
-\textbf{Journal of clinical monitoring and computing}, Springer, v.~35, n.~1, p. 123--133, 2021.}
+{MO{\c{C}}O, A.; VERKRUYSSE, W. Pulse oximetry based on photoplethysmography
+  imaging with red and green light: Calibratability and challenges.
+\textbf{Journal of clinical monitoring and computing}, Springer, v.~35, n.~1,
+  p. 123--133, 2021.}
 
 \bibitem[Mukkamala et al. 2015]{mukkamala2015toward}
 \abntrefinfo{Mukkamala et al.}{MUKKAMALA et al.}{2015}
-{MUKKAMALA, R.; HAHN, J.-O.; INAN, O.~T.; MESTHA, L.~K.; KIM, C.-S.; T{\"O}REYIN, H.; KYAL, S. Toward ubiquitous blood pressure monitoring via pulse transit time: theory and practice.
-\textbf{IEEE transactions on biomedical engineering}, IEEE, v.~62, n.~8, p. 1879--1901, 2015.}
+{MUKKAMALA, R.; HAHN, J.-O.; INAN, O.~T.; MESTHA, L.~K.; KIM, C.-S.;
+  T{\"O}REYIN, H.; KYAL, S. Toward ubiquitous blood pressure monitoring via
+  pulse transit time: theory and practice.
+\textbf{IEEE transactions on biomedical engineering}, IEEE, v.~62, n.~8, p.
+  1879--1901, 2015.}
 
 \bibitem[Murakami et al. 2015]{murakami2015non}
 \abntrefinfo{Murakami et al.}{MURAKAMI et al.}{2015}
-{MURAKAMI, K.; YOSHIOKA, M.; OZAWA, J. Non-contact pulse transit time measurement using imaging camera, and its relation to blood pressure. In:  IEEE. \textbf{2015 14th IAPR International Conference on Machine Vision Applications (MVA)}. [S.l.], 2015. p. 414--417.}
+{MURAKAMI, K.; YOSHIOKA, M.; OZAWA, J. Non-contact pulse transit time
+  measurement using imaging camera, and its relation to blood pressure. In:
+  IEEE. \textbf{2015 14th IAPR International Conference on Machine Vision
+  Applications (MVA)}. [S.l.], 2015. p. 414--417.}
 
 \bibitem[Nagar et al. 2024]{nagar2024r2i}
 \abntrefinfo{Nagar et al.}{NAGAR et al.}{2024}
-{NAGAR, S.; HASEGAWA-JOHNSON, M.; BEISER, D.~G.; AHUJA, N. R2i-rppg: A robust region of interest selection method for remote photoplethysmography to extract heart rate.
+{NAGAR, S.; HASEGAWA-JOHNSON, M.; BEISER, D.~G.; AHUJA, N. R2i-rppg: A robust
+  region of interest selection method for remote photoplethysmography to
+  extract heart rate.
 \textbf{arXiv preprint arXiv:2410.15851}, 2024.}
 
 \bibitem[Napolean et al. 2022]{napolean2022heart}
 \abntrefinfo{Napolean et al.}{NAPOLEAN et al.}{2022}
-{NAPOLEAN, Y.; MARWADE, A.; TOMEN, N.; ALKEMADE, P.; EIJSVOGELS, T.; GEMERT, J.~C. van. Heart rate estimation in intense exercise videos. In:  IEEE. \textbf{2022 IEEE International Conference on Image Processing (ICIP)}. [S.l.], 2022. p. 3933--3937.}
+{NAPOLEAN, Y.; MARWADE, A.; TOMEN, N.; ALKEMADE, P.; EIJSVOGELS, T.; GEMERT,
+  J.~C. van. Heart rate estimation in intense exercise videos. In:  IEEE.
+  \textbf{2022 IEEE International Conference on Image Processing (ICIP)}.
+  [S.l.], 2022. p. 3933--3937.}
 
 \bibitem[Niu et al. 2018]{niu2018synrhythm}
 \abntrefinfo{Niu et al.}{NIU et al.}{2018}
-{NIU, X.; HAN, H.; SHAN, S.; CHEN, X. Synrhythm: Learning a deep heart rate estimator from general to specific. In:  IEEE. \textbf{2018 24th international conference on pattern recognition (ICPR)}. [S.l.], 2018. p. 3580--3585.}
+{NIU, X.; HAN, H.; SHAN, S.; CHEN, X. Synrhythm: Learning a deep heart rate
+  estimator from general to specific. In:  IEEE. \textbf{2018 24th
+  international conference on pattern recognition (ICPR)}. [S.l.], 2018. p.
+  3580--3585.}
 
 \bibitem[Niu et al. 2019]{niu2019rhythmnet}
 \abntrefinfo{Niu et al.}{NIU et al.}{2019}
-{NIU, X.; SHAN, S.; HAN, H.; CHEN, X. Rhythmnet: End-to-end heart rate estimation from face via spatial-temporal representation.
-\textbf{IEEE Transactions on Image Processing}, IEEE, v.~29, p. 2409--2423, 2019.}
+{NIU, X.; SHAN, S.; HAN, H.; CHEN, X. Rhythmnet: End-to-end heart rate
+  estimation from face via spatial-temporal representation.
+\textbf{IEEE Transactions on Image Processing}, IEEE, v.~29, p. 2409--2423,
+  2019.}
 
 \bibitem[Nowara e McDuff 2019]{nowara2019combating}
 \abntrefinfo{Nowara e McDuff}{NOWARA; MCDUFF}{2019}
-{NOWARA, E.; MCDUFF, D. Combating the impact of video compression on non-contact vital sign measurement using supervised learning. In:  \textbf{Proceedings of the IEEE/CVF International Conference on Computer Vision Workshops}. [S.l.: s.n.], 2019. p.~0--0.}
+{NOWARA, E.; MCDUFF, D. Combating the impact of video compression on
+  non-contact vital sign measurement using supervised learning. In:
+  \textbf{Proceedings of the IEEE/CVF International Conference on Computer
+  Vision Workshops}. [S.l.: s.n.], 2019. p.~0--0.}
 
 \bibitem[Nowara et al. 2020]{nowara2020meta}
 \abntrefinfo{Nowara et al.}{NOWARA et al.}{2020}
-{NOWARA, E.~M.; MCDUFF, D.; VEERARAGHAVAN, A. A meta-analysis of the impact of skin tone and gender on non-contact photoplethysmography measurements. In:  \textbf{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops}. [S.l.: s.n.], 2020. p. 284--285.}
+{NOWARA, E.~M.; MCDUFF, D.; VEERARAGHAVAN, A. A meta-analysis of the impact of
+  skin tone and gender on non-contact photoplethysmography measurements. In:
+  \textbf{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern
+  Recognition Workshops}. [S.l.: s.n.], 2020. p. 284--285.}
 
 \bibitem[Papageorgiou e Haan 2014]{papageorgiou2014adaptive}
 \abntrefinfo{Papageorgiou e Haan}{PAPAGEORGIOU; HAAN}{2014}
-{PAPAGEORGIOU, A.; HAAN, G. de. Adaptive gain tuning for robust remote pulse rate monitoring under changing light conditions.
+{PAPAGEORGIOU, A.; HAAN, G. de. Adaptive gain tuning for robust remote pulse
+  rate monitoring under changing light conditions.
 \textbf{Technische Universiteit Eindhoven}, 2014.}
 
 \bibitem[Pel{\'a}ez-Coca et al. 2021]{pelaez2021impact}
 \abntrefinfo{Pel{\'a}ez-Coca et al.}{PEL{\'A}EZ-COCA et al.}{2021}
-{PEL{\'A}EZ-COCA, M.~D.; HERNANDO, A.; L{\'A}ZARO, J.; GIL, E. Impact of the ppg sampling rate in the pulse rate variability indices evaluating several fiducial points in different pulse waveforms.
-\textbf{IEEE journal of biomedical and health informatics}, IEEE, v.~26, n.~2, p. 539--549, 2021.}
+{PEL{\'A}EZ-COCA, M.~D.; HERNANDO, A.; L{\'A}ZARO, J.; GIL, E. Impact of the
+  ppg sampling rate in the pulse rate variability indices evaluating several
+  fiducial points in different pulse waveforms.
+\textbf{IEEE journal of biomedical and health informatics}, IEEE, v.~26, n.~2,
+  p. 539--549, 2021.}
 
 \bibitem[Pilz et al. 2018]{pilz2018local}
 \abntrefinfo{Pilz et al.}{PILZ et al.}{2018}
-{PILZ, C.~S.; ZAUNSEDER, S.; KRAJEWSKI, J.; BLAZEK, V. Local group invariance for heart rate estimation from face videos in the wild. In:  \textbf{Proceedings of the IEEE conference on computer vision and pattern recognition workshops}. [S.l.: s.n.], 2018. p. 1254--1262.}
+{PILZ, C.~S.; ZAUNSEDER, S.; KRAJEWSKI, J.; BLAZEK, V. Local group invariance
+  for heart rate estimation from face videos in the wild. In:
+  \textbf{Proceedings of the IEEE conference on computer vision and pattern
+  recognition workshops}. [S.l.: s.n.], 2018. p. 1254--1262.}
 
 \bibitem[Poh et al. 2010]{poh2010advancements}
 \abntrefinfo{Poh et al.}{POH et al.}{2010a}
-{POH, M.-Z.; MCDUFF, D.~J.; PICARD, R.~W. Advancements in noncontact, multiparameter physiological measurements using a webcam.
-\textbf{IEEE transactions on biomedical engineering}, IEEE, v.~58, n.~1, p. 7--11, 2010.}
+{POH, M.-Z.; MCDUFF, D.~J.; PICARD, R.~W. Advancements in noncontact,
+  multiparameter physiological measurements using a webcam.
+\textbf{IEEE transactions on biomedical engineering}, IEEE, v.~58, n.~1, p.
+  7--11, 2010.}
 
 \bibitem[Poh et al. 2010]{poh2010non}
 \abntrefinfo{Poh et al.}{POH et al.}{2010b}
-{\underline{\ \ \ \ \ \ \ \ }. Non-contact, automated cardiac pulse measurements using video imaging and blind source separation.
-\textbf{Optics express}, Optical Society of America, v.~18, n.~10, p. 10762--10774, 2010.}
+{\underline{\ \ \ \ \ \ \ \ }. Non-contact, automated cardiac pulse
+  measurements using video imaging and blind source separation.
+\textbf{Optics express}, Optical Society of America, v.~18, n.~10, p.
+  10762--10774, 2010.}
 
 \bibitem[Qi et al. 2022]{qi2022yolo5face}
 \abntrefinfo{Qi et al.}{QI et al.}{2022}
-{QI, D.; TAN, W.; YAO, Q.; LIU, J. Yolo5face: Why reinventing a face detector. In:  SPRINGER. \textbf{European Conference on Computer Vision}. [S.l.], 2022. p. 228--244.}
+{QI, D.; TAN, W.; YAO, Q.; LIU, J. Yolo5face: Why reinventing a face detector.
+  In:  SPRINGER. \textbf{European Conference on Computer Vision}. [S.l.], 2022.
+  p. 228--244.}
 
 \bibitem[Rouast et al. 2018]{rouast2018review}
 \abntrefinfo{Rouast et al.}{ROUAST et al.}{2018}
-{ROUAST, P.~V.; ADAM, M.~T.; CHIONG, R.; CORNFORTH, D.; LUX, E. Remote heart rate measurement using low-cost rgb face video: a technical literature review.
-\textbf{Frontiers of Computer Science}, Springer, v.~12, n.~5, p. 858--872, 2018.}
+{ROUAST, P.~V.; ADAM, M.~T.; CHIONG, R.; CORNFORTH, D.; LUX, E. Remote heart
+  rate measurement using low-cost rgb face video: a technical literature
+  review.
+\textbf{Frontiers of Computer Science}, Springer, v.~12, n.~5, p. 858--872,
+  2018.}
 
 \bibitem[Sabokrou et al. 2021]{Sabokrou2021deephr}
 \abntrefinfo{Sabokrou et al.}{SABOKROU et al.}{2021}
-{SABOKROU, M.; POURREZA, M.; LI, X.; FATHY, M.; ZHAO, G. Deep-hr: Fast heart rate estimation from face video under realistic conditions.
+{SABOKROU, M.; POURREZA, M.; LI, X.; FATHY, M.; ZHAO, G. Deep-hr: Fast heart
+  rate estimation from face video under realistic conditions.
 \textbf{Expert Systems with Applications}, v.~186, p. 115596, 2021.
 ISSN 0957-4174.
-Dispon{\'\i}vel em: \url{https://www.sciencedirect.com/science/article/pii/S0957417421009969}.}
+Dispon{\'\i}vel em:
+  \url{https://www.sciencedirect.com/science/article/pii/S0957417421009969}.}
 
 \bibitem[Sanyal e Nundy 2018]{sanyal2018algorithms}
 \abntrefinfo{Sanyal e Nundy}{SANYAL; NUNDY}{2018}
-{SANYAL, S.; NUNDY, K.~K. Algorithms for monitoring heart rate and respiratory rate from the video of a user’s face.
-\textbf{IEEE Journal of translational engineering in health and medicine}, IEEE, v.~6, p. 1--11, 2018.}
+{SANYAL, S.; NUNDY, K.~K. Algorithms for monitoring heart rate and respiratory
+  rate from the video of a user’s face.
+\textbf{IEEE Journal of translational engineering in health and medicine},
+  IEEE, v.~6, p. 1--11, 2018.}
 
 \bibitem[Sch{\"a}fer e Vagedes 2013]{schafer2013accurate}
 \abntrefinfo{Sch{\"a}fer e Vagedes}{SCH{\"A}FER; VAGEDES}{2013}
-{SCH{\"A}FER, A.; VAGEDES, J. How accurate is pulse rate variability as an estimate of heart rate variability?: A review on studies comparing photoplethysmographic technology with an electrocardiogram.
-\textbf{International journal of cardiology}, Elsevier, v.~166, n.~1, p. 15--29, 2013.}
+{SCH{\"A}FER, A.; VAGEDES, J. How accurate is pulse rate variability as an
+  estimate of heart rate variability?: A review on studies comparing
+  photoplethysmographic technology with an electrocardiogram.
+\textbf{International journal of cardiology}, Elsevier, v.~166, n.~1, p.
+  15--29, 2013.}
 
 \bibitem[Schrumpf et al. 2019]{schrumpf2019exploiting}
 \abntrefinfo{Schrumpf et al.}{SCHRUMPF et al.}{2019}
-{SCHRUMPF, F.; M{\"O}NCH, C.; BAUSCH, G.; FUCHS, M. Exploiting weak head movements for camera-based respiration detection. In:  IEEE. \textbf{2019 41st Annual International Conference of the IEEE Engineering in Medicine and Biology Society (EMBC)}. [S.l.], 2019. p. 6059--6062.}
+{SCHRUMPF, F.; M{\"O}NCH, C.; BAUSCH, G.; FUCHS, M. Exploiting weak head
+  movements for camera-based respiration detection. In:  IEEE. \textbf{2019
+  41st Annual International Conference of the IEEE Engineering in Medicine and
+  Biology Society (EMBC)}. [S.l.], 2019. p. 6059--6062.}
 
 \bibitem[Secerbegovic et al. 2016]{secerbegovic2016blood}
 \abntrefinfo{Secerbegovic et al.}{SECERBEGOVIC et al.}{2016}
-{SECERBEGOVIC, A.; BERGSLAND, J.; HALVORSEN, P.~S.; SULJANOVIC, N.; MUJCIC, A.; BALASINGHAM, I. Blood pressure estimation using video plethysmography. In:  IEEE. \textbf{2016 IEEE 13th international symposium on biomedical imaging (ISBI)}. [S.l.], 2016. p. 461--464.}
+{SECERBEGOVIC, A.; BERGSLAND, J.; HALVORSEN, P.~S.; SULJANOVIC, N.; MUJCIC, A.;
+  BALASINGHAM, I. Blood pressure estimation using video plethysmography. In:
+  IEEE. \textbf{2016 IEEE 13th international symposium on biomedical imaging
+  (ISBI)}. [S.l.], 2016. p. 461--464.}
 
 \bibitem[Selvaraju et al. 2022]{selvaraju2022continuous}
 \abntrefinfo{Selvaraju et al.}{SELVARAJU et al.}{2022}
-{SELVARAJU, V.; SPICHER, N.; WANG, J.; GANAPATHY, N.; WARNECKE, J.~M.; LEONHARDT, S.; SWAMINATHAN, R.; DESERNO, T.~M. Continuous monitoring of vital signs using cameras: A systematic review.
+{SELVARAJU, V.; SPICHER, N.; WANG, J.; GANAPATHY, N.; WARNECKE, J.~M.;
+  LEONHARDT, S.; SWAMINATHAN, R.; DESERNO, T.~M. Continuous monitoring of vital
+  signs using cameras: A systematic review.
 \textbf{Sensors}, MDPI, v.~22, n.~11, p.~4097, 2022.}
 
 \bibitem[Sinhal et al. 2019]{sinhal2019overview}
 \abntrefinfo{Sinhal et al.}{SINHAL et al.}{2019}
-{SINHAL, R.; SINGH, K.; RAGHUWANSHI, M. An overview of remote photoplethysmography methods for vital sign monitoring. In:  SPRINGER. \textbf{Computer Vision and Machine Intelligence in Medical Image Analysis: International Symposium, ISCMM 2019}. [S.l.], 2019. p. 21--31.}
+{SINHAL, R.; SINGH, K.; RAGHUWANSHI, M. An overview of remote
+  photoplethysmography methods for vital sign monitoring. In:  SPRINGER.
+  \textbf{Computer Vision and Machine Intelligence in Medical Image Analysis:
+  International Symposium, ISCMM 2019}. [S.l.], 2019. p. 21--31.}
 
 \bibitem[Song et al. 2021]{Song2021pulsegan}
 \abntrefinfo{Song et al.}{SONG et al.}{2021}
-{SONG, R.; CHEN, H.; CHENG, J.; LI, C.; LIU, Y.; CHEN, X. Pulsegan: Learning to generate realistic pulse waveforms in remote photoplethysmography.
-\textbf{IEEE Journal of Biomedical and Health Informatics}, IEEE, v.~25, n.~5, p. 1373--1384, 2021.}
+{SONG, R.; CHEN, H.; CHENG, J.; LI, C.; LIU, Y.; CHEN, X. Pulsegan: Learning to
+  generate realistic pulse waveforms in remote photoplethysmography.
+\textbf{IEEE Journal of Biomedical and Health Informatics}, IEEE, v.~25, n.~5,
+  p. 1373--1384, 2021.}
 
 \bibitem[Song et al. 2020]{song2020new}
 \abntrefinfo{Song et al.}{SONG et al.}{2020a}
-{SONG, R.; ZHANG, S.; CHENG, J.; LI, C.; CHEN, X. New insights on super-high resolution for video-based heart rate estimation with a semi-blind source separation method.
+{SONG, R.; ZHANG, S.; CHENG, J.; LI, C.; CHEN, X. New insights on super-high
+  resolution for video-based heart rate estimation with a semi-blind source
+  separation method.
 \textbf{Computers in biology and medicine}, Elsevier, v.~116, p. 103535, 2020.}
 
 \bibitem[Song et al. 2020]{song2020heart}
 \abntrefinfo{Song et al.}{SONG et al.}{2020b}
-{SONG, R.; ZHANG, S.; LI, C.; ZHANG, Y.; CHENG, J.; CHEN, X. Heart rate estimation from facial videos using a spatiotemporal representation with convolutional neural networks.
-\textbf{IEEE Transactions on Instrumentation and Measurement}, IEEE, v.~69, n.~10, p. 7411--7421, 2020.}
+{SONG, R.; ZHANG, S.; LI, C.; ZHANG, Y.; CHENG, J.; CHEN, X. Heart rate
+  estimation from facial videos using a spatiotemporal representation with
+  convolutional neural networks.
+\textbf{IEEE Transactions on Instrumentation and Measurement}, IEEE, v.~69,
+  n.~10, p. 7411--7421, 2020.}
 
 \bibitem[{\v{S}}petl{\'\i}k et al. 2018]{vspetlik2018visual}
 \abntrefinfo{{\v{S}}petl{\'\i}k et al.}{{\v{S}}PETL{\'I}K et al.}{2018}
-{{\v{S}}PETL{\'I}K, R.; FRANC, V.; MATAS, J. Visual heart rate estimation with convolutional neural network. In:  \textbf{Proceedings of the british machine vision conference, Newcastle, UK}. [S.l.: s.n.], 2018. p.~3--6.}
+{{\v{S}}PETL{\'I}K, R.; FRANC, V.; MATAS, J. Visual heart rate estimation with
+  convolutional neural network. In:  \textbf{Proceedings of the british machine
+  vision conference, Newcastle, UK}. [S.l.: s.n.], 2018. p.~3--6.}
 
 \bibitem[Spicher et al. 2016]{spicher2016initial}
 \abntrefinfo{Spicher et al.}{SPICHER et al.}{2016}
-{SPICHER, N.; KUKUK, M.; MADERWALD, S.; LADD, M.~E. Initial evaluation of prospective cardiac triggering using photoplethysmography signals recorded with a video camera compared to pulse oximetry and electrocardiography at 7t mri.
+{SPICHER, N.; KUKUK, M.; MADERWALD, S.; LADD, M.~E. Initial evaluation of
+  prospective cardiac triggering using photoplethysmography signals recorded
+  with a video camera compared to pulse oximetry and electrocardiography at 7t
+  mri.
 \textbf{Biomedical engineering online}, Springer, v.~15, n.~1, p.~126, 2016.}
 
 \bibitem[Stricker et al. 2014]{stricker2014pure}
 \abntrefinfo{Stricker et al.}{STRICKER et al.}{2014}
-{STRICKER, R.; M{\"U}LLER, S.; GROSS, H.-M. Non-contact video-based pulse rate measurement on a mobile service robot. In:  IEEE. \textbf{The 23rd IEEE international symposium on robot and human interactive communication}. [S.l.], 2014. p. 1056--1062.}
+{STRICKER, R.; M{\"U}LLER, S.; GROSS, H.-M. Non-contact video-based pulse rate
+  measurement on a mobile service robot. In:  IEEE. \textbf{The 23rd IEEE
+  international symposium on robot and human interactive communication}.
+  [S.l.], 2014. p. 1056--1062.}
 
 \bibitem[Sun et al. 2013]{sun2013noncontact}
 \abntrefinfo{Sun et al.}{SUN et al.}{2013}
-{SUN, Y.; HU, S.; AZORIN-PERIS, V.; KALAWSKY, R.; GREENWALD, S. Noncontact imaging photoplethysmography to effectively access pulse rate variability.
-\textbf{Journal of biomedical optics}, Society of Photo-Optical Instrumentation Engineers, v.~18, n.~6, p. 061205--061205, 2013.}
+{SUN, Y.; HU, S.; AZORIN-PERIS, V.; KALAWSKY, R.; GREENWALD, S. Noncontact
+  imaging photoplethysmography to effectively access pulse rate variability.
+\textbf{Journal of biomedical optics}, Society of Photo-Optical Instrumentation
+  Engineers, v.~18, n.~6, p. 061205--061205, 2013.}
 
 \bibitem[Sun et al. 2012]{sun2012use}
 \abntrefinfo{Sun et al.}{SUN et al.}{2012}
-{SUN, Y.; PAPIN, C.; AZORIN-PERIS, V.; KALAWSKY, R.; GREENWALD, S.; HU, S. Use of ambient light in remote photoplethysmographic systems: comparison between a high-performance camera and a low-cost webcam.
-\textbf{Journal of biomedical optics}, Society of Photo-Optical Instrumentation Engineers, v.~17, n.~3, p. 037005--037005, 2012.}
+{SUN, Y.; PAPIN, C.; AZORIN-PERIS, V.; KALAWSKY, R.; GREENWALD, S.; HU, S. Use
+  of ambient light in remote photoplethysmographic systems: comparison between
+  a high-performance camera and a low-cost webcam.
+\textbf{Journal of biomedical optics}, Society of Photo-Optical Instrumentation
+  Engineers, v.~17, n.~3, p. 037005--037005, 2012.}
 
 \bibitem[Sun et al. 2022]{sun2022contactless}
 \abntrefinfo{Sun et al.}{SUN et al.}{2022}
-{SUN, Y.; YANG, Y.-Y.; WU, B.-J.; HUANG, P.-W.; CHENG, S.-E.; WU, B.-F.; CHEN, C.-C. Contactless facial video recording with deep learning models for the detection of atrial fibrillation.
-\textbf{Scientific reports}, Nature Publishing Group UK London, v.~12, n.~1, p.~281, 2022.}
+{SUN, Y.; YANG, Y.-Y.; WU, B.-J.; HUANG, P.-W.; CHENG, S.-E.; WU, B.-F.; CHEN,
+  C.-C. Contactless facial video recording with deep learning models for the
+  detection of atrial fibrillation.
+\textbf{Scientific reports}, Nature Publishing Group UK London, v.~12, n.~1,
+  p.~281, 2022.}
 
 \bibitem[Takano e Ohta 2007]{takano2007heart}
 \abntrefinfo{Takano e Ohta}{TAKANO; OHTA}{2007}
 {TAKANO, C.; OHTA, Y. Heart rate measurement based on a time-lapse image.
-\textbf{Medical engineering \& physics}, IOP Publishing, v.~29, n.~8, p. 853--857, 2007.}
+\textbf{Medical engineering \& physics}, IOP Publishing, v.~29, n.~8, p.
+  853--857, 2007.}
 
 \bibitem[Tarassenko et al. 2014]{tarassenko2014non}
 \abntrefinfo{Tarassenko et al.}{TARASSENKO et al.}{2014}
-{TARASSENKO, L.; VILLARROEL, M.; GUAZZI, A.; JORGE, J.; CLIFTON, D.; PUGH, C. Non-contact video-based vital sign monitoring using ambient light and auto-regressive models.
+{TARASSENKO, L.; VILLARROEL, M.; GUAZZI, A.; JORGE, J.; CLIFTON, D.; PUGH, C.
+  Non-contact video-based vital sign monitoring using ambient light and
+  auto-regressive models.
 \textbf{Physiological measurement}, IOP Publishing, v.~35, n.~5, p.~807, 2014.}
 
 \bibitem[Tomasi e Kanade 1991]{tomasi1991detection}
@@ -536,117 +800,171 @@ Dispon{\'\i}vel em: \url{https://www.sciencedirect.com/science/article/pii/S0957
 
 \bibitem[Trumpp et al. 2017]{trumpp2017relation}
 \abntrefinfo{Trumpp et al.}{TRUMPP et al.}{2017}
-{TRUMPP, A.; RASCHE, S.; WEDEKIND, D.; RUDOLF, M.; MALBERG, H.; MATSCHKE, K.; ZAUNSEDER, S. Relation between pulse pressure and the pulsation strength in camera-based photoplethysmograms.
+{TRUMPP, A.; RASCHE, S.; WEDEKIND, D.; RUDOLF, M.; MALBERG, H.; MATSCHKE, K.;
+  ZAUNSEDER, S. Relation between pulse pressure and the pulsation strength in
+  camera-based photoplethysmograms.
 2017.}
 
 \bibitem[Tsou et al. 2020]{tsou2020siamese}
 \abntrefinfo{Tsou et al.}{TSOU et al.}{2020}
-{TSOU, Y.-Y.; LEE, Y.-A.; HSU, C.-T.; CHANG, S.-H. Siamese-rppg network: Remote photoplethysmography signal estimation from face videos. In:  \textbf{Proceedings of the 35th annual ACM symposium on applied computing}. [S.l.: s.n.], 2020. p. 2066--2073.}
+{TSOU, Y.-Y.; LEE, Y.-A.; HSU, C.-T.; CHANG, S.-H. Siamese-rppg network: Remote
+  photoplethysmography signal estimation from face videos. In:
+  \textbf{Proceedings of the 35th annual ACM symposium on applied computing}.
+  [S.l.: s.n.], 2020. p. 2066--2073.}
 
 \bibitem[Tsouri e Li 2015]{tsouri2015benefits}
 \abntrefinfo{Tsouri e Li}{TSOURI; LI}{2015}
-{TSOURI, G.~R.; LI, Z. On the benefits of alternative color spaces for noncontact heart rate measurements using standard red-green-blue cameras.
-\textbf{Journal of biomedical optics}, Society of Photo-Optical Instrumentation Engineers, v.~20, n.~4, p. 048002--048002, 2015.}
+{TSOURI, G.~R.; LI, Z. On the benefits of alternative color spaces for
+  noncontact heart rate measurements using standard red-green-blue cameras.
+\textbf{Journal of biomedical optics}, Society of Photo-Optical Instrumentation
+  Engineers, v.~20, n.~4, p. 048002--048002, 2015.}
 
 \bibitem[Verkruysse et al. 2008]{verkruysse2008remote}
 \abntrefinfo{Verkruysse et al.}{VERKRUYSSE et al.}{2008}
-{VERKRUYSSE, W.; SVAASAND, L.~O.; NELSON, J.~S. Remote plethysmographic imaging using ambient light.
-\textbf{Optics express}, Optical Society of America, v.~16, n.~26, p. 21434--21445, 2008.}
+{VERKRUYSSE, W.; SVAASAND, L.~O.; NELSON, J.~S. Remote plethysmographic imaging
+  using ambient light.
+\textbf{Optics express}, Optical Society of America, v.~16, n.~26, p.
+  21434--21445, 2008.}
 
 \bibitem[Villarroel et al. 2014]{villarroel2014neonatal}
 \abntrefinfo{Villarroel et al.}{VILLARROEL et al.}{2014}
-{VILLARROEL, M.; GUAZZI, A.; JORGE, J.; DAVIS, S.; WATKINSON, P.; GREEN, G.; SHENVI, A.; MCCORMICK, K.; TARASSENKO, L. Continuous non-contact vital sign monitoring in neonatal intensive care unit.
-\textbf{Healthcare technology letters}, Wiley Online Library, v.~1, n.~3, p. 87--91, 2014.}
+{VILLARROEL, M.; GUAZZI, A.; JORGE, J.; DAVIS, S.; WATKINSON, P.; GREEN, G.;
+  SHENVI, A.; MCCORMICK, K.; TARASSENKO, L. Continuous non-contact vital sign
+  monitoring in neonatal intensive care unit.
+\textbf{Healthcare technology letters}, Wiley Online Library, v.~1, n.~3, p.
+  87--91, 2014.}
 
 \bibitem[Villarroel et al. 2020]{villarroel2020non}
 \abntrefinfo{Villarroel et al.}{VILLARROEL et al.}{2020}
-{VILLARROEL, M.; JORGE, J.; MEREDITH, D.; SUTHERLAND, S.; PUGH, C.; TARASSENKO, L. Non-contact vital-sign monitoring of patients undergoing haemodialysis treatment.
-\textbf{Scientific reports}, Nature Publishing Group UK London, v.~10, n.~1, p. 18529, 2020.}
+{VILLARROEL, M.; JORGE, J.; MEREDITH, D.; SUTHERLAND, S.; PUGH, C.; TARASSENKO,
+  L. Non-contact vital-sign monitoring of patients undergoing haemodialysis
+  treatment.
+\textbf{Scientific reports}, Nature Publishing Group UK London, v.~10, n.~1, p.
+  18529, 2020.}
 
 \bibitem[Villarroel et al. 2017]{villarroel2017non}
 \abntrefinfo{Villarroel et al.}{VILLARROEL et al.}{2017}
-{VILLARROEL, M.; JORGE, J.; PUGH, C.; TARASSENKO, L. Non-contact vital sign monitoring in the clinic. In:  IEEE. \textbf{2017 12th IEEE international conference on automatic face \& gesture recognition (FG 2017)}. [S.l.], 2017. p. 278--285.}
+{VILLARROEL, M.; JORGE, J.; PUGH, C.; TARASSENKO, L. Non-contact vital sign
+  monitoring in the clinic. In:  IEEE. \textbf{2017 12th IEEE international
+  conference on automatic face \& gesture recognition (FG 2017)}. [S.l.], 2017.
+  p. 278--285.}
 
 \bibitem[Viola e Jones 2001]{viola2001rapid}
 \abntrefinfo{Viola e Jones}{VIOLA; JONES}{2001}
-{VIOLA, P.; JONES, M. Rapid object detection using a boosted cascade of simple features. In:  IEEE. \textbf{Proceedings of the 2001 IEEE computer society conference on computer vision and pattern recognition. CVPR 2001}. [S.l.], 2001. v.~1, p.~I--I.}
+{VIOLA, P.; JONES, M. Rapid object detection using a boosted cascade of simple
+  features. In:  IEEE. \textbf{Proceedings of the 2001 IEEE computer society
+  conference on computer vision and pattern recognition. CVPR 2001}. [S.l.],
+  2001. v.~1, p.~I--I.}
 
 \bibitem[Viola e Jones 2004]{viola2004robust}
 \abntrefinfo{Viola e Jones}{VIOLA; JONES}{2004}
 {VIOLA, P.; JONES, M.~J. Robust real-time face detection.
-\textbf{International journal of computer vision}, Springer, v.~57, n.~2, p. 137--154, 2004.}
+\textbf{International journal of computer vision}, Springer, v.~57, n.~2, p.
+  137--154, 2004.}
 
 \bibitem[Wang et al. 2016]{wang2016algorithmic}
 \abntrefinfo{Wang et al.}{WANG et al.}{2016}
-{WANG, W.; BRINKER, A.~C. D.; STUIJK, S.; HAAN, G. D. Algorithmic principles of remote ppg.
-\textbf{IEEE Transactions on Biomedical Engineering}, IEEE, v.~64, n.~7, p. 1479--1491, 2016.}
+{WANG, W.; BRINKER, A.~C. D.; STUIJK, S.; HAAN, G. D. Algorithmic principles of
+  remote ppg.
+\textbf{IEEE Transactions on Biomedical Engineering}, IEEE, v.~64, n.~7, p.
+  1479--1491, 2016.}
 
 \bibitem[Wang e Shan 2020]{wang2020impact}
 \abntrefinfo{Wang e Shan}{WANG; SHAN}{2020}
 {WANG, W.; SHAN, C. Impact of makeup on remote-ppg monitoring.
-\textbf{Biomedical Physics \& Engineering Express}, IOP Publishing, v.~6, n.~3, p. 035004, 2020.}
+\textbf{Biomedical Physics \& Engineering Express}, IOP Publishing, v.~6, n.~3,
+  p. 035004, 2020.}
 
 \bibitem[Wang et al. 2014]{wang2014exploiting}
 \abntrefinfo{Wang et al.}{WANG et al.}{2014}
-{WANG, W.; STUIJK, S.; HAAN, G. D. Exploiting spatial redundancy of image sensor for motion robust rppg.
-\textbf{IEEE transactions on Biomedical Engineering}, IEEE, v.~62, n.~2, p. 415--425, 2014.}
+{WANG, W.; STUIJK, S.; HAAN, G. D. Exploiting spatial redundancy of image
+  sensor for motion robust rppg.
+\textbf{IEEE transactions on Biomedical Engineering}, IEEE, v.~62, n.~2, p.
+  415--425, 2014.}
 
 \bibitem[Wang et al. 2015]{wang2015novel}
 \abntrefinfo{Wang et al.}{WANG et al.}{2015}
-{\underline{\ \ \ \ \ \ \ \ }. A novel algorithm for remote photoplethysmography: Spatial subspace rotation.
-\textbf{IEEE transactions on biomedical engineering}, IEEE, v.~63, n.~9, p. 1974--1984, 2015.}
+{\underline{\ \ \ \ \ \ \ \ }. A novel algorithm for remote
+  photoplethysmography: Spatial subspace rotation.
+\textbf{IEEE transactions on biomedical engineering}, IEEE, v.~63, n.~9, p.
+  1974--1984, 2015.}
 
 \bibitem[Wei et al. 2017]{wei2017non}
 \abntrefinfo{Wei et al.}{WEI et al.}{2017}
-{WEI, B.; HE, X.; ZHANG, C.; WU, X. Non-contact, synchronous dynamic measurement of respiratory rate and heart rate based on dual sensitive regions.
+{WEI, B.; HE, X.; ZHANG, C.; WU, X. Non-contact, synchronous dynamic
+  measurement of respiratory rate and heart rate based on dual sensitive
+  regions.
 \textbf{Biomedical engineering online}, Springer, v.~16, n.~1, p.~17, 2017.}
 
 \bibitem[Wu et al. 2022]{wu2022motion}
 \abntrefinfo{Wu et al.}{WU et al.}{2022a}
-{WU, B.-F.; WU, B.-J.; CHENG, S.-E.; SUN, Y.; CHUNG, M.-L. Motion-robust atrial fibrillation detection based on remote-photoplethysmography.
-\textbf{IEEE Journal of Biomedical and Health Informatics}, IEEE, v.~27, n.~6, p. 2705--2716, 2022.}
+{WU, B.-F.; WU, B.-J.; CHENG, S.-E.; SUN, Y.; CHUNG, M.-L. Motion-robust atrial
+  fibrillation detection based on remote-photoplethysmography.
+\textbf{IEEE Journal of Biomedical and Health Informatics}, IEEE, v.~27, n.~6,
+  p. 2705--2716, 2022.}
 
 \bibitem[Wu et al. 2022]{wu2022facial}
 \abntrefinfo{Wu et al.}{WU et al.}{2022b}
-{WU, B.-F.; WU, B.-J.; TSAI, B.-R.; HSU, C.-P. A facial-image-based blood pressure measurement system without calibration.
-\textbf{IEEE Transactions on Instrumentation and Measurement}, IEEE, v.~71, p. 1--13, 2022.}
+{WU, B.-F.; WU, B.-J.; TSAI, B.-R.; HSU, C.-P. A facial-image-based blood
+  pressure measurement system without calibration.
+\textbf{IEEE Transactions on Instrumentation and Measurement}, IEEE, v.~71, p.
+  1--13, 2022.}
 
 \bibitem[Wu et al. 2023]{wu2023motion}
 \abntrefinfo{Wu et al.}{WU et al.}{2023}
-{WU, Y.-C.; CHIU, L.-W.; WU, B.-F.; LIN, L. L.-C.; HO, T.-H.; CHUNG, M.-L.; WU, S.-F. Motion robust remote photoplethysmography measurement during exercise for contactless physical activity intensity detection.
-\textbf{IEEE Transactions on Instrumentation and Measurement}, IEEE, v.~72, p. 1--14, 2023.}
+{WU, Y.-C.; CHIU, L.-W.; WU, B.-F.; LIN, L. L.-C.; HO, T.-H.; CHUNG, M.-L.; WU,
+  S.-F. Motion robust remote photoplethysmography measurement during exercise
+  for contactless physical activity intensity detection.
+\textbf{IEEE Transactions on Instrumentation and Measurement}, IEEE, v.~72, p.
+  1--14, 2023.}
 
 \bibitem[Xiao et al. 2024]{xiao2024remote}
 \abntrefinfo{Xiao et al.}{XIAO et al.}{2024}
-{XIAO, H.; LIU, T.; SUN, Y.; LI, Y.; ZHAO, S.; AVOLIO, A. Remote photoplethysmography for heart rate measurement: A review.
-\textbf{Biomedical Signal Processing and Control}, Elsevier, v.~88, p. 105608, 2024.}
+{XIAO, H.; LIU, T.; SUN, Y.; LI, Y.; ZHAO, S.; AVOLIO, A. Remote
+  photoplethysmography for heart rate measurement: A review.
+\textbf{Biomedical Signal Processing and Control}, Elsevier, v.~88, p. 105608,
+  2024.}
 
 \bibitem[Xu et al. 2014]{xu2014robust}
 \abntrefinfo{Xu et al.}{XU et al.}{2014}
-{XU, S.; SUN, L.; ROHDE, G.~K. Robust efficient estimation of heart rate pulse from video.
-\textbf{Biomedical optics express}, Optical Society of America, v.~5, n.~4, p. 1124--1135, 2014.}
+{XU, S.; SUN, L.; ROHDE, G.~K. Robust efficient estimation of heart rate pulse
+  from video.
+\textbf{Biomedical optics express}, Optical Society of America, v.~5, n.~4, p.
+  1124--1135, 2014.}
 
 \bibitem[Yang et al. 2016]{yang2016motion}
 \abntrefinfo{Yang et al.}{YANG et al.}{2016}
-{YANG, Y.; LIU, C.; YU, H.; SHAO, D.; TSOW, F.; TAO, N. Motion robust remote photoplethysmography in cielab color space.
-\textbf{Journal of biomedical optics}, Society of Photo-Optical Instrumentation Engineers, v.~21, n.~11, p. 117001--117001, 2016.}
+{YANG, Y.; LIU, C.; YU, H.; SHAO, D.; TSOW, F.; TAO, N. Motion robust remote
+  photoplethysmography in cielab color space.
+\textbf{Journal of biomedical optics}, Society of Photo-Optical Instrumentation
+  Engineers, v.~21, n.~11, p. 117001--117001, 2016.}
 
 \bibitem[Yang et al. 2023]{yang2023cbppggan}
 \abntrefinfo{Yang et al.}{YANG et al.}{2023}
-{YANG, Z.; WANG, H.; LIU, B.; LU, F. cbppggan: A generic enhancement framework for unpaired pulse waveforms in camera-based photoplethysmography.
-\textbf{IEEE Journal of Biomedical and Health Informatics}, IEEE, v.~28, n.~2, p. 598--608, 2023.}
+{YANG, Z.; WANG, H.; LIU, B.; LU, F. cbppggan: A generic enhancement framework
+  for unpaired pulse waveforms in camera-based photoplethysmography.
+\textbf{IEEE Journal of Biomedical and Health Informatics}, IEEE, v.~28, n.~2,
+  p. 598--608, 2023.}
 
 \bibitem[Yu et al. 2019]{yu2019physnet}
 \abntrefinfo{Yu et al.}{YU et al.}{2019a}
-{YU, Z.; LI, X.; ZHAO, G. Remote photoplethysmograph signal measurement from facial videos using spatio-temporal networks.
+{YU, Z.; LI, X.; ZHAO, G. Remote photoplethysmograph signal measurement from
+  facial videos using spatio-temporal networks.
 \textbf{arXiv preprint arXiv:1905.02419}, 2019.}
 
 \bibitem[Yu et al. 2019]{yu2019stvenrppgnet}
 \abntrefinfo{Yu et al.}{YU et al.}{2019b}
-{YU, Z.; PENG, W.; LI, X.; HONG, X.; ZHAO, G. Remote heart rate measurement from highly compressed facial videos: an end-to-end deep learning solution with video enhancement. In:  \textbf{Proceedings of the IEEE/CVF international conference on computer vision}. [S.l.: s.n.], 2019. p. 151--160.}
+{YU, Z.; PENG, W.; LI, X.; HONG, X.; ZHAO, G. Remote heart rate measurement
+  from highly compressed facial videos: an end-to-end deep learning solution
+  with video enhancement. In:  \textbf{Proceedings of the IEEE/CVF
+  international conference on computer vision}. [S.l.: s.n.], 2019. p.
+  151--160.}
 
 \bibitem[Yu et al. 2022]{yu2022physformer}
 \abntrefinfo{Yu et al.}{YU et al.}{2022}
-{YU, Z.; SHEN, Y.; SHI, J.; ZHAO, H.; TORR, P.~H.; ZHAO, G. Physformer: Facial video-based physiological measurement with temporal difference transformer. In:  \textbf{Proceedings of the IEEE/CVF conference on computer vision and pattern recognition}. [S.l.: s.n.], 2022. p. 4186--4196.}
+{YU, Z.; SHEN, Y.; SHI, J.; ZHAO, H.; TORR, P.~H.; ZHAO, G. Physformer: Facial
+  video-based physiological measurement with temporal difference transformer.
+  In:  \textbf{Proceedings of the IEEE/CVF conference on computer vision and
+  pattern recognition}. [S.l.: s.n.], 2022. p. 4186--4196.}
 
 \end{thebibliography}
