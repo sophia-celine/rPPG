@@ -1,16 +1,16 @@
 # Fdb version 4
-["bibtex master_texto"] 1780512579.0726 "master_texto.aux" "master_texto.bbl" "master_texto" 1780512583.25797 0
-  "./bib/mybib.bib" 1780512548 55730 42b72c045cd9b82e2a0aa06630a55557 ""
+["bibtex master_texto"] 1781193803.31466 "master_texto.aux" "master_texto.bbl" "master_texto" 1781193807.53469 0
+  "./bib/mybib.bib" 1781193782 55760 261eb5a14906f04b71284313f45a40a6 ""
   "c:/texlive/2026/texmf-dist/bibtex/bib/abntex2/abntex2-options.bib" 1780318764 5396 4eb260dac60f150ae608d45252853090 ""
   "c:/texlive/2026/texmf-dist/bibtex/bst/abntex2/abntex2-alf.bst" 1780318764 60064 0819ac8568f9a482510a46e3a8a6f605 ""
-  "master_texto.aux" 1780512582 52667 76e6762d1c21d10e0000d476cacc126c "pdflatex"
+  "master_texto.aux" 1781193806 52667 76e6762d1c21d10e0000d476cacc126c "pdflatex"
   (generated)
   "master_texto.bbl"
   "master_texto.blg"
   (rewritten before read)
-["pdflatex"] 1780512579.41631 "c:/Users/Sophia/Documents/rPPG/latex/master_texto.tex" "master_texto.pdf" "master_texto" 1780512583.25843 0
+["pdflatex"] 1781193803.66942 "c:/Users/Sophia/Documents/rPPG/latex/master_texto.tex" "master_texto.pdf" "master_texto" 1781193807.53515 0
   "apendices/apendiceA.tex" 1780505756 510 f6d138f95d908e102899f172566e8ddf ""
-  "c:/Users/Sophia/Documents/rPPG/latex/master_texto.tex" 1780505820 7786 a4092c6322c69e1369de9d4a8484cfed ""
+  "c:/Users/Sophia/Documents/rPPG/latex/master_texto.tex" 1780951702 7787 678db263a39695e45e66545dbd78635b ""
   "c:/texlive/2026/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc" 1780319448 2971 def0b6c1f0b107b3b936def894055589 ""
   "c:/texlive/2026/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1780319448 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "c:/texlive/2026/texmf-dist/fonts/map/fontname/texfonts.map" 1780320404 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -259,13 +259,13 @@
   "imagens/rr_best.png" 1780351294 218831 e760b3df88ebf473c2b0d9bfe67e6667 ""
   "imagens/setup_coleta.png" 1780316348 135780 3abcf9795c5a1f76c63b1c724616cba4 ""
   "imagens/snr_ex.png" 1780316348 82019 0c287b43c5e3f25a2faf8ddcfc03c991 ""
-  "master_texto.aux" 1780512582 52667 76e6762d1c21d10e0000d476cacc126c "pdflatex"
-  "master_texto.bbl" 1780512579 48302 5bc9ba56144a64abddc58f37cf746a63 "bibtex master_texto"
-  "master_texto.lof" 1780512582 5420 8d50cc957ff77f270e87dbd197906693 "pdflatex"
-  "master_texto.lot" 1780512582 1086 8aed0e17283843ff8c5abc5720826e20 "pdflatex"
-  "master_texto.out" 1780512580 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
-  "master_texto.tex" 1780505820 7786 a4092c6322c69e1369de9d4a8484cfed ""
-  "master_texto.toc" 1780512582 4174 dcbeeedd5dfaa0cae1ea71133661f6ea "pdflatex"
+  "master_texto.aux" 1781193806 52667 76e6762d1c21d10e0000d476cacc126c "pdflatex"
+  "master_texto.bbl" 1781193803 48353 6f9a0a42a195ad43f1e83ffe47945887 "bibtex master_texto"
+  "master_texto.lof" 1781193806 5420 8d50cc957ff77f270e87dbd197906693 "pdflatex"
+  "master_texto.lot" 1781193806 1086 8aed0e17283843ff8c5abc5720826e20 "pdflatex"
+  "master_texto.out" 1781193804 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "master_texto.tex" 1780951702 7787 678db263a39695e45e66545dbd78635b ""
+  "master_texto.toc" 1781193806 4174 dcbeeedd5dfaa0cae1ea71133661f6ea "pdflatex"
   "paginas/discussao.tex" 1780505756 5281 9c08593dc1bb67054263cb272da008fe ""
   "paginas/intro.tex" 1780512570 18623 f1d5f3ec7425f2cc7454c9d11a36859d ""
   "paginas/metodologia.tex" 1780505756 23689 421aa7f87b4b08426df940fd00fc01a7 ""
