@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks, butter, filtfilt, welch
 from scipy.interpolate import interp1d
+import matplotlib.ticker as ticker
 
 # =========================================================
 # CONFIGURAÇÕES GLOBAIS
@@ -15,6 +16,71 @@ RR_MIN_BPM = 4.0      # Frequência respiratória mínima (RPM)
 RR_MAX_BPM = 65.0     # Frequência respiratória máxima (RPM)
 SD_THRESHOLD = 4.0    # Limite de desvio padrão para fusão robusta (RPM)
 SAVE_TXT = False        
+PLOT_LANG = 'en'      # Idioma dos gráficos: 'en' ou 'pt'
+
+# Dicionário de tradução para os gráficos e logs
+TEXT = {
+    'en': {
+        'method': 'METHOD',
+        'mae': 'MAE (RPM)',
+        'rmse': 'RMSE (RPM)',
+        'mape': 'MAPE (%)',
+        'n_samples': 'N',
+        'title_bw': 'Baseline Wander Modulation Sequences (BW)',
+        'title_am': 'Amplitude Modulation Sequences (AM)',
+        'title_fm': 'Frequency Modulation Sequences (FM)',
+        'psd_bw': 'Power Spectral Density (PSD) - BW Modulation',
+        'psd_am': 'Power Spectral Density (PSD) - AM Modulation',
+        'psd_fm': 'Power Spectral Density (PSD) - FM Modulation',
+        'rpm': 'RPM',
+        'window': 'Window',
+        'time': 'Time (s)',
+        'norm_amp': 'Normalized Amp.',
+        'psd_label': 'Power Density',
+        'resp_band': 'Resp. Band',
+        'error': 'Error (RPM)',
+        'err_bw': 'BW',
+        'err_am': 'AM',
+        'err_fm': 'FM',
+        'err_fusion': 'Fusion',
+        'ref_label': 'Thoracic Impedance',
+        'resp_band_full': 'Respiratory Band',
+        'fusion': 'Fusion',
+        'gt_ref': 'GT (Ref)',
+    },
+    'pt': {
+        'method': 'MÉTODO',
+        'mae': 'MAE (RPM)',
+        'rmse': 'RMSE (RPM)',
+        'mape': 'MAPE (%)',
+        'n_samples': 'N',
+        'title_bw': 'Sequências de Modulação de Linha de Base (BW)',
+        'title_am': 'Sequências de Modulação de Amplitude (AM)',
+        'title_fm': 'Sequências de Modulação de Frequência (FM)',
+        'psd_bw': 'Espectro de Potência (PSD) - Modulação BW',
+        'psd_am': 'Espectro de Potência (PSD) - Modulação AM',
+        'psd_fm': 'Espectro de Potência (PSD) - Modulação FM',
+        'rpm': 'RPM',
+        'window': 'Janela',
+        'time': 'Tempo (s)',
+        'norm_amp': 'Amp. Normalizada',
+        'psd_label': 'Densidade de Potência',
+        'resp_band': 'Banda Resp.',
+        'error': 'Erro (RPM)',
+        'err_bw': 'Erro BW',
+        'err_am': 'Erro AM',
+        'err_fm': 'Erro FM',
+        'err_fusion': 'Erro Fusão',
+        'ref_label': 'Impedância Torácica',
+        'resp_band_full': 'Banda Respiratória',
+        'fusion': 'Fusão',
+        'gt_ref': 'GT (Ref)',
+    }
+}
+
+def t(key):
+    """Função auxiliar para tradução rápida."""
+    return TEXT.get(PLOT_LANG, TEXT['en']).get(key, key)
 
 # Configurações de visualização
 PLOT_CONFIG = {
@@ -240,12 +306,12 @@ def run_batch_analysis(folder_path, ref_path=None):
             plots[key] = (fig, axes.flatten())
 
     setup_fig('rr_estimates')
-    setup_fig('sig_bw', 'Sequências de Modulação de Linha de Base (BW)')
-    setup_fig('sig_am', 'Sequências de Modulação de Amplitude (AM)')
-    setup_fig('sig_fm', 'Sequências de Modulação de Frequência (FM)')
-    setup_fig('psd_bw', 'Espectro de Potência (PSD) - Modulação BW')
-    setup_fig('psd_am', 'Espectro de Potência (PSD) - Modulação AM')
-    setup_fig('psd_fm', 'Espectro de Potência (PSD) - Modulação FM')
+    setup_fig('sig_bw', t('title_bw'))
+    setup_fig('sig_am', t('title_am'))
+    setup_fig('sig_fm', t('title_fm'))
+    setup_fig('psd_bw', t('psd_bw'))
+    setup_fig('psd_am', t('psd_am'))
+    setup_fig('psd_fm', t('psd_fm'))
     setup_fig('error_per_window')
 
     for i, (filename, res) in enumerate(all_results):
@@ -263,13 +329,13 @@ def run_batch_analysis(folder_path, ref_path=None):
             # reliable = np.array(res['is_reliable'], dtype=bool)
             # ax1.scatter(wins[reliable], fusion[reliable], color='black', s=30, label='Fusão (OK)')
             # ax1.scatter(wins[~reliable], fusion[~reliable], color='red', marker='x', label='Fusão (Instável)')
-            ax1.plot(wins, fusion, color='orange', label='Fusão')
+            ax1.plot(wins, fusion, color='orange', label=t('fusion'))
 
             # Plot da Referência e Cálculo de Métricas
             title_metrics = ""
             if ref_rr is not None:
                 min_len = min(len(res['fusion']), len(ref_rr))
-                ax1.plot(np.arange(min_len), ref_rr[:min_len], 'k-', linewidth=1.5, label='GT (Ref)', alpha=0.7)
+                ax1.plot(np.arange(min_len), ref_rr[:min_len], 'k-', linewidth=1.5, label=t('gt_ref'), alpha=0.7)
                 
                 mae, rmse, mape = calculate_metrics(ref_rr[:min_len], fusion[:min_len])
                 title_metrics = f"\nMAE:{mae:.1f} RMSE:{rmse:.1f} MAPE:{mape:.1f}%"
@@ -283,11 +349,13 @@ def run_batch_analysis(folder_path, ref_path=None):
                     'n': min_len
                 })
 
-            ax1.set_title(f"{method_name}{title_metrics}")
-            ax1.set_ylabel("RPM")
-            ax1.set_xlabel("Janela")
+            ax1.set_title(f"{method_name}{title_metrics}", fontsize='xx-large')
+            ax1.set_ylabel(t('rpm'), fontsize='xx-large')
+            ax1.set_xlabel(t('window'), fontsize='xx-large')
+            ax1.tick_params(axis='both', labelsize=16)
             ax1.set_ylim(RR_MIN_BPM - 5, RR_MAX_BPM + 5)
-            ax1.legend(loc='upper right', fontsize='x-small', ncol=2)
+            ax1.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+            ax1.legend(loc='upper left', fontsize='xx-large', ncol=2)
             ax1.grid(True, alpha=0.3)
 
         # Plot Modulação BW (Figura 2)
@@ -297,9 +365,9 @@ def run_batch_analysis(folder_path, ref_path=None):
             ax_bw = plots['sig_bw'][1][i]
             t_mod = np.arange(len(res['sig_bw'])) / FS_RESAMP
             ax_bw.plot(t_mod, norm(res['sig_bw']), 'g', alpha=0.7)
-            ax_bw.set_title(f"Método: {method_name}")
-            ax_bw.set_xlabel("Tempo (s)")
-            ax_bw.set_ylabel("Amp. Normalizada")
+            ax_bw.set_title(f"{t('method')}: {method_name}")
+            ax_bw.set_xlabel(t('time'))
+            ax_bw.set_ylabel(t('norm_amp'))
             ax_bw.grid(True, alpha=0.3)
 
         # Plot Modulação AM (Figura 3)
@@ -307,9 +375,9 @@ def run_batch_analysis(folder_path, ref_path=None):
             ax_am = plots['sig_am'][1][i]
             t_mod = np.arange(len(res['sig_am'])) / FS_RESAMP
             ax_am.plot(t_mod, norm(res['sig_am']), 'b', alpha=0.7)
-            ax_am.set_title(f"Método: {method_name}")
-            ax_am.set_xlabel("Tempo (s)")
-            ax_am.set_ylabel("Amp. Normalizada")
+            ax_am.set_title(f"{t('method')}: {method_name}")
+            ax_am.set_xlabel(t('time'))
+            ax_am.set_ylabel(t('norm_amp'))
             ax_am.grid(True, alpha=0.3)
 
         # Plot Modulação FM (Figura 4)
@@ -317,9 +385,9 @@ def run_batch_analysis(folder_path, ref_path=None):
             ax_fm = plots['sig_fm'][1][i]
             t_mod = np.arange(len(res['sig_fm'])) / FS_RESAMP
             ax_fm.plot(t_mod, norm(res['sig_fm']), 'r', alpha=0.7)
-            ax_fm.set_title(f"Método: {method_name}")
-            ax_fm.set_xlabel("Tempo (s)")
-            ax_fm.set_ylabel("Amp. Normalizada")
+            ax_fm.set_title(f"{t('method')}: {method_name}")
+            ax_fm.set_xlabel(t('time'))
+            ax_fm.set_ylabel(t('norm_amp'))
             ax_fm.grid(True, alpha=0.3)
 
         def plot_modulation_psd(ax, sig, color, title):
@@ -355,15 +423,17 @@ def run_batch_analysis(folder_path, ref_path=None):
             err_fm = np.abs(np.array(res['fm'][:min_len]) - ref_rr[:min_len])
             err_fusion = np.abs(np.array(res['fusion'][:min_len]) - ref_rr[:min_len])
             
-            ax_err.plot(wins, err_bw, 'g--', alpha=0.5, label='Erro BW')
-            ax_err.plot(wins, err_am, 'b--', alpha=0.5, label='Erro AM')
-            ax_err.plot(wins, err_fm, 'r--', alpha=0.5, label='Erro FM')
-            ax_err.plot(wins, err_fusion, 'k-', linewidth=1.5, label='Erro Fusão')
+            ax_err.plot(wins, err_bw, 'g--', alpha=0.5, label=t('err_bw'))
+            ax_err.plot(wins, err_am, 'b--', alpha=0.5, label=t('err_am'))
+            ax_err.plot(wins, err_fm, 'r--', alpha=0.5, label=t('err_fm'))
+            ax_err.plot(wins, err_fusion, 'k-', linewidth=1.5, label=t('err_fusion'))
             
-            ax_err.set_title(f"{method_name}")
-            ax_err.set_ylabel("Erro (RPM)")
-            ax_err.set_xlabel("Janela")
-            ax_err.legend(loc='upper right', fontsize='x-small', ncol=2)
+            ax_err.set_title(f"{method_name}", fontsize='xx-large')
+            ax_err.set_ylabel(t('error'), fontsize='xx-large')
+            ax_err.set_xlabel(t('window'), fontsize='xx-large')
+            ax_err.legend(loc='upper left', fontsize='xx-large', ncol=2)
+            ax_err.xaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+            ax_err.tick_params(axis='both', labelsize=14)
             ax_err.grid(True, alpha=0.3)
 
     # Plot do Espectro de Referência (Figura Independente)
@@ -377,11 +447,11 @@ def run_batch_analysis(folder_path, ref_path=None):
         freqs, psd = welch(ref_sig - np.mean(ref_sig), fs=fs, nperseg=int(WINDOW_SEC * fs), nfft=nfft)
         rpm = freqs * 60
         
-        ax_ref.plot(rpm, psd, color='black', lw=2, label='Impedância Torácica')
+        ax_ref.plot(rpm, psd, color='black', lw=2, label=t('ref_label'))
         ax_ref.set_xlim(0, RR_MAX_BPM + 20)
-        ax_ref.set_xlabel("RPM")
-        ax_ref.set_ylabel("Densidade de Potência")
-        ax_ref.axvspan(RR_MIN_BPM, RR_MAX_BPM, color='gray', alpha=0.1, label='Banda Respiratória')
+        ax_ref.set_xlabel(t('rpm'))
+        ax_ref.set_ylabel(t('psd_label'))
+        ax_ref.axvspan(RR_MIN_BPM, RR_MAX_BPM, color='gray', alpha=0.1, label=t('resp_band_full'))
         ax_ref.grid(True, alpha=0.3)
         ax_ref.legend()
         fig_psd_ref.tight_layout()
@@ -398,17 +468,20 @@ def run_batch_analysis(folder_path, ref_path=None):
         output_path = os.path.join(os.path.dirname(folder_path), "metrics_rr.txt")
         try:
             with open(output_path, 'w', encoding='utf-8') as f:
-                header = f"{'MÉTODO':<20} | {'MAE (RPM)':<10} | {'RMSE (RPM)':<10} | {'MAPE (%)':<10} | {'N'}"
+                header = f"{t('method'):<20} | {t('mae'):<10} | {t('rmse'):<10} | {t('mape'):<10} | {t('n_samples')}"
                 f.write(header + "\n")
                 f.write("-" * len(header) + "\n")
                 for s in final_stats:
                     line = f"{s['method']:<20} | {s['mae']:<10.2f} | {s['rmse']:<10.2f} | {s['mape']:<10.2f} | {s['n']}"
                     f.write(line + "\n")
-            print(f"\n[INFO] Métricas de erro exportadas para: {output_path}")
+            msg = "[INFO] Metrics exported to:" if PLOT_LANG == 'en' else "[INFO] Métricas de erro exportadas para:"
+            print(f"\n{msg} {output_path}")
         except Exception as e:
-            print(f"Erro ao salvar arquivo de métricas: {e}")
+            msg_err = "Error saving metrics file:" if PLOT_LANG == 'en' else "Erro ao salvar arquivo de métricas:"
+            print(f"{msg_err} {e}")
 
-    print("Exibindo gráficos...")
+    msg_show = "Displaying plots..." if PLOT_LANG == 'en' else "Exibindo gráficos..."
+    print(msg_show)
     plt.show()
 
 if __name__ == "__main__":
