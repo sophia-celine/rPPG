@@ -11,7 +11,7 @@ Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
-Reallocated field_info (elt_size=4) to 15281 items from 5000.
+Reallocated field_info (elt_size=4) to 15350 items from 5000.
 Database file #1: abntex2-options.bib
 Database file #2: bib/mybib.bib
 Warning--I didn't find a database entry for "abnt-year-extra-label=yes"
@@ -24,45 +24,45 @@ Reallocated glb_str_end (elt_size=4) to 20 items from 10.
 | Em caso de dúvidas ou problemas com este estilo procure |
 | http://www.abntex.net.br/                               |
 +---------------------------------------------------------+
-You've used 148 entries,
+You've used 149 entries,
             6714 wiz_defined-function locations,
-            1961 strings with 42535 characters,
-and the built_in function-call counts, 159481 in all, are:
-= -- 11549
-> -- 7036
-< -- 562
-+ -- 3086
-- -- 1983
-* -- 12766
-:= -- 19866
-add.period$ -- 533
-call.type$ -- 150
-change.case$ -- 2283
-chr.to.int$ -- 423
-cite$ -- 141
-duplicate$ -- 8325
-empty$ -- 10054
-format.name$ -- 10650
-if$ -- 37612
+            1966 strings with 42817 characters,
+and the built_in function-call counts, 160611 in all, are:
+= -- 11643
+> -- 7078
+< -- 563
++ -- 3102
+- -- 1995
+* -- 12848
+:= -- 20005
+add.period$ -- 539
+call.type$ -- 151
+change.case$ -- 2298
+chr.to.int$ -- 424
+cite$ -- 142
+duplicate$ -- 8379
+empty$ -- 10144
+format.name$ -- 10711
+if$ -- 37895
 int.to.chr$ -- 10
 int.to.str$ -- 3
-missing$ -- 2981
-newline$ -- 676
-num.names$ -- 705
-pop$ -- 3577
+missing$ -- 3000
+newline$ -- 680
+num.names$ -- 710
+pop$ -- 3606
 preamble$ -- 1
-purify$ -- 697
+purify$ -- 702
 quote$ -- 0
-skip$ -- 8736
+skip$ -- 8793
 stack$ -- 1
-substring$ -- 6505
-swap$ -- 4628
-text.length$ -- 302
+substring$ -- 6562
+swap$ -- 4657
+text.length$ -- 303
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 17
 warning$ -- 0
-while$ -- 1186
+while$ -- 1195
 width$ -- 0
-write$ -- 2437
+write$ -- 2454
 (There was 1 warning)

@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import scipy.signal
 from scipy.signal import find_peaks, butter, filtfilt, welch
 from scipy.interpolate import interp1d
 import matplotlib.ticker as ticker
@@ -15,7 +16,7 @@ WINDOW_SEC = 30       # Tamanho da janela de análise (Segundos)
 RR_MIN_BPM = 4.0      # Frequência respiratória mínima (RPM)
 RR_MAX_BPM = 65.0     # Frequência respiratória máxima (RPM)
 SD_THRESHOLD = 4.0    # Limite de desvio padrão para fusão robusta (RPM)
-SAVE_TXT = False        
+SAVE_TXT = True        
 PLOT_LANG = 'en'      # Idioma dos gráficos: 'en' ou 'pt'
 
 # Dicionário de tradução para os gráficos e logs
@@ -140,20 +141,27 @@ def berger_algorithm(peak_times, fs_target, duration):
         y_new[i] = acc / dt
     return t_new, y_new
 
+def _next_power_of_2(x):
+    """Calcula a potência de 2 mais próxima."""
+    return 1 if x == 0 else 2 ** (x - 1).bit_length()
+
 def estimate_rr_fft(sig, fs):
-    """Estima a RR encontrando o pico de energia no espectro FFT."""
-    n = len(sig)
-    n_fft = max(512, 1 << (n-1).bit_length()) # Zero padding para resolução
-    freqs = np.fft.rfftfreq(n_fft, d=1/fs)
-    mag = np.abs(np.fft.rfft(sig - np.mean(sig), n=n_fft))
-    
-    # Máscara para a banda de 4 a 65 RPM
-    mask = (freqs >= RR_MIN_BPM/60) & (freqs <= RR_MAX_BPM/60)
-    if not np.any(mask):
+    """Estima a RR encontrando o pico de energia no espectro usando periodograma."""
+    low_pass = RR_MIN_BPM / 60
+    high_pass = RR_MAX_BPM / 60
+
+    sig_exp = np.expand_dims(sig, 0)
+    N = _next_power_of_2(sig_exp.shape[1])
+    f_ppg, pxx_ppg = scipy.signal.periodogram(sig_exp, fs=fs, nfft=N, detrend='constant')
+
+    fmask_ppg = np.argwhere((f_ppg >= low_pass) & (f_ppg <= high_pass))
+    if len(fmask_ppg) == 0:
         return np.nan
-    
-    peak_idx = np.argmax(mag[mask])
-    return freqs[mask][peak_idx] * 60
+
+    mask_ppg = np.take(f_ppg, fmask_ppg)
+    mask_pxx = np.take(pxx_ppg, fmask_ppg)
+    return np.take(mask_ppg, np.argmax(mask_pxx, 0))[0] * 60
+
 
 def calculate_metrics(y_true, y_pred):
     """Calcula MAE, RMSE e MAPE ignorando NaNs."""
@@ -486,6 +494,6 @@ def run_batch_analysis(folder_path, ref_path=None):
 
 if __name__ == "__main__":
     # Altere para o caminho da sua pasta de sinais BVP
-    TARGET_FOLDER = r"../preliminary_results/examples"
-    REF_FILE = r"../get_ground_truth/thoracic_impedance/L8_16-45-38_16-47-38.txt"
+    TARGET_FOLDER = r"../preliminary_results/L9/bvp"
+    REF_FILE = r"../get_ground_truth/thoracic_impedance/L9_16-05-26_16-07-25.txt"
     run_batch_analysis(TARGET_FOLDER, ref_path=REF_FILE)

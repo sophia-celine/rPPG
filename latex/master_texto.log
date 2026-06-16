@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2026.5.14)  9 JUN 2026 18:17
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.6.1)  16 JUN 2026 11:20
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -997,10 +997,15 @@ l.105 \end{abstract}
 pdfTeX warning (ext4): destination with the same identifier (name{page.}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.11 ... por meio do ECG.}}{54}{figure.caption.18}
+l.9 ...erada como ruído.}}{51}{figure.caption.14}
                                                   % [4
 
-{c:/texlive/2026/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}])
+]
+pdfTeX warning (ext4): destination with the same identifier (name{page.}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.18 ... médio absoluto.}}{60}{figure.caption.27}
+                                                  % [5{c:/texlive/2026/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}])
 \tf@lof=\write5
 \openout5 = `master_texto.lof'.
 
@@ -1009,7 +1014,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.}) has be
 <to be read again> 
                    \relax 
 l.109 \listadetabelas
-                      [5] (./master_texto.lot)
+                      [6] (./master_texto.lot)
 \tf@lot=\write6
 \openout6 = `master_texto.lot'.
 
@@ -1018,14 +1023,14 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.}) has be
 <to be read again> 
                    \relax 
 l.115 \sumario
-               [6
+               [7
 
 ] (./master_texto.toc
 pdfTeX warning (ext4): destination with the same identifier (name{page.}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.26 ...de oxigênio (SpO2)}{38}{subsection.2.5.4}
-                                                   [7
+l.26 ...de oxigênio (SpO2)}{39}{subsection.2.5.4}
+                                                   [8
 
 ])
 \tf@toc=\write7
@@ -1036,7 +1041,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.}) has be
 <to be read again> 
                    \relax 
 l.115 \sumario
-               [8] (./paginas/intro.tex
+               [9] (./paginas/intro.tex
 
 Package fancyhdr Warning: \fancyhead's `E' option without twoside option is useless.
 (fancyhdr)                Please consider using the `twoside' option on input line 1.
@@ -1046,49 +1051,53 @@ Cap\'{\i }tulo 1.
 Package fancyhdr Warning: \fancyhead's `E' option without twoside option is useless.
 (fancyhdr)                Please consider using the `twoside' option on input line 9.
 
-[9
+[10
 
 
 ]
-<imagens/PPGwaveAllen2007.png, id=259, 719.68875pt x 381.425pt>
+<imagens/PPGwaveAllen2007.png, id=273, 719.68875pt x 381.425pt>
 File: imagens/PPGwaveAllen2007.png Graphic file (type png)
 <use imagens/PPGwaveAllen2007.png>
 Package pdftex.def Info: imagens/PPGwaveAllen2007.png  used on input line 16.
 (pdftex.def)             Requested size: 273.14923pt x 144.76839pt.
- [10]
-<imagens/rPPGschematic.png, id=280, 910.40125pt x 687.56876pt>
+ [11]
+<imagens/rPPGschematic.png, id=293, 910.40125pt x 687.56876pt>
 File: imagens/rPPGschematic.png Graphic file (type png)
 <use imagens/rPPGschematic.png>
 Package pdftex.def Info: imagens/rPPGschematic.png  used on input line 28.
 (pdftex.def)             Requested size: 273.14923pt x 206.2932pt.
- [11 <./imagens/PPGwaveAllen2007.png>] [12 <./imagens/rPPGschematic.png>] [13] [14] [15]) [16] (./paginas/revisao.tex
+ [12 <./imagens/PPGwaveAllen2007.png>] [13 <./imagens/rPPGschematic.png>] [14] [15] [16]) [17] (./paginas/revisao.tex
 Cap\'{\i }tulo 2.
 
 Package fancyhdr Warning: \fancyhead's `E' option without twoside option is useless.
 (fancyhdr)                Please consider using the `twoside' option on input line 24.
 
-[17
+[18
 
-] [18] [19] [20] [21] [22] [23] [24] [25] [26] [27] [28] [29] [30] [31] [32] [33] [34] [35]
-<imagens/dominio_tempo.png, id=780, 403.9893pt x 312.2064pt>
+] [19] [20] [21] [22] [23] [24] [25] [26] [27] [28] [29] [30] [31] [32] [33] [34] [35] [36]
+<imagens/dominio_tempo.png, id=796, 650.43pt x 464.6961pt>
 File: imagens/dominio_tempo.png Graphic file (type png)
 <use imagens/dominio_tempo.png>
 Package pdftex.def Info: imagens/dominio_tempo.png  used on input line 289.
-(pdftex.def)             Requested size: 204.85846pt x 158.31325pt.
-<imagens/dominio_freq.png, id=781, 412.6617pt x 315.8199pt>
+(pdftex.def)             Requested size: 204.85846pt x 146.35876pt.
+<imagens/dominio_freq.png, id=797, 412.6617pt x 315.8199pt>
 File: imagens/dominio_freq.png Graphic file (type png)
 <use imagens/dominio_freq.png>
 Package pdftex.def Info: imagens/dominio_freq.png  used on input line 296.
 (pdftex.def)             Requested size: 204.85846pt x 156.7819pt.
- [36 <./imagens/dominio_tempo.png> <./imagens/dominio_freq.png>] [37]
-<imagens/resp_mods.png, id=823, 805.8105pt x 336.0555pt>
+ [37 <./imagens/dominio_tempo.png> <./imagens/dominio_freq.png>] [38]
+<imagens/resp_mods.png, id=839, 1122.3531pt x 578.16pt>
 File: imagens/resp_mods.png Graphic file (type png)
 <use imagens/resp_mods.png>
 Package pdftex.def Info: imagens/resp_mods.png  used on input line 322.
-(pdftex.def)             Requested size: 455.24411pt x 189.86145pt.
- [38 <./imagens/resp_mods.png>] [39]) [40] (./paginas/metodologia.tex
+(pdftex.def)             Requested size: 455.24411pt x 234.5064pt.
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[39] [40 <./imagens/resp_mods.png>]) [41] (./paginas/metodologia.tex
 Cap\'{\i }tulo 3.
-<imagens/methods.png, id=900, 1112.155pt x 544.0325pt>
+<imagens/methods.png, id=916, 1112.155pt x 544.0325pt>
 File: imagens/methods.png Graphic file (type png)
 <use imagens/methods.png>
 Package pdftex.def Info: imagens/methods.png  used on input line 7.
@@ -1097,31 +1106,31 @@ Package pdftex.def Info: imagens/methods.png  used on input line 7.
 Package fancyhdr Warning: \fancyhead's `E' option without twoside option is useless.
 (fancyhdr)                Please consider using the `twoside' option on input line 16.
 
-[41
+[42
 
  <./imagens/methods.png>]
-<imagens/setup_coleta.png, id=907, 623.32875pt x 403.5075pt>
+<imagens/setup_coleta.png, id=924, 623.32875pt x 403.5075pt>
 File: imagens/setup_coleta.png Graphic file (type png)
 <use imagens/setup_coleta.png>
 Package pdftex.def Info: imagens/setup_coleta.png  used on input line 23.
 (pdftex.def)             Requested size: 227.62206pt x 147.34981pt.
- [42 <./imagens/setup_coleta.png>] [43] [44]
+ [43 <./imagens/setup_coleta.png>] [44] [45]
 Overfull \hbox (22.87445pt too wide) in paragraph at lines 57--78
  [][] 
  []
 
-[45]
-<imagens/bw.png, id=966, 722.7pt x 226.9278pt>
+[46]
+<imagens/bw.png, id=983, 722.7pt x 226.9278pt>
 File: imagens/bw.png Graphic file (type png)
 <use imagens/bw.png>
 Package pdftex.def Info: imagens/bw.png  used on input line 92.
 (pdftex.def)             Requested size: 318.66948pt x 100.06322pt.
-<imagens/am.png, id=967, 722.7pt x 212.4738pt>
+<imagens/am.png, id=984, 722.7pt x 212.4738pt>
 File: imagens/am.png Graphic file (type png)
 <use imagens/am.png>
 Package pdftex.def Info: imagens/am.png  used on input line 99.
 (pdftex.def)             Requested size: 318.66948pt x 93.68976pt.
-<imagens/fm.png, id=968, 722.7pt x 231.264pt>
+<imagens/fm.png, id=985, 722.7pt x 231.264pt>
 File: imagens/fm.png Graphic file (type png)
 <use imagens/fm.png>
 Package pdftex.def Info: imagens/fm.png  used on input line 107.
@@ -1130,8 +1139,8 @@ Package pdftex.def Info: imagens/fm.png  used on input line 107.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[46] [47 <./imagens/bw.png> <./imagens/am.png> <./imagens/fm.png>] [48]
-<imagens/snr_ex.png, id=1000, 867.24pt x 322.3242pt>
+[47] [48 <./imagens/bw.png> <./imagens/am.png> <./imagens/fm.png>] [49]
+<imagens/snr_ex.png, id=1020, 867.24pt x 322.3242pt>
 File: imagens/snr_ex.png Graphic file (type png)
 <use imagens/snr_ex.png>
 Package pdftex.def Info: imagens/snr_ex.png  used on input line 202.
@@ -1140,17 +1149,17 @@ Package pdftex.def Info: imagens/snr_ex.png  used on input line 202.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-) [49] [50 <./imagens/snr_ex.png>] (./paginas/resultados.tex
+) [50] [51 <./imagens/snr_ex.png>] (./paginas/resultados.tex
 Cap\'{\i }tulo 4.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-<imagens/corr_examples_L7.png, id=1023, 1084.05pt x 289.08pt>
+<imagens/corr_examples_L7.png, id=1044, 1084.05pt x 289.08pt>
 File: imagens/corr_examples_L7.png Graphic file (type png)
 <use imagens/corr_examples_L7.png>
 Package pdftex.def Info: imagens/corr_examples_L7.png  used on input line 61.
 (pdftex.def)             Requested size: 409.71692pt x 109.25604pt.
-<imagens/corr_examples_L9.png, id=1024, 1084.05pt x 289.08pt>
+<imagens/corr_examples_L9.png, id=1045, 1084.05pt x 289.08pt>
 File: imagens/corr_examples_L9.png Graphic file (type png)
 <use imagens/corr_examples_L9.png>
 Package pdftex.def Info: imagens/corr_examples_L9.png  used on input line 70.
@@ -1162,26 +1171,26 @@ LaTeX Warning: `!h' float specifier changed to `!ht'.
 Package fancyhdr Warning: \fancyhead's `E' option without twoside option is useless.
 (fancyhdr)                Please consider using the `twoside' option on input line 85.
 
-[51
+[52
 
-] [52 <./imagens/corr_examples_L7.png> <./imagens/corr_examples_L9.png>] [53]
-<imagens/best_specs_L9.png, id=1043, 1084.05pt x 289.08pt>
+] [53 <./imagens/corr_examples_L7.png> <./imagens/corr_examples_L9.png>] [54]
+<imagens/best_specs_L9.png, id=1065, 1084.05pt x 289.08pt>
 File: imagens/best_specs_L9.png Graphic file (type png)
 <use imagens/best_specs_L9.png>
 Package pdftex.def Info: imagens/best_specs_L9.png  used on input line 203.
 (pdftex.def)             Requested size: 455.24411pt x 121.39954pt.
-<imagens/best_psds_L9.png, id=1044, 1084.05pt x 289.08pt>
+<imagens/best_psds_L9.png, id=1066, 1084.05pt x 289.08pt>
 File: imagens/best_psds_L9.png Graphic file (type png)
 <use imagens/best_psds_L9.png>
 Package pdftex.def Info: imagens/best_psds_L9.png  used on input line 211.
 (pdftex.def)             Requested size: 455.24411pt x 121.39954pt.
-<imagens/best_estimates_L9.png, id=1045, 1011.78pt x 289.08pt>
+<imagens/best_estimates_L9.png, id=1067, 1011.78pt x 289.08pt>
 File: imagens/best_estimates_L9.png Graphic file (type png)
 <use imagens/best_estimates_L9.png>
 Package pdftex.def Info: imagens/best_estimates_L9.png  used on input line 219.
 (pdftex.def)             Requested size: 455.24411pt x 130.07155pt.
- [54 <./imagens/best_specs_L9.png> <./imagens/best_psds_L9.png> <./imagens/best_estimates_L9.png>]
-<imagens/mean_error_per_window_2e3.png, id=1055, 1084.05pt x 428.5611pt>
+ [55 <./imagens/best_specs_L9.png> <./imagens/best_psds_L9.png> <./imagens/best_estimates_L9.png>]
+<imagens/mean_error_per_window_2e3.png, id=1076, 1084.05pt x 428.5611pt>
 File: imagens/mean_error_per_window_2e3.png Graphic file (type png)
 <use imagens/mean_error_per_window_2e3.png>
 Package pdftex.def Info: imagens/mean_error_per_window_2e3.png  used on input line 229.
@@ -1190,8 +1199,8 @@ Package pdftex.def Info: imagens/mean_error_per_window_2e3.png  used on input li
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[55 <./imagens/mean_error_per_window_2e3.png>]
-<imagens/rr_best.png, id=1063, 1542.76375pt x 788.9475pt>
+[56 <./imagens/mean_error_per_window_2e3.png>]
+<imagens/rr_best.png, id=1084, 1542.76375pt x 788.9475pt>
 File: imagens/rr_best.png Graphic file (type png)
 <use imagens/rr_best.png>
 Package pdftex.def Info: imagens/rr_best.png  used on input line 364.
@@ -1200,18 +1209,18 @@ Package pdftex.def Info: imagens/rr_best.png  used on input line 364.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[56] [57 <./imagens/rr_best.png>]
-<imagens/best_specs_valid.png, id=1077, 1084.05pt x 289.08pt>
+[57] [58 <./imagens/rr_best.png>]
+<imagens/best_specs_valid.png, id=1099, 1084.05pt x 289.08pt>
 File: imagens/best_specs_valid.png Graphic file (type png)
 <use imagens/best_specs_valid.png>
 Package pdftex.def Info: imagens/best_specs_valid.png  used on input line 482.
 (pdftex.def)             Requested size: 455.24411pt x 121.39954pt.
-<imagens/best_psd_valid.png, id=1078, 1084.05pt x 289.08pt>
+<imagens/best_psd_valid.png, id=1100, 1084.05pt x 289.08pt>
 File: imagens/best_psd_valid.png Graphic file (type png)
 <use imagens/best_psd_valid.png>
 Package pdftex.def Info: imagens/best_psd_valid.png  used on input line 490.
 (pdftex.def)             Requested size: 455.24411pt x 121.39954pt.
-<imagens/best_estimates_valid.png, id=1079, 1011.78pt x 289.08pt>
+<imagens/best_estimates_valid.png, id=1101, 1011.78pt x 289.08pt>
 File: imagens/best_estimates_valid.png Graphic file (type png)
 <use imagens/best_estimates_valid.png>
 Package pdftex.def Info: imagens/best_estimates_valid.png  used on input line 498.
@@ -1220,28 +1229,28 @@ Package pdftex.def Info: imagens/best_estimates_valid.png  used on input line 49
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[58 <./imagens/best_specs_valid.png> <./imagens/best_psd_valid.png>]
-<imagens/mean_error_per_window_valid.png, id=1087, 1084.05pt x 469.755pt>
+[59 <./imagens/best_specs_valid.png> <./imagens/best_psd_valid.png>]
+<imagens/mean_error_per_window_valid.png, id=1109, 1084.05pt x 469.755pt>
 File: imagens/mean_error_per_window_valid.png Graphic file (type png)
 <use imagens/mean_error_per_window_valid.png>
 Package pdftex.def Info: imagens/mean_error_per_window_valid.png  used on input line 508.
 (pdftex.def)             Requested size: 455.24411pt x 197.27425pt.
-) [59 <./imagens/best_estimates_valid.png> <./imagens/mean_error_per_window_valid.png>] (./paginas/discussao.tex
+) [60 <./imagens/best_estimates_valid.png> <./imagens/mean_error_per_window_valid.png>] (./paginas/discussao.tex
 Cap\'{\i }tulo 5.
 
 Package fancyhdr Warning: \fancyhead's `E' option without twoside option is useless.
 (fancyhdr)                Please consider using the `twoside' option on input line 6.
 
-[60
+[61
 
-]) [61]
+]) [62]
 
 Package fancyhdr Warning: \fancyhead's `E' option without twoside option is useless.
 (fancyhdr)                Please consider using the `twoside' option on input line 147.
 
 (./apendices/apendiceA.tex
 Apêndice A.
-<imagens/ref_spec_L8.png, id=1107, 541.3023pt x 279.6849pt>
+<imagens/ref_spec_L8.png, id=1128, 541.3023pt x 279.6849pt>
 File: imagens/ref_spec_L8.png Graphic file (type png)
 <use imagens/ref_spec_L8.png>
 Package pdftex.def Info: imagens/ref_spec_L8.png  used on input line 7.
@@ -1250,7 +1259,7 @@ Package pdftex.def Info: imagens/ref_spec_L8.png  used on input line 7.
 Package fancyhdr Warning: \fancyhead's `E' option without twoside option is useless.
 (fancyhdr)                Please consider using the `twoside' option on input line 13.
 
-[62
+[63
 
  <./imagens/ref_spec_L8.png>])
 
@@ -1262,10 +1271,10 @@ Package fancyhdr Warning: \fancyhead's `E' option without twoside option is usel
 Package fancyhdr Warning: \fancyhead's `E' option without twoside option is useless.
 (fancyhdr)                Please consider using the `twoside' option on input line 64.
 
-[63
+[64
 
 
-] [64] [65] [66] [67] [68] [69] [70] [71] [72] [73]) [74] (./master_texto.aux)
+] [65] [66] [67] [68] [69] [70] [71] [72] [73] [74]) [75] (./master_texto.aux)
  ***********
 LaTeX2e <2026-06-01>
 L3 programming layer <2026-05-26>
@@ -1274,10 +1283,10 @@ Package rerunfilecheck Info: File `master_texto.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 33355 strings out of 467167
- 661626 string characters out of 5413692
- 1087346 words of memory out of 5000000
- 61777 multiletter control sequences out of 15000+600000
+ 33361 strings out of 467167
+ 661770 string characters out of 5413692
+ 1090109 words of memory out of 5000000
+ 61782 multiletter control sequences out of 15000+600000
  643861 words of font info for 79 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  99i,13n,118p,1990b,1268s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -1285,10 +1294,10 @@ Here is how much of TeX's memory you used:
 pdfTeX warning (dest): name{chapter.reff.} has been referenced but does not exist, replaced by a fixed one
 
 <c:/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb><c:/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><c:/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb><c:/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb><c:/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb><c:/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb><c:/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmmib8.pfb><c:/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb><c:/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb><c:/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><c:/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfbx1200.pfb><c:/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfbx1440.pfb><c:/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfbx1728.pfb><c:/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfbx2074.pfb><c:/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfrm1095.pfb><c:/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfrm1200.pfb><c:/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfrm1440.pfb><c:/texlive/2026/texmf-dist/fonts/type1/public/cm-super/sfti1200.pfb>
-Output written on master_texto.pdf (75 pages, 2687533 bytes).
+Output written on master_texto.pdf (76 pages, 2834148 bytes).
 PDF statistics:
- 1320 PDF objects out of 1440 (max. 8388607)
- 1148 compressed objects within 12 object streams
- 308 named destinations out of 1000 (max. 500000)
+ 1341 PDF objects out of 1440 (max. 8388607)
+ 1168 compressed objects within 12 object streams
+ 309 named destinations out of 1000 (max. 500000)
  128 words of extra memory for PDF output out of 10000 (max. 10000000)
 

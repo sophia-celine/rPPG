@@ -29,9 +29,11 @@ def generate_ecg(t, f_card):
     peaks = np.arange(0, t[-1], 1/f_card)
 
     for p in peaks:
-        ecg += np.exp(-((t - p) / 0.01)**2)                  # R peak
-        ecg += 0.2 * np.exp(-((t - (p - 0.2)) / 0.02)**2)    # P wave
-        ecg += 0.3 * np.exp(-((t - (p + 0.25)) / 0.02)**2)   # T wave
+        ecg += 1.0 * np.exp(-((t - p) / 0.01)**2)               # R (pico central e agudo)
+        ecg -= 0.15 * np.exp(-((t - (p - 0.02)) / 0.01)**2)     # Q (pequena deflexão negativa antes)
+        ecg -= 0.2 * np.exp(-((t - (p + 0.02)) / 0.01)**2)      # S (deflexão negativa após o R)
+        ecg += 0.15 * np.exp(-((t - (p - 0.16)) / 0.03)**2)     # P (onda arredondada lenta)
+        ecg += 0.3 * np.exp(-((t - (p + 0.3)) / 0.05)**2)       # T (onda mais larga que a P)
 
     return ecg
 
@@ -59,9 +61,11 @@ def generate_ecg_fm(t, f_inst):
     for idx in peak_indices:
         p = t[idx]
 
-        ecg += np.exp(-((t - p) / 0.01)**2)                  # R
-        ecg += 0.2 * np.exp(-((t - (p - 0.2)) / 0.02)**2)    # P
-        ecg += 0.3 * np.exp(-((t - (p + 0.25)) / 0.02)**2)   # T
+        ecg += 1.0 * np.exp(-((t - p) / 0.01)**2)               # R
+        ecg -= 0.15 * np.exp(-((t - (p - 0.02)) / 0.01)**2)     # Q
+        ecg -= 0.2 * np.exp(-((t - (p + 0.02)) / 0.01)**2)      # S
+        ecg += 0.15 * np.exp(-((t - (p - 0.16)) / 0.03)**2)     # P
+        ecg += 0.3 * np.exp(-((t - (p + 0.3)) / 0.05)**2)       # T
 
     return ecg
 
@@ -129,4 +133,3 @@ for ax in axes.flatten():
 
 plt.tight_layout()
 plt.show()
-

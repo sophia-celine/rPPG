@@ -1,12 +1,12 @@
-MÉTODO               | MAE (RPM)  | RMSE (RPM) | MAPE (%)   | N
+METHOD               | MAE (RPM)  | RMSE (RPM) | MAPE (%)   | N
 ---------------------------------------------------------------
-DeepPhysPURE         | 17.04      | 17.04      | 66.48      | 1
-DeepPhysUBFC-rPPG    | 14.70      | 14.70      | 57.33      | 1
-EfficientPhysPURE    | 12.35      | 12.35      | 48.19      | 1
-EfficientPhysUBFC-rPPG | 11.42      | 11.42      | 44.53      | 1
-PhysFormerPURE       | 13.60      | 13.60      | 53.07      | 1
-PhysFormerUBFC-rPPG  | 6.26       | 6.26       | 24.42      | 1
-PhysNetPURE          | 1.73       | 1.73       | 6.74       | 1
-PhysNetUBFC-rPPG     | 13.60      | 13.60      | 53.07      | 1
-TSCAN-PURE           | 13.29      | 13.29      | 51.85      | 1
-TSCAN-UBFC-rPPG      | 11.73      | 11.73      | 45.75      | 1
+DeepPhysPURE         | 14.80      | 14.98      | 57.74      | 3
+DeepPhysUBFC-rPPG    | 15.43      | 15.70      | 60.18      | 3
+EfficientPhysPURE    | 12.51      | 12.55      | 48.80      | 3
+EfficientPhysUBFC-rPPG | 13.97      | 14.21      | 54.49      | 3
+PhysFormerPURE       | 13.34      | 13.60      | 52.05      | 3
+PhysFormerUBFC-rPPG  | 13.76      | 14.24      | 53.68      | 3
+PhysNetPURE          | 8.13       | 8.62       | 31.73      | 3
+PhysNetUBFC-rPPG     | 13.34      | 13.84      | 52.05      | 3
+TSCAN-PURE           | 12.30      | 12.54      | 47.99      | 3
+TSCAN-UBFC-rPPG      | 11.47      | 12.03      | 44.74      | 3
