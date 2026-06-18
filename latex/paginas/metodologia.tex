@@ -48,7 +48,7 @@ Simultaneamente à gravação de cada vídeo, serão adquiridos sinais fisiológ
 
 \section{Processamento de dados de vídeo}
 
-A seguir é descrita  a metodologia de processamento de dados que foi utilizada nas coletas preliminares e que será utilizada em coletas futuras. Para a avaliação dos algoritmos de fotopletismografia remota nos dados coletados, os vídeos adquiridos foram processados por meio de um fluxo de análise implementado com o auxílio da ferramenta de código aberto rPPG-Toolbox \cite{liu2022rppg}. Essa plataforma disponibiliza implementações dos principais métodos não supervisionados de extração de sinais por fotopletismografia remota, além de modelos supervisionados para treinamento e avaliação em bases de dados públicas. Adicionalmente, o ambiente permite a incorporação de conjuntos de dados e algoritmos customizados. Com isso, propõe-se a validação dos algoritmos mostrados na \autoref{tab:metodos_rppg} nos dados coletados dos pacientes de UTI, por meio da inserção de um dataset customizado e da adaptação do conjunto de ferramentas citado.
+A seguir é descrita  a metodologia de processamento de dados que foi utilizada nas coletas preliminares e que será utilizada em coletas futuras. Para a avaliação dos algoritmos de fotopletismografia remota nos dados coletados, os vídeos adquiridos foram processados por meio de um fluxo de análise implementado com o auxílio da ferramenta de código aberto rPPG-Toolbox \cite{liu2022rppg}. Essa plataforma disponibiliza implementações dos principais métodos não supervisionados de extração de sinais por fotopletismografia remota, além de modelos supervisionados para treinamento e avaliação em bases de dados públicas. Adicionalmente, o ambiente permite a incorporação de conjuntos de dados e algoritmos customizados. Com isso, propõe-se a validação dos algoritmos mostrados na \autoref{tab:metodos_rppg} nos dados coletados dos pacientes da UTI, utilizando o conjunto de ferramentas citado para extração dos sinais de rPPG. 
 
 \begin{table}[ht]
 \centering
@@ -79,9 +79,9 @@ A seguir é descrita  a metodologia de processamento de dados que foi utilizada 
 
 Em cada vídeo de entrada, foi realizada a detecção da face utilizando a ferramenta YOLO5Face \cite{qi2022yolo5face} a cada 25 quadros, sendo que a região de interesse selecionada foi a região retangular retornada por essa ferramenta. Em seguida, os quadros recortados nessa região foram utilizados como entrada para os algoritmos de rPPG. No caso especificamente dos algoritmos não supervisionados, foi realizada, ainda, a média espacial dos pixels de cada quadro para o processamento das variações das intensidades dos canais de cor. Em relação à validação dos métodos baseados em aprendizado profundo, foram considerados os modelos treinados no dataset denominado PURE \cite{stricker2014pure} e no dataset referido como UBFC-rPPG \cite{bobbia2019unsupervised}.
 
-A partir da onda de pulso resultante dos algoritmos considerados, a frequência cardíaca foi estimada por análise em frequência utilizando a FFT em janelas de 15 segundos, sendo que o pico do espectro de potência do sinal filtrado por um filtro passa-banda entre as bandas de 0,6 e 3,3 Hz foi considerado como a frequência cardíaca. A frequência respiratória foi estimada por meio da extração de três modulações do sinal de rPPG causadas pela respiração, sendo elas a modulação de linha de base (BW), a modulação de amplitude (AM) e a modulação de frequência (FM). Para isso, o sinal inicial extraído com cada um dos algoritmos de rPPG definidos foi filtrado por um filtro passa-altas com frequência de corte correspondente a 4 respirações por minuto. 
+A partir da onda de pulso resultante dos algoritmos considerados, a frequência cardíaca foi estimada em janelas de 15 segundos por análise espectral, de forma que a frequência correspondente ao pico de maior energia na densidade espectral de potência estimada pelo periodograma do sinal filtrado por um filtro passa-banda entre as bandas de 0,6 e 3,3 Hz foi considerada como a frequência cardíaca da janela correspondente. Adicionalmente, foram obtidos o espectrograma e o espectro de densidade de potência (PSD) do sinal de rPPG completo. O PSD fornece uma representação global da distribuição de energia em frequência ao longo de todo o sinal, enquanto o espectrograma permite a análise tempo-frequência, evidenciando a variação temporal do conteúdo espectral durante a aquisição.
 
-A partir do sinal inicial de rPPG, a demodulação da componente BW foi obtida por meio da sequência discreta formada pela média entre as amplitudes dos pontos de vale e dos respectivos picos subsequentes, conforme exemplifica a \autoref{fig:bw-algorithm}. A demodulação de amplitude foi obtida por meio da sequência discreta formada pelas diferenças entre as amplitudes dos pontos de vale e dos respectivos picos subsequentes, conforme exemplifica a \autoref{fig:am-algorithm}. A demodulação da componente FM, por sua vez, foi obtida pela sequência discreta formada pelos intervalos entre picos consecutivos, como explicitado pela \autoref{fig:fm-algorithm}. 
+A frequência respiratória foi estimada por meio da extração de três modulações do sinal de rPPG causadas pela respiração, sendo elas a flutuação de linha de base (BW), a modulação de amplitude (AM) e a modulação de frequência (FM). Para isso, o sinal inicial extraído com cada um dos algoritmos de rPPG definidos foi filtrado por um filtro passa-altas com frequência de corte correspondente a 4 respirações por minuto. A partir do sinal inicial filtrado de rPPG, a componente BW foi obtida por meio da sequência discreta formada pela média entre as amplitudes dos pontos de vale e dos respectivos picos subsequentes, conforme exemplifica a \autoref{fig:bw-algorithm}. A componente correspondente à modulação de amplitude foi obtida por meio da sequência discreta formada pelas diferenças entre as amplitudes dos pontos de vale e dos respectivos picos subsequentes, conforme exemplifica a \autoref{fig:am-algorithm}. A componente FM, por sua vez, foi obtida pela sequência discreta formada pelos intervalos entre picos consecutivos, como explicitado pela \autoref{fig:fm-algorithm}. 
 
 \begin{figure}[h!]
     \centering
@@ -90,14 +90,14 @@ A partir do sinal inicial de rPPG, a demodulação da componente BW foi obtida p
     \begin{subfigure}{0.7\textwidth}
         \centering
         \includegraphics[width=\linewidth]{imagens/bw.png}
-        \caption{Demodulação da componente BW.}
+        \caption{}
         \label{fig:bw-algorithm}
     \end{subfigure}
 
     \begin{subfigure}{0.7\textwidth}
         \centering
         \includegraphics[width=\linewidth]{imagens/am.png}
-        \caption{Demodulação da componente AM.}
+        \caption{}
         \label{fig:am-algorithm}
     \end{subfigure}
 
@@ -105,47 +105,20 @@ A partir do sinal inicial de rPPG, a demodulação da componente BW foi obtida p
     \begin{subfigure}{0.7\textwidth}
         \centering
         \includegraphics[width=\linewidth]{imagens/fm.png}
-        \caption{Demodulação da componente FM.}
+        \caption{}
         \label{fig:fm-algorithm}
     \end{subfigure}
 
-    \caption{Estratégias de extração de cada modulação gerada pela respiração a partir do sinal de rPPG.}
+    \caption{Estratégias de extração das componentes referentes às modulações causadas pela respiração a partir do sinal de rPPG.(a) Extração da componente BW a partir da média entre as amplitudes dos pontos de vale e dos respectivos picos subsequentes. (b) Extração da componente AM a partir das diferenças entre as amplitudes dos pontos de vale e dos respectivos picos subsequentes. (c) Extração da componente FM a partir dos intervalos entre picos consecutivos.}
     Fonte: autoria própria
     \label{fig:resp-mods-algorithms}
 \end{figure}
 
-Assim, as sequências discretas referentes às demodulações de amplitude e de linha de base foram re-amostradas em uma grade temporal uniforme de 4 Hz por meio de interpolação linear. Já a sequência referente à demodulação de frequência foi re-amostrada em uma grade temporal uniforme de 4 Hz por meio do algoritmo de Berger \cite{berger1986efficient}. A partir disso, a frequência respiratória foi estimada a partir de cada uma das sequências interpoladas por meio de análise espectral, de forma que a frequência com maior energia no espectro de potência obtido por FFT dentro das bandas esperadas nesse contexto, de 4 a 65 respirações por minuto, foi considerada como o valor de frequência respiratória obtido a partir da demodulação correspondente. Esse processo foi realizado em janelas de 30 segundos do sinal de rPPG original. Em seguida, a fim de reduzir interferências de artefatos de ruído, foi realizada uma estratégia de fusão das estimativas de frequência respiratória realizadas a partir das três demodulações, de modo que foi considerada como estimativa final a média desses 3 valores \cite{charlton2016assessment, luguern2020assessment}.
+Assim, com base no algoritmo desenvolvido por \citeonline{karlen2013multiparameter}, as sequências discretas referentes às componentes AM e BW foram re-amostradas em uma grade temporal uniforme de 4 Hz por meio de interpolação linear. Já a sequência referente à demodulação de frequência foi re-amostrada em uma grade temporal uniforme de 4 Hz por meio do algoritmo de Berger \cite{berger1986efficient}. A partir disso, a frequência respiratória foi estimada a partir de cada uma das sequências interpoladas por meio de análise espectral. A frequência correspondente ao pico de maior energia na densidade espectral de potência estimada pelo periodograma, dentro da faixa de 4 a 65 respirações por minuto, foi considerada como a estimativa da frequência respiratória obtida a partir da componente correspondente. Esse processo foi realizado em janelas de 30 segundos do sinal de rPPG original. Em seguida, a fim de aprimorar a estimativa final, foi realizada uma estratégia de fusão das estimativas de frequência respiratória realizadas a partir das três demodulações, de modo que foi considerada como estimativa final a média desses 3 valores \cite{karlen2013multiparameter, charlton2016assessment, luguern2020assessment}.
 
 \section{Processamento dos dados de referência}
 
-No que se refere ao processamento dos dados de referência, foi extraído o sinal do eletrocardiograma considerado como padrão-ouro para a obtenção da frequência cardíaca, sendo que esse parâmetro foi calculado utilizando a biblioteca HeartPy \cite{heartpy}, considerando janelas de 15 segundos. A forma de onda fotopletismográfica, por sua vez, obtida com um oxímetro de pulso posicionado no dedo indicador, foi utilizada para comparação com o sinal de pulso resultante dos algoritmos por meio de uma análise por correlação cruzada baseada no índice de correlação de Pearson. Por fim, a frequência respiratória de referência foi calculada por análise em frequência do sinal respiratório de referência, por meio da aplicação da FFT em janelas de 30 segundos, de modo que o pico do espectro de potência considerado entre 4 e 65 respirações por minuto foi considerado como o valor da frequência respiratória de referência. 
-
-% \begin{figure}[h!]
-%     \centering
-
-%     % Linha superior
-%     \begin{subfigure}{0.45\textwidth}
-%         \centering
-%         \includegraphics[width=\linewidth]{imagens/ecg_exemplo.png}
-%         \caption{ECG}
-%     \end{subfigure}
-%     \hfill
-%     \begin{subfigure}{0.45\textwidth}
-%         \centering
-%         \includegraphics[width=\linewidth]{imagens/PPG_oximetro_exemplo.png}
-%         \caption{PPG}
-%     \end{subfigure}
-
-%     % Linha inferior
-%     \begin{subfigure}{0.6\textwidth}
-%         \centering
-%         \includegraphics[width=\linewidth]{imagens/impedancia_toracica_exemplo.png}
-%         \caption{Impedância torácica}
-%     \end{subfigure}
-
-%     \caption{Exemplos de sinais de referência}
-%     \label{fig:sinais-referencia}
-% \end{figure}
+No que se refere ao processamento dos dados de referência, foi extraído o sinal do eletrocardiograma considerado como padrão-ouro para a obtenção da frequência cardíaca, sendo que esse parâmetro foi calculado utilizando a biblioteca HeartPy \cite{heartpy}, considerando janelas de 15 segundos. A forma de onda fotopletismográfica, por sua vez, obtida com um oxímetro de pulso posicionado no dedo indicador, foi utilizada para comparação com o sinal de pulso resultante dos algoritmos por meio de uma análise por correlação cruzada normalizada. Por fim, a frequência respiratória de referência foi calculada por análise espectral do sinal respiratório de referência em janelas de 30 segundos, de modo que o ponto de maior energia na densidade espectral de potência estimada pelo periodograma do sinal considerado entre 4 e 65 respirações por minuto foi considerado como o valor da frequência respiratória de referência. 
 
 \section{Métricas de avaliação}
 
@@ -199,7 +172,7 @@ Nesse caso, \(S\) é o espectro de frequência do sinal de rPPG, \(f\) é a freq
 
 \begin{figure}[h]
     \centering
-\includegraphics[width=1\linewidth]{imagens/snr_ex.png}
+\includegraphics[width=0.8\linewidth]{imagens/snr_ex.png}
     \caption{Representação da máscara espectral empregada no cálculo da relação sinal-ruído (SNR). As regiões destacadas em verde e amarelo correspondem, respectivamente, às bandas centradas na frequência fundamental do sinal de referência e em seu primeiro harmônico, considerando uma tolerância de ±0,1 Hz. A energia contida nessas bandas é considerada como sinal, enquanto a energia espectral remanescente na banda de análise é considerada como ruído.}
     Fonte: autoria própria
     \label{fig:snr}

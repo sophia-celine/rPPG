@@ -146,7 +146,7 @@ if __name__ == "__main__":
     # Caminho para o seu arquivo PPG fixo (Ground Truth)
     # PPG_PATH = r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\spo2\original_spo2_L7_16-22-48_16-24-47.txt" 
     # PPG_PATH = r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\spo2\original_spo2_L9_16-05-26_16-07-25.txt" 
-    PPG_PATH = "/home/soph/rppg/rPPG/get_ground_truth/spo2/original_spo2_L7_16-22-48_16-24-47.txt"
+    PPG_PATH = "/home/soph/rppg/rPPG/get_ground_truth/spo2/original_spo2_L9_16-05-26_16-07-25.txt"
     
     
     # Pasta contendo os arquivos rPPG (.txt)
@@ -210,11 +210,11 @@ if __name__ == "__main__":
                 ax.plot(time_axis, res['ppg'][:actual_limit], label='PPG', color='blue', alpha=0.6)
                 ax.plot(time_axis, res['rppg'][:actual_limit], label='rPPG', color='red', alpha=0.8)
                 
-                ax.set_title(f"{res['name']}\nPearson: {res['pearson']:.4f}", fontsize='xx-large')
-                ax.set_xlabel("Time (s)", fontsize='xx-large')
-                ax.set_ylabel("Normalized amplitude", fontsize='xx-large')
-                ax.tick_params(axis='both', labelsize=16)
-                ax.legend(fontsize='xx-large', loc='upper right')
+                ax.set_title(f"{res['name']}\nPearson: {res['pearson']:.4f}")
+                ax.set_xlabel("Tempo (s)")
+                ax.set_ylabel("Amplitude normalizada (u.a.)")
+                # ax.tick_params(axis='both', labelsize=16)
+                ax.legend(loc='upper right')
                 ax.grid(True, linestyle='--', alpha=0.5)
 
             # Remove subplots vazios se houver

@@ -183,6 +183,38 @@ def run_global_evaluation(patients_config, window_sec=15):
                 
             except Exception as e:
                 print(f"Erro ao coletar erros por janela para {file_name} do paciente {p_idx + 1}: {e}")
+    
+    # Cálculo da maior média de erros individualizada por paciente
+    max_avg_error_per_patient = {}
+
+    for p_idx, patient_data_entry in patient_errors_data.items():
+        p_id = patient_data_entry['id']
+        if p_id not in max_avg_error_per_patient:
+            max_avg_error_per_patient[p_id] = 0
+        
+        # Calculamos a média para este conjunto específico de métodos (ex: supervisionados)
+        patient_methods_data = patient_data_entry['methods']
+        max_win = -1
+        for _, (indices, _) in patient_methods_data.items():
+            if len(indices) > 0:
+                max_win = max(max_win, np.max(indices))
+        
+        if max_win >= 0:
+            # Cria matriz temporária para calcular a curva média que será plotada
+            temp_matrix = np.full((len(patient_methods_data), max_win + 1), np.nan)
+            for m_idx, (m_name, (indices, errors)) in enumerate(patient_methods_data.items()):
+                for i, win_idx in enumerate(indices):
+                    temp_matrix[m_idx, win_idx] = errors[i]
+            
+            mean_curve = np.nanmean(temp_matrix, axis=0)
+            if len(mean_curve[~np.isnan(mean_curve)]) > 0:
+                # O limite do eixo Y deve ser o valor máximo da curva média
+                current_max_avg = np.nanmax(mean_curve)
+                max_avg_error_per_patient[p_id] = max(max_avg_error_per_patient[p_id], current_max_avg)
+
+    # Adiciona uma margem de segurança de 5% no topo da maior média encontrada
+    for p_id in max_avg_error_per_patient:
+        max_avg_error_per_patient[p_id] *= 1.05
 
     if patient_errors_data:
         num_patients = len(patients_config)
@@ -230,9 +262,9 @@ def run_global_evaluation(patients_config, window_sec=15):
                 ax.text(0.5, 0.5, "Nenhum dado de método para este paciente", ha='center', va='center', transform=ax.transAxes)
             
             ax.set_title(f"{patient_label}")
-            ax.set_xlabel("Janela de Tempo")
+            ax.set_xlabel("Janela")
+            ax.set_ylim(0, max_avg_error_per_patient[patient_data_entry['id']])
             ax.set_ylabel("Erro Absoluto Médio (bpm)")
-            ax.legend(loc='upper right', fontsize='small')
             ax.grid(True, linestyle='--', alpha=0.7)
 
         for j in range(num_patients, len(axes_mae_per_window)):
@@ -247,20 +279,34 @@ if __name__ == "__main__":
     # Adicione aqui os caminhos para cada "caso" de teste
     # =========================================================
     DATA_CONFIG = [
-        {
-            "patient_name": "Vídeo 1",
-            "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/vinicius_video019_ecg2.csv",
-            "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/vin019/dl_hr_preds",
-            "fs": 1000,
-            "type": "supervisionados"
-        },
-        {
-            "patient_name": "Vídeo 2",
-            "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/vinicius_video023_ecg.csv",
-            "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/vin023/dl_hr_preds",
-            "fs": 1000,
-            "type": "supervisionados"
-        },
+        # {
+        #     "patient_name": "Vídeo 1",
+        #     "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/vinicius_video019_ecg2.csv",
+        #     "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/vin019/dl_hr_preds",
+        #     "fs": 1000,
+        #     "type": "supervisionados"
+        # },
+        # {
+        #     "patient_name": "Vídeo 2",
+        #     "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/vinicius_video023_ecg.csv",
+        #     "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/vin023/dl_hr_preds",
+        #     "fs": 1000,
+        #     "type": "supervisionados"
+        # },
+        # {
+        #     "patient_name": "Vídeo 1",
+        #     "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/vinicius_video019_ecg2.csv",
+        #     "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/vin019/hr_preds",
+        #     "fs": 1000,
+        #     "type": "não supervisionados"
+        # },
+        # {
+        #     "patient_name": "Vídeo 2",
+        #     "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/vinicius_video023_ecg.csv",
+        #     "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/vin023/hr_preds",
+        #     "fs": 1000,
+        #     "type": "não supervisionados"
+        # },
         # {
         #     "patient_name": "1",
         #     "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/ecg_signal_L7_16-22-48_16-24-47.csv",
@@ -268,20 +314,6 @@ if __name__ == "__main__":
         #     "fs": 250,
         #     "type": "supervisionados"
         # },
-        {
-            "patient_name": "Vídeo 1",
-            "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/vinicius_video019_ecg2.csv",
-            "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/vin019/hr_preds",
-            "fs": 1000,
-            "type": "não supervisionados"
-        },
-        {
-            "patient_name": "Vídeo 2",
-            "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/vinicius_video023_ecg.csv",
-            "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/vin023/hr_preds",
-            "fs": 1000,
-            "type": "não supervisionados"
-        },
         # {
         #     "patient_name": "1",
         #     "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/ecg_signal_L7_16-22-48_16-24-47.csv",
@@ -289,6 +321,34 @@ if __name__ == "__main__":
         #     "fs": 250,
         #     "type": "não supervisionados"
         # },
+        {
+            "patient_name": "Paciente 2",
+            "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/ecg_signal_L9_16-05-26_16-07-25.csv",
+            "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/L9/dl_hr_preds",
+            "fs": 250,
+            "type": "supervisionados"
+        },
+        {
+            "patient_name": "Paciente 3",
+            "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/ecg_signal_L8_16-45-38_16-47-38.csv",
+            "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/L8/dl_hr_preds",
+            "fs": 250,
+            "type": "supervisionados"
+        },
+        {
+            "patient_name": "Paciente 2",
+            "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/ecg_signal_L9_16-05-26_16-07-25.csv",
+            "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/L9/hr_preds",
+            "fs": 250,
+            "type": "não supervisionados"
+        },        
+        {
+            "patient_name": "Paciente 3",
+            "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/ecg_signal_L8_16-45-38_16-47-38.csv",
+            "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/L8/hr_preds",
+            "fs": 250,
+            "type": "não supervisionados"
+        },
     ]
     
     # Tamanho da janela (deve ser o mesmo usado na geração das predições)

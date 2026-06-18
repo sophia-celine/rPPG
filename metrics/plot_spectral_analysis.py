@@ -84,19 +84,17 @@ def plot_spectral_analysis(folder_paths, fs=25.0, lowcut=0.6, highcut=3.3):
             
             ax_s = axes_spec[i]
             im = ax_s.pcolormesh(t, f, 10 * np.log10(Sxx + 1e-12), shading='gouraud', cmap='jet')
-            ax_s.set_title(f"{display_name}", fontsize='xx-large')
-            ax_s.set_xlabel("Time (s)", fontsize='xx-large')
-            ax_s.set_ylabel("Frequendcy (Hz)", fontsize='xx-large')
-            ax_s.tick_params(axis='both', labelsize=16)
+            ax_s.set_title(f"{display_name}")
+            ax_s.set_xlabel("Tempo (s)")
+            ax_s.set_ylabel("Frequência (Hz)")
+            # ax_s.tick_params(axis='both', labelsize=16)
             ax_s.set_ylim(lowcut, highcut)
             cbar = fig_spec.colorbar(im, ax=ax_s)
-            cbar.set_label('dB', fontsize='xx-large')
-            cbar.ax.tick_params(labelsize=16)
+            cbar.set_label('dB')
+            # cbar.ax.tick_params(labelsize=16)
 
             # 2. Cálculo do Espectro de Potência (Welch ou Periodograma)
-            # O Welch minimiza o ruído através da média de segmentos com janelamento
-            freqs, psd = signal.welch(sig_filt, fs=fs, nperseg=min(len(sig_filt), 256), 
-                                      nfft=nfft_val, window='hamming')
+            freqs, psd = signal.periodogram(sig, fs=fs, nfft=nfft_val, detrend='constant')
             
             ax_p = axes_psd[i]
             ax_p.plot(freqs, psd, color='tab:green', linewidth=2)
@@ -109,10 +107,10 @@ def plot_spectral_analysis(folder_paths, fs=25.0, lowcut=0.6, highcut=3.3):
                 ax_p.axvline(peak_f, color='red', linestyle='--', alpha=0.6)
                 ax_p.text(peak_f + 0.1, np.max(psd)*0.8, f"{peak_f*60:.1f} BPM", color='red')
 
-            ax_p.set_title(f"{display_name}", fontsize='xx-large')
-            ax_p.set_xlabel("Frequency (Hz)", fontsize='xx-large')
-            ax_p.set_ylabel("Spectral Density", fontsize='xx-large')
-            ax_p.tick_params(axis='both', labelsize=16)
+            ax_p.set_title(f"{display_name}")
+            ax_p.set_xlabel("Frequência (Hz)")
+            ax_p.set_ylabel("Densidade espectral")
+            # ax_p.tick_params(axis='both', labelsize=16)
             ax_p.set_xlim(0, highcut + 1)
             ax_p.grid(True, alpha=0.3)
 
@@ -141,8 +139,8 @@ if __name__ == "__main__":
     # Para usar duas pastas: FOLDERS = ["/caminho/pasta1", "/caminho/pasta2"]
     
     FOLDERS = [
-        "../preliminary_results/examples",
-        # "/home/soph/rppg/rPPG/preliminary_results/L9/bvp"
+        # "../preliminary_results/examples",
+        "../preliminary_results/L9/bvp"
         # "/home/soph/rppg/rPPG/preliminary_results/L9/outra_pasta" # Exemplo de segunda pasta
     ]
     

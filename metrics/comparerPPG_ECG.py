@@ -76,17 +76,19 @@ def run_evaluation():
     # Configuration
     # =========================
     # Path to the ground truth ECG CSV 
+    # ecg_csv = "/home/soph/rppg/rPPG/get_ground_truth/ECG/ecg_signal_L8_16-45-38_16-47-38.csv"
+    # ecg_csv = "/home/soph/rppg/rPPG/get_ground_truth/ECG/ecg_signal_L9_16-05-26_16-07-25.csv"
     ecg_csv = "/home/soph/rppg/rPPG/get_ground_truth/ECG/ecg_signal_L8_16-45-38_16-47-38.csv"
     # Define se os gráficos do ECG (sinal e HR baseline) serão exibidos
-    SHOW_ECG_PLOT = True
+    SHOW_ECG_PLOT = False
     # Define o número de colunas nos gráficos de subplots
-    PLOT_COLS = 2
+    PLOT_COLS = 1
     # Folder containing the 7 prediction txt files
-    predictions_folder = "/home/soph/rppg/rPPG/preliminary_results/L8/dl_hr_preds"
+    predictions_folder = "/home/soph/rppg/rPPG/preliminary_results/examples"
     # Folder containing the raw BVP signals (waveforms) for SNR calculation
-    bvp_signals_folder = "/home/soph/rppg/rPPG/preliminary_results/L8/bvp_dl"
+    bvp_signals_folder = "/home/soph/rppg/rPPG/preliminary_results/examples"
 
-    DL_analysis = True
+    DL_analysis = False
     
     fs_ecg = 250      # Sample rate of the input ECG
     fs_camera = 25     # FPS do vídeo/rPPG
@@ -252,7 +254,7 @@ def run_evaluation():
         ax_hr.set_title(f"{os.path.splitext(file_name)[0].split('_')[1]}")
         ax_hr.set_ylabel('Frequência cardíaca (bpm)')
         ax_hr.set_xlabel('Janela de Amostragem')
-        ax_hr.legend(fontsize='small')
+        ax_hr.legend(fontsize='medium')
         ax_hr.grid(True)
 
         # Calcular o erro absoluto por janela para os dados válidos

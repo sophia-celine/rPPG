@@ -136,7 +136,7 @@ plt.text((t[p1] + t[p2])/2, h-0.1, f'FM = $\Delta t$',
 
 
 plt.xlabel("Tempo (s)")
-plt.ylabel("Amplitude / Período (s)")
+plt.ylabel("Amplitude")
 plt.legend()
 plt.grid(True)
 plt.tight_layout()

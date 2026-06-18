@@ -313,7 +313,7 @@ def plot_snr_exemplification(freqs, fft_mag, lowcut, highcut, title="Exemplo de 
 
     # plt.title(f"{title}\nSNR Resultante: {snr:.2f} dB", fontsize=14)
     plt.xlabel("Frequência (Hz)")
-    plt.ylabel("Magnitude")
+    plt.ylabel("Magnitude (dB)")
     
     # Ajusta o zoom para a área de interesse (0 a 5Hz é comum para rPPG)
     plt.xlim(0, 5) 

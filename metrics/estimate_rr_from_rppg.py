@@ -17,7 +17,7 @@ RR_MIN_BPM = 4.0      # Frequência respiratória mínima (RPM)
 RR_MAX_BPM = 65.0     # Frequência respiratória máxima (RPM)
 SD_THRESHOLD = 4.0    # Limite de desvio padrão para fusão robusta (RPM)
 SAVE_TXT = True        
-PLOT_LANG = 'en'      # Idioma dos gráficos: 'en' ou 'pt'
+PLOT_LANG = 'pt'      # Idioma dos gráficos: 'en' ou 'pt'
 
 # Dicionário de tradução para os gráficos e logs
 TEXT = {
@@ -89,9 +89,9 @@ PLOT_CONFIG = {
     'sig_bw': False,        # Sinal temporal da modulação BW
     'sig_am': False,        # Sinal temporal da modulação AM
     'sig_fm': False,        # Sinal temporal da modulação FM
-    'psd_bw': False,        # Espectro de potência (PSD) da modulação BW
-    'psd_am': False,        # Espectro de potência (PSD) da modulação AM
-    'psd_fm': False,        # Espectro de potência (PSD) da modulação FM
+    'psd_bw': True,        # Espectro de potência (PSD) da modulação BW
+    'psd_am': True,        # Espectro de potência (PSD) da modulação AM
+    'psd_fm': True,        # Espectro de potência (PSD) da modulação FM
     'error_per_window': True, # Erro absoluto por janela comparando modulações
     'psd_ref': True        # Espectro de potência (PSD) do sinal de referência
 }
@@ -161,6 +161,37 @@ def estimate_rr_fft(sig, fs):
     mask_ppg = np.take(f_ppg, fmask_ppg)
     mask_pxx = np.take(pxx_ppg, fmask_ppg)
     return np.take(mask_ppg, np.argmax(mask_pxx, 0))[0] * 60
+
+
+# def estimate_rr_fft(sig, fs):
+#     """Estima a RR encontrando o pico de energia no espectro usando Welch."""
+
+#     low_pass = RR_MIN_BPM / 60
+#     high_pass = RR_MAX_BPM / 60
+
+#     sig = np.asarray(sig)
+
+#     N = _next_power_of_2(len(sig))
+
+#     f_ppg, pxx_ppg = scipy.signal.welch(
+#         sig,
+#         fs=fs,
+#         window='hann',
+#         nperseg=len(sig)//2,
+#         noverlap=len(sig)//4,
+#         nfft=N,
+#         detrend='constant'
+#     )
+
+#     mask = (f_ppg >= low_pass) & (f_ppg <= high_pass)
+
+#     if not np.any(mask):
+#         return np.nan
+
+#     f_band = f_ppg[mask]
+#     pxx_band = pxx_ppg[mask]
+
+#     return f_band[np.argmax(pxx_band)] * 60
 
 
 def calculate_metrics(y_true, y_pred):
@@ -401,14 +432,16 @@ def run_batch_analysis(folder_path, ref_path=None):
         def plot_modulation_psd(ax, sig, color, title):
             if len(sig) == 0: return
             fs = FS_RESAMP
-            freqs, psd = welch(sig - np.mean(sig), fs=fs, nperseg=len(sig)//2, nfft=2048)
+            nfft = 2048
+            # Periodograma em vez de FFT simples para consistência com estimativa
+            freqs, psd = scipy.signal.periodogram(sig, fs=fs, nfft=nfft, detrend='constant')
             rpm = freqs * 60
             ax.plot(rpm, psd, color=color, lw=2)
             ax.set_xlim(0, RR_MAX_BPM + 20)
-            ax.set_title(f"PSD {title}: {method_name}")
-            ax.set_xlabel("RPM")
-            ax.set_ylabel("Densidade de Potência")
-            ax.axvspan(RR_MIN_BPM, RR_MAX_BPM, color='gray', alpha=0.1, label='Banda Resp.')
+            ax.set_title(f"Spectrum {title}: {method_name}")
+            ax.set_xlabel(t('rpm'))
+            ax.set_ylabel(t('psd_label'))
+            ax.axvspan(RR_MIN_BPM, RR_MAX_BPM, color='gray', alpha=0.1, label=t('resp_band'))
             ax.grid(True, alpha=0.3)
 
         # Plot PSDs (Figuras 5, 6 e 7)
@@ -449,10 +482,10 @@ def run_batch_analysis(folder_path, ref_path=None):
         fig_psd_ref, ax_ref = plt.subplots(figsize=(10, 6))
         # fig_psd_ref.suptitle('Espectro de Potência (PSD) - Sinal de Referência (GT)', fontsize=16)
         
-        # Usando Welch no sinal completo para ver a frequência respiratória dominante
+        # Periodograma para ver a frequência respiratória dominante
         fs = FS_REF
-        nfft = 4096 if WINDOW_SEC * fs < 4096 else WINDOW_SEC * fs
-        freqs, psd = welch(ref_sig - np.mean(ref_sig), fs=fs, nperseg=int(WINDOW_SEC * fs), nfft=nfft)
+        nfft = _next_power_of_2(len(ref_sig))
+        freqs, psd = scipy.signal.periodogram(ref_sig, fs=fs, nfft=nfft, detrend='constant')
         rpm = freqs * 60
         
         ax_ref.plot(rpm, psd, color='black', lw=2, label=t('ref_label'))
@@ -494,6 +527,6 @@ def run_batch_analysis(folder_path, ref_path=None):
 
 if __name__ == "__main__":
     # Altere para o caminho da sua pasta de sinais BVP
-    TARGET_FOLDER = r"../preliminary_results/L9/bvp"
-    REF_FILE = r"../get_ground_truth/thoracic_impedance/L9_16-05-26_16-07-25.txt"
+    TARGET_FOLDER = r"../preliminary_results/L8/bvp"
+    REF_FILE = r"../get_ground_truth/thoracic_impedance/L8_16-45-38_16-47-38.txt"
     run_batch_analysis(TARGET_FOLDER, ref_path=REF_FILE)
