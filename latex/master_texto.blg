@@ -1,4 +1,4 @@
-This is BibTeX, Version 0.99d (TeX Live 2022/dev/Debian)
+This is BibTeX, Version 0.99e (TeX Live 2026)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: master_texto.aux
 The style file: abntex2-alf.bst
@@ -11,7 +11,7 @@ Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
-Reallocated field_info (elt_size=4) to 15419 items from 5000.
+Reallocated field_info (elt_size=4) to 15488 items from 5000.
 Database file #1: abntex2-options.bib
 Database file #2: bib/mybib.bib
 Warning--I didn't find a database entry for "abnt-year-extra-label=yes"
@@ -24,45 +24,45 @@ Reallocated glb_str_end (elt_size=4) to 20 items from 10.
 | Em caso de dúvidas ou problemas com este estilo procure |
 | http://www.abntex.net.br/                               |
 +---------------------------------------------------------+
-You've used 150 entries,
+You've used 151 entries,
             6714 wiz_defined-function locations,
-            1970 strings with 42995 characters,
-and the built_in function-call counts, 161738 in all, are:
-= -- 11723
-> -- 7128
-< -- 567
-+ -- 3122
-- -- 2009
-* -- 12942
-:= -- 20146
-add.period$ -- 542
-call.type$ -- 152
-change.case$ -- 2314
-chr.to.int$ -- 428
-cite$ -- 143
-duplicate$ -- 8436
-empty$ -- 10211
-format.name$ -- 10786
-if$ -- 38159
+            1976 strings with 43318 characters,
+and the built_in function-call counts, 163983 in all, are:
+= -- 12029
+> -- 7143
+< -- 654
++ -- 3214
+- -- 2014
+* -- 13066
+:= -- 20410
+add.period$ -- 546
+call.type$ -- 153
+change.case$ -- 2321
+chr.to.int$ -- 429
+cite$ -- 144
+duplicate$ -- 8724
+empty$ -- 10268
+format.name$ -- 10809
+if$ -- 38564
 int.to.chr$ -- 10
 int.to.str$ -- 3
-missing$ -- 3020
-newline$ -- 685
-num.names$ -- 715
-pop$ -- 3628
+missing$ -- 3036
+newline$ -- 690
+num.names$ -- 720
+pop$ -- 3649
 preamble$ -- 1
-purify$ -- 707
+purify$ -- 710
 quote$ -- 0
-skip$ -- 8850
+skip$ -- 9141
 stack$ -- 1
-substring$ -- 6620
-swap$ -- 4691
-text.length$ -- 306
+substring$ -- 6725
+swap$ -- 4788
+text.length$ -- 307
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 17
 warning$ -- 0
-while$ -- 1204
+while$ -- 1211
 width$ -- 0
-write$ -- 2472
+write$ -- 2486
 (There was 1 warning)
