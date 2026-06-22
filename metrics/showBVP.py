@@ -21,7 +21,7 @@ def plot_first_n_samples(folder_path, ref_path=None, n_samples=500, fs=25, ref_f
     if ref_path and show_ref:
         num_plots += 1
 
-    cols = 2
+    cols = 1
     rows = int(np.ceil(num_plots / cols))
 
     # 2. Configurar a figura
@@ -83,10 +83,10 @@ def plot_first_n_samples(folder_path, ref_path=None, n_samples=500, fs=25, ref_f
             
             # Plotagem
             ax.plot(time_axis, plot_data, color='tab:blue', linewidth=1.5)
-            ax.set_title(f"{filename.split('_')[1]}", fontsize=10)
-            ax.set_xlabel("Tempo (s)")
-            ax.set_ylabel("Amplitude")
-            ax.grid(True, linestyle='--', alpha=0.5)
+            # ax.set_title(f"{filename.split('_')[1]}", fontsize=10)
+            # ax.set_xlabel("Tempo (s)")
+            # ax.set_ylabel("Amplitude")
+            ax.grid(False)#, linestyle='--', alpha=0.5)
             
         except Exception as e:
             ax.text(0.5, 0.5, f"Erro ao carregar:\n{filename}", 

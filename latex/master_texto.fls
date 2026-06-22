@@ -1449,11 +1449,11 @@ INPUT ./imagens/best_psds.png
 INPUT imagens/best_psds.png
 INPUT ./imagens/best_psds.png
 INPUT ./imagens/best_psds.png
-INPUT ./imagens/best_estimates_L9.png
-INPUT ./imagens/best_estimates_L9.png
-INPUT imagens/best_estimates_L9.png
-INPUT ./imagens/best_estimates_L9.png
-INPUT ./imagens/best_estimates_L9.png
+INPUT ./imagens/best_hr_est.png
+INPUT ./imagens/best_hr_est.png
+INPUT imagens/best_hr_est.png
+INPUT ./imagens/best_hr_est.png
+INPUT ./imagens/best_hr_est.png
 INPUT ./imagens/mean_error_per_window_2e3.png
 INPUT ./imagens/mean_error_per_window_2e3.png
 INPUT imagens/mean_error_per_window_2e3.png

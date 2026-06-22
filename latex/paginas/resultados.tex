@@ -15,7 +15,7 @@ Os sinais de rPPG e os sinais de fotopletismografia de referência dos vídeos d
 
 \begin{table*}[h!]
 \centering
-\caption{Coeficientes de correlação linear de Pearson entre os sinais de rPPG e o sinal de PPG de referência para os pacientes 1 e 2.}
+\caption{Coeficientes de correlação linear de Pearson entre os sinais de rPPG e o sinal de PPG de referência para os pacientes 1 e 2 pós alinhamento pelo atraso correspondente ao máximo da correlação cruzada normalizada. Termos entre parênteses indicam a base de dados na qual os modelos foram treinados.}
 \resizebox{0.7\textwidth}{!}{
 \begin{tabular}{llcc}
 \hline
@@ -193,14 +193,14 @@ O erro médio absoluto, o erro médio quadrático em batimentos por minuto e o e
 
 É possível observar que o método não supervisionado que resultou no menor valor de erro absoluto médio para o paciente 1 foi o método CHROM. Em relação ao sinal do paciente 2, os métodos CHROM, ICA e POS resultaram nos menores valores de erro comparados ao restante dos métodos. Além disso, os métodos LGI e POS foram os que resultaram nos menores valores de erro para as estimativas de frequência cardíaca a partir dos sinais do paciente 3. No que se refere aos métodos supervisionados, por sua vez, o modelo PhysFormer treinado da base de dados PURE foi o que apresentou o melhor resultado para o paciente 1, o modelo TSCAN treinado na base de dados PURE resultou no menor valor de erro para as estimativas do paciente 2 e o modelo PhysNet treinado no mesmo \textit{dataset} foi o que obteve o melhor resultado para o paciente 3. À parte isso, a comparação entre todos os métodos permite analisar que o método POS foi o que resultou na melhor relação sinal-ruído para os sinais dos pacientes 2 e 3. Já para o paciente 1, o sinal gerado pelo modelo PhysFormer treinado na base de dados PURE foi o que apresentou o melhor valor para essa métrica.
 
-Observa-se, por fim, que os métodos CHROM, ICA e POS aplicados ao sinal do paciente 2 resultaram no menor valor de erro absoluto médio entre todos os algoritmos não supervisionados. Da mesma forma, o modelo TSCAN treinado na base de dados PURE também aplicado ao sinal do paciente 2 resultou no menor erro absoluto médio entre os modelos supervisionados. Na \autoref{fig:best-specs}, pode-se analisar os espectrogramas de dois desses sinais, nos quais é possível identificar, de forma distinguível, uma região de maior densidade espectral de potência persistente ao longo da maior parte da janela temporal analisada. 
+Observa-se, por fim, que os métodos CHROM, ICA e POS aplicados ao sinal do paciente 2 resultaram no menor valor de erro absoluto médio entre todos os algoritmos não supervisionados. Da mesma forma, o modelo TSCAN treinado na base de dados PURE também aplicado ao sinal do paciente 2 resultou no menor erro absoluto médio entre os modelos supervisionados. Na \autoref{fig:best-specs}, pode-se analisar os espectrogramas de dois desses sinais, nos quais é possível identificar, de forma distinguível, uma região de maior densidade espectral de potência persistente ao longo da maior parte do sinal analisado em sua completude. 
 
-Similarmente, os espectros de potência desses sinais apresentados na \autoref{fig:best-psd} permitem a identificação do pico referente à essa frequência, a partir da qual pode ser realizada a estimativa do valor de frequência cardíaca. Nesse caso, a análise em frequência foi realizada no sinal completo com duração próxima a dois minutos. Em comparação, as estimativas de frequência cardíaca por janela são apresentadas na \autoref{fig:best-estimates-L9}. 
+Similarmente, os espectros de potência desses sinais apresentados na \autoref{fig:best-psd} permitem a identificação do pico referente à frequência predominante, a partir da qual pode ser realizada a estimativa do valor de frequência cardíaca. Nesse caso, a análise em frequência também foi realizada no sinal completo com duração próxima a dois minutos. Em comparação, as estimativas de frequência cardíaca por janela são apresentadas na \autoref{fig:best-estimates-L9}. 
 
 \begin{figure}[h!]
     \centering
 \includegraphics[width=1\linewidth]{imagens/best_specs.png}
-    \caption{Espectrogramas de dois dos sinais de rPPG cujas estimativas de frequência cardíaca resultaram no menor erro absoluto médio em relação às estimativas obtidas por meio do ECG. Á esquerda, o espectrograma do sinal obtido pelo método POS aplicado ao vídeo do paciente 2. Á direita, o espectrograma do modelo PhysNet treinado na base de dados PURE aplicado ao vídeo do paciente 3.}
+    \caption{Espectrogramas de dois dos sinais de rPPG cujas estimativas de frequência cardíaca resultaram no menor erro absoluto médio em relação às estimativas obtidas por meio do ECG. À esquerda, o espectrograma do sinal obtido pelo método POS aplicado ao vídeo do paciente 2. À direita, o espectrograma do modelo PhysNet treinado na base de dados PURE aplicado ao vídeo do paciente 3.}
     Fonte: autoria própria
     \label{fig:best-specs}
 \end{figure}
@@ -208,14 +208,14 @@ Similarmente, os espectros de potência desses sinais apresentados na \autoref{f
 \begin{figure}[h!]
     \centering
 \includegraphics[width=1\linewidth]{imagens/best_psds.png}
-    \caption{Espectros de potência de dois dos sinais de rPPG cujas estimativas de frequência cardíaca resultaram no menor erro absoluto médio em relação às estimativas obtidas por meio do ECG.Á esquerda, o espectrograma do sinal obtido pelo método POS aplicado ao vídeo do paciente 2. Á direita, o espectrograma do modelo PhysNet treinado na base de dados PURE aplicado ao vídeo do paciente 3.}
+    \caption{Espectros de potência de dois dos sinais de rPPG cujas estimativas de frequência cardíaca resultaram no menor erro absoluto médio em relação às estimativas obtidas por meio do ECG. À esquerda, o espectrograma do sinal obtido pelo método POS aplicado ao vídeo do paciente 2. À direita, o espectrograma do modelo PhysNet treinado na base de dados PURE aplicado ao vídeo do paciente 3.}
     Fonte: autoria própria
     \label{fig:best-psd}
 \end{figure}
 
 \begin{figure}[h!]
     \centering
-\includegraphics[width=1\linewidth]{imagens/best_estimates_L9.png}
+\includegraphics[width=1\linewidth]{imagens/best_hr_est.png}
     \caption{Estimativas de frequência cardíaca por janela obtidas por meio de dois dos métodos de rPPG que resultaram no menor erro absoluto médio em relação às estimativas obtidas por meio do ECG. Á esquerda, o espectrograma do sinal obtido pelo método POS aplicado ao vídeo do paciente 2. Á direita, o espectrograma do modelo PhysNet treinado na base de dados PURE aplicado ao vídeo do paciente 3.}
     Fonte: autoria própria
     \label{fig:best-estimates-L9}
@@ -239,7 +239,7 @@ O erro médio absoluto, o erro médio quadrático, medidos em respirações por 
 
 \begin{table*}[h!]
 \centering
-\caption{Métricas de erro da estimativa de frequência respiratória por meio de cada método de rPPG em comparação com as obtidas a partir do sinal de referência para os pacientes 1, 2 e 3. MAE e RMSE são expressos em batimentos por minuto (bpm), MAPE em porcentagem (\%) e SNR em decibéis (dB).}
+\caption{Métricas de erro da estimativa de frequência respiratória por meio de cada método de rPPG em comparação com as obtidas a partir do sinal de referência para os pacientes 1, 2 e 3. MAE e RMSE são expressos em respirações por minuto (rpm), MAPE em porcentagem (\%) e SNR em decibéis (dB).}
 \resizebox{\textwidth}{!}{
 \begin{tabular}{llccccccccc}
 \hline
@@ -354,7 +354,7 @@ O erro médio absoluto, o erro médio quadrático, medidos em respirações por 
 \label{tab:rppg_rr_metrics_all}
 \end{table*}
 
-Pode-ser verificar que, para os dados do paciente 1, as estimativas de frequência respiratória realizadas a partir do sinal gerado pelo método POS e pelo método GREEn foram as que resultaram no menor erro médio absoluto entre os métodos não supervisionados, assim como as estimativas obtidas a partir do sinal gerado pelo modelo PhysNet treinado na base de dados PURE foram as que resultaram no menor erro médio absoluto entre os métodos supervisionados. Para o paciente 2, os métodos que resultaram no menor erro médio absoluto para as estimativas de frequência respiratória foram o PBV, entre os não supervisionados, e o modelo PhysFormer treinado na base de dados PURE, entre os supervisionados. Por fim, para o paciente 3, o método CHROM foi o que resultou no menor MAE entre os métodos não supervisionados, ao passo que o modelo EfficientPhys treinado na base de dados PURE foi o que resultou no menor MAE entre os supervisionados.
+Pode-ser verificar que, para os dados do paciente 1, as estimativas de frequência respiratória realizadas a partir do sinal gerado pelo método POS e pelo método GREEN foram as que resultaram no menor erro médio absoluto entre os métodos não supervisionados, assim como as estimativas obtidas a partir do sinal gerado pelo modelo PhysNet treinado na base de dados PURE foram as que resultaram no menor erro médio absoluto entre os métodos supervisionados. Para o paciente 2, os métodos que resultaram no menor erro médio absoluto para as estimativas de frequência respiratória foram o PBV, entre os não supervisionados, e o modelo PhysFormer treinado na base de dados PURE, entre os supervisionados. Por fim, para o paciente 3, o método CHROM foi o que resultou no menor MAE entre os métodos não supervisionados, ao passo que o modelo EfficientPhys treinado na base de dados PURE foi o que resultou no menor MAE entre os supervisionados.
 
 Entre os métodos não supervisionados, para todos os pacientes, o método CHROM aplicado ao vídeo do paciente 3 foi o que gerou estimativas de frequência respiratória com o menor erro médio absoluto. Já entre os métodos supervisionados, o modelo PhysFormer treinado na base de dados PURE aplicado no vídeo do paciente 2 foi o que resultou no sinal cujas estimativas de frequência respiratória tiveram o menor MAE. As estimativas por janela obtidas por meio de cada uma das componentes BW, AM e FM e as obtidas por meio da fusão desses valores são apresentadas na \autoref{fig:rr-best}, bem como o erro por janela. Nessa figura, é possível observar, ainda, que as estimativas obtidas por meio da fusão dos valores obtidos por cada uma das componentes apresentam, na maioria dos pontos, um erro menor do que o erro das estimativas obtidas pelas componentes individuais.
 

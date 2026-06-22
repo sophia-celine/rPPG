@@ -228,7 +228,7 @@ def run_global_evaluation(patients_config, window_sec=15):
 
         for p_idx, patient_data_entry in patient_errors_data.items():
             ax = axes_mae_per_window[p_idx]
-            patient_label = f"{patient_data_entry['id']} (Métodos {patient_data_entry['type']})"
+            patient_label = f"{patient_data_entry['id']} ({patient_data_entry['type']})"
             patient_methods_data = patient_data_entry['methods']
 
             max_window_idx_for_patient = -1
@@ -261,12 +261,12 @@ def run_global_evaluation(patients_config, window_sec=15):
             else:
                 ax.text(0.5, 0.5, "Nenhum dado de método para este paciente", ha='center', va='center', transform=ax.transAxes)
             
-            ax.set_title(f"{patient_label}")
-            ax.set_xlabel("Janela")
+            ax.set_title(f"{patient_label}", fontsize='xx-large')
+            ax.set_xlabel("Window", fontsize='xx-large')
             ax.set_ylim(0, max_avg_error_per_patient[patient_data_entry['id']])
-            ax.set_ylabel("Erro Absoluto Médio (bpm)")
+            ax.set_ylabel("MAE (bpm)", fontsize='xx-large')
             ax.grid(True, linestyle='--', alpha=0.7)
-
+            ax.tick_params(axis='both', labelsize=16)
         for j in range(num_patients, len(axes_mae_per_window)):
             fig_mae_per_window.delaxes(axes_mae_per_window[j])
 
@@ -322,32 +322,32 @@ if __name__ == "__main__":
         #     "type": "não supervisionados"
         # },
         {
-            "patient_name": "Paciente 2",
+            "patient_name": "Patient 2",
             "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/ecg_signal_L9_16-05-26_16-07-25.csv",
             "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/L9/dl_hr_preds",
             "fs": 250,
-            "type": "supervisionados"
+            "type": "Supervised methods"
         },
         {
-            "patient_name": "Paciente 3",
+            "patient_name": "Patient 3",
             "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/ecg_signal_L8_16-45-38_16-47-38.csv",
             "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/L8/dl_hr_preds",
             "fs": 250,
-            "type": "supervisionados"
+            "type": "Supervised methods"
         },
         {
-            "patient_name": "Paciente 2",
+            "patient_name": "Patient 2",
             "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/ecg_signal_L9_16-05-26_16-07-25.csv",
             "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/L9/hr_preds",
             "fs": 250,
-            "type": "não supervisionados"
+            "type": "Unsupervised methods"
         },        
         {
-            "patient_name": "Paciente 3",
+            "patient_name": "Patient 3",
             "gt_path": "/home/soph/rppg/rPPG/get_ground_truth/ECG/ecg_signal_L8_16-45-38_16-47-38.csv",
             "pred_folder": "/home/soph/rppg/rPPG/preliminary_results/L8/hr_preds",
             "fs": 250,
-            "type": "não supervisionados"
+            "type": "Unsupervised methods"
         },
     ]
     
