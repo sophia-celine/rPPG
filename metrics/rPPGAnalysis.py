@@ -11,6 +11,7 @@ from scipy.interpolate import interp1d
 import heartpy as hp
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 import matplotlib.ticker as ticker
+from scipy.sparse import spdiags
 
 class rPPGAnalysis:
     def __init__(self, video_path: Path, 
@@ -33,6 +34,9 @@ class rPPGAnalysis:
         self.hr_window_size = hr_window_size
         self.respiration_window_size = respiration_window_size
         self.rppg_signals = self._load_rppg_signals()
+        self.ecg_hr_values = self._estimate_hr_ecg()
+        self.rppg_hr_values = self._estimate_hr_rppg()
+        self.hr_results = self.compare_hr_rppg_ecg()
 
     def _load_rppg_signals(self):
         rppg_signals = {}
@@ -74,10 +78,11 @@ class rPPGAnalysis:
         capture.release()
         return fps
 
-    def _calculate_fft_hr(self, low_pass=0.6, high_pass=3.3):
+    def _calculate_fft_hr(self, segment, low_pass=0.6, high_pass=3.3):
         """Calculate heart rate based on PPG using Fast Fourier transform (FFT)."""
-        N = 1500 #_next_power_of_2(ppg_signal.shape[1])     # zero-padding para resolução de 1 bpm
-        f_ppg, pxx_ppg = scipy.signal.periodogram(self.rppg_signal, fs=self.video_fps, nfft=N, detrend=False)
+        segment = np.expand_dims(segment, 0)
+        N = self._next_power_of_2(segment.shape[1])     # @TODO colocar zero-padding para resolução de 1 bpm
+        f_ppg, pxx_ppg = scipy.signal.periodogram(segment, fs=self.video_fps, nfft=N, detrend=False)
         fmask_ppg = np.argwhere((f_ppg >= low_pass) & (f_ppg <= high_pass))
         mask_ppg = np.take(f_ppg, fmask_ppg)
         mask_pxx = np.take(pxx_ppg, fmask_ppg)
@@ -110,30 +115,78 @@ class rPPGAnalysis:
 
     @staticmethod
     def bandpass_filter(data, lowcut, highcut, fs, order=4):
-        nyq = 0.5 * fs
-        low = lowcut / nyq
-        high = highcut / nyq
-        b, a = butter(order, [low, high], btype='band')
-        return filtfilt(b, a, data)
+        [b, a] = butter(1, [lowcut / fs * 2, highcut / fs * 2], btype='bandpass')
+        return filtfilt(b, a, np.double(data))
+    
+    @staticmethod   
+    def power2db(mag):
+        """Convert power to dB."""
+        return 10 * np.log10(mag)
 
-    @staticmethod
-    def load_signal(file_path):
+    def _load_signal(self, file_path):
         data = np.loadtxt(file_path)
         if data.ndim > 1:
             return data[0, :] if data.shape[0] < data.shape[1] else data[:, 0]
         return data
+    
+    def _detrend(self, input_signal, lambda_value):
+        """Detrend PPG signal."""
+        signal_length = input_signal.shape[0]
+        # observation matrix
+        H = np.identity(signal_length)
+        ones = np.ones(signal_length)
+        minus_twos = -2 * np.ones(signal_length)
+        diags_data = np.array([ones, minus_twos, ones])
+        diags_index = np.array([0, 1, 2])
+        D = spdiags(diags_data, diags_index,
+                    (signal_length - 2), signal_length).toarray()
+        detrended_signal = np.dot(
+            (H - np.linalg.inv(H + (lambda_value ** 2) * np.dot(D.T, D))), input_signal)
+        return detrended_signal
+    
+    def _calculate_SNR(self, pred_ppg_signal, hr_label, low_pass=0.6, high_pass=3.3):
+        """Calculate SNR as the ratio of the area under the curve of the frequency spectrum 
+            around the first and second harmonics of the ground truth HR frequency.
+        """
+        # Get the first and second harmonics of the ground truth HR in Hz
+        first_harmonic_freq = hr_label / 60
+        second_harmonic_freq = 2 * first_harmonic_freq
+        deviation = 6 / 60  # 6 beats/min converted to Hz
 
-    def compare_hr_rppg_ecg(self):
+        # Calculate FFT
+        pred_ppg_signal = np.expand_dims(pred_ppg_signal, 0)
+        N = self._next_power_of_2(pred_ppg_signal.shape[1])
+        f_ppg, pxx_ppg = scipy.signal.periodogram(pred_ppg_signal, fs=self.video_fps, nfft=N, detrend=False)
 
-        results = {}
+        # Calculate the indices corresponding to the frequency ranges
+        idx_harmonic1 = np.argwhere((f_ppg >= (first_harmonic_freq - deviation)) & (f_ppg <= (first_harmonic_freq + deviation)))
+        idx_harmonic2 = np.argwhere((f_ppg >= (second_harmonic_freq - deviation)) & (f_ppg <= (second_harmonic_freq + deviation)))
+        idx_remainder = np.argwhere((f_ppg >= low_pass) & (f_ppg <= high_pass) \
+        & ~((f_ppg >= (first_harmonic_freq - deviation)) & (f_ppg <= (first_harmonic_freq + deviation))) \
+        & ~((f_ppg >= (second_harmonic_freq - deviation)) & (f_ppg <= (second_harmonic_freq + deviation))))
 
-        window_len_rppg = int(self.hr_window_size * self.video_fps)
-        n_windows_rppg = len(rppg_signal) // window_len_rppg
-        window_len_ecg = int(self.hr_window_size * self.ecg_sample_rate)
-        n_windows_ecg = len(ecg) // window_len_ecg
+        # Select the corresponding values from the periodogram
+        pxx_ppg = np.squeeze(pxx_ppg)
+        pxx_harmonic1 = pxx_ppg[idx_harmonic1]
+        pxx_harmonic2 = pxx_ppg[idx_harmonic2]
+        pxx_remainder = pxx_ppg[idx_remainder]
+
+        # Calculate the signal power
+        signal_power_hm1 = np.sum(pxx_harmonic1)
+        signal_power_hm2 = np.sum(pxx_harmonic2)
+        signal_power_rem = np.sum(pxx_remainder)
+
+        # Calculate the SNR as the ratio of the areas
+        if not signal_power_rem == 0:
+            return self.power2db((signal_power_hm1 + signal_power_hm2) / signal_power_rem)
+        return 0
+
+    def _estimate_hr_ecg(self):
 
         ecg = hp.get_data(self.gt_ecg_path)
         ecg = self.filter_ecg(ecg, sample_rate=self.ecg_sample_rate)
+        window_len_ecg = int(self.hr_window_size * self.ecg_sample_rate)
+        n_windows_ecg = len(ecg) // window_len_ecg
 
         print(f"Calculating Ground Truth HR for {n_windows_ecg} windows...")
         ecg_hr_values = []
@@ -142,25 +195,42 @@ class rPPGAnalysis:
             hr = self.estimate_hr_heartpy(segment, self.ecg_sample_rate)
             ecg_hr_values.append(hr)
         
-        ecg_hr_values = np.array(ecg_hr_values)
+        return np.array(ecg_hr_values)
+    
+    def _estimate_hr_rppg(self):
+
+        hr_rppg = {}
 
         for i in self.rppg_signals:
             rppg_signal = self.rppg_signals[i]
-            rppg_signal = self.bandpass_filter(rppg_signal, lowcut=0.6, highcut=3.3, fs=self.video_fps)
-            
-            print(f"Calculating rPPG HR for {n_windows_rppg} windows using method '{i}'...")
+            rppg_signal = self._detrend(rppg_signal, 100)
+            rppg_signal = self.bandpass_filter(rppg_signal, lowcut=0.6, highcut=3.3, fs=self.video_fps, order=1)
+            window_len_rppg = int(self.hr_window_size * self.video_fps)
+            n_windows_rppg = len(rppg_signal) // window_len_rppg
+
             rppg_hr_values = []
             for j in range(n_windows_rppg):
                 segment = rppg_signal[j * window_len_rppg : (j + 1) * window_len_rppg]
-                hr = self.estimate_hr_heartpy(segment, self.video_fps)
+                # segment = self._detrend(segment, 100)
+                # segment = self.bandpass_filter(segment, lowcut=0.6, highcut=3.3, fs=self.video_fps, order=1)
+                hr = self._calculate_fft_hr(segment)
                 rppg_hr_values.append(hr)
 
             rppg_hr_values = np.array(rppg_hr_values)
+            hr_rppg[i] = rppg_hr_values
+        print(f"Calculating rPPG HR for {n_windows_rppg} windows")
+            
+        return hr_rppg
 
-            # Align lengths
-            min_length = min(len(ecg_hr_values), len(rppg_hr_values))
-            ecg_hr_aligned = ecg_hr_values[:min_length]
-            rppg_hr_aligned = rppg_hr_values[:min_length]
+    def compare_hr_rppg_ecg(self):
+
+        hr_results = {}
+        window_len_rppg = int(self.hr_window_size * self.video_fps)
+        
+        for method in self.rppg_hr_values:
+            min_length = min(len(self.ecg_hr_values), len(self.rppg_hr_values[method]))
+            ecg_hr_aligned = self.ecg_hr_values[:min_length]
+            rppg_hr_aligned = self.rppg_hr_values[method][:min_length]
 
             mae = mean_absolute_error(ecg_hr_aligned, rppg_hr_aligned)
             rmse = np.sqrt(mean_squared_error(ecg_hr_aligned, rppg_hr_aligned))
@@ -168,23 +238,23 @@ class rPPGAnalysis:
 
             snr_values = []
             for win_idx in range(min_length):
-                if np.isnan(ecg_hr_values[win_idx]): continue
+                if np.isnan(self.ecg_hr_values[win_idx]): continue
                 
                 start, end = win_idx * window_len_rppg, (win_idx + 1) * window_len_rppg
-                if end > len(rppg_signal): break
+                if end > len(self.rppg_signals[method]): break
                 
-                snr = self._calculate_SNR(rppg_signal[start:end], ecg_hr_values[win_idx], fs=self.video_fps)
+                snr = self._calculate_SNR(self.rppg_signals[method][start:end], self.ecg_hr_values[win_idx])
                 snr_values.append(snr)
             if snr_values: avg_snr = np.mean(snr_values)
             
-            results[i] = ({
+            hr_results[method] = ({
                 'mae': mae,
                 'rmse': rmse,
                 'mape': mape,
                 'snr': avg_snr,
             })
         
-        return results
+        return hr_results
 
     def compare_rr_rppg_ref(self):
         pass
