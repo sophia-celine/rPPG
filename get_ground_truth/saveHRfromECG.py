@@ -53,11 +53,11 @@ def save_hr_from_ecg():
     # Configuration
     # =========================
     # Path to the CSV file
-    input_csv = "/home/soph/rppg/rPPG/get_ground_truth/ECG/vinicius_video023_ecg.csv" #r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\ECG\vinicius_video023_ecg.csv"
-    output_txt = "/home/soph/rppg/rPPG/get_ground_truth/ECG/vinicius_video023_ecg.txt" #r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\ECG\vinicius_video023_ecg.txt"
-    vid_path = "/media/soph/UTIrPPG/20260423_Coleta Vinicius/video023-cropped.avi" #r"C:\Users\Sophia\Videos\Baumer Video Records\VCXU.2-57C\video023-cropped.avi"
-    
-    fs = 1000       # Sample rate of the input ECG (e.g., 1000 Hz)
+    input_csv = "../../rPPG_data/ECG/vinicius_video023_ecg.csv" #r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\ECG\vinicius_video023_ecg.csv"
+    output_txt = "../../rPPG_data/vinicius_video023_ecg.txt" #r"C:\Users\Sophia\Documents\rPPG\get_ground_truth\ECG\vinicius_video023_ecg.txt"
+    vid_path = "../../rPPG_data/ECG/video023-cropped.avi" #r"C:\Users\Sophia\Videos\Baumer Video Records\VCXU.2-57C\video023-cropped.avi"
+
+    fs = 250       # Sample rate of the input ECG (e.g., 1000 Hz)
     n_points = count_video_frames(vid_path)  # Target number of points for the output (to match video duration/frames)
     window_sec = 15  # Sliding window size in seconds
     step_sec = 1     # Step size in seconds

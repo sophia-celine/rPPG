@@ -14,13 +14,19 @@ import matplotlib.ticker as ticker
 from scipy.sparse import spdiags
 
 class rPPGAnalysis:
-    def __init__(self, video_path: Path, 
-                 ecg_data_path: Path, 
-                 ppg_data_path: Path, 
-                 respiration_data_path: Path, 
-                 rPPG_folder_path: Path, 
-                 hr_window_size: int, 
-                 respiration_window_size: int):
+    def __init__(self, video_path: Path,
+                 ecg_data_path: Path,
+                 ppg_data_path: Path,
+                 respiration_data_path: Path,
+                 rPPG_folder_path: Path,
+                 hr_window_size: int,
+                 respiration_window_size: int,
+                 auto_run: bool = False):
+        """Create analysis object.
+
+        If `auto_run` is False (default), heavy operations are deferred
+        and must be triggered by calling `run()`.
+        """
         self.video_path = video_path
         self.gt_ecg_path = ecg_data_path
         self.gt_ppg_path = ppg_data_path
@@ -29,14 +35,38 @@ class rPPGAnalysis:
         self.ecg_sample_rate = 250
         self.gt_ppg_sample_rate = 62.5
         self.gt_respiration_sample_rate = 125
-        self.frame_count = self._get_frame_count()
-        self.video_fps = self._get_video_fps()
+
+        # lightweight config
         self.hr_window_size = hr_window_size
         self.respiration_window_size = respiration_window_size
+
+        # deferred/computed values (initialized to None)
+        self.frame_count = None
+        self.video_fps = None
+        self.rppg_signals = None
+        self.ecg_hr_values = None
+        self.rppg_hr_values = None
+        self.hr_results = None
+        self.NCC_results = None
+
+        if auto_run:
+            self.run()
+
+    def run(self):
+        """Execute the heavy loading and processing steps.
+
+        Call this explicitly when you want to perform I/O and compute results.
+        """
+        # populate video metadata
+        self.frame_count = self._get_frame_count()
+        self.video_fps = self._get_video_fps()
+
+        # load signals and compute HR values
         self.rppg_signals = self._load_rppg_signals()
         self.ecg_hr_values = self._estimate_hr_ecg()
         self.rppg_hr_values = self._estimate_hr_rppg()
         self.hr_results = self.compare_hr_rppg_ecg()
+        self.NCC_results = self.compare_rppg_ppg()
 
     def _load_rppg_signals(self):
         rppg_signals = {}
@@ -203,16 +233,16 @@ class rPPGAnalysis:
 
         for i in self.rppg_signals:
             rppg_signal = self.rppg_signals[i]
-            rppg_signal = self._detrend(rppg_signal, 100)
-            rppg_signal = self.bandpass_filter(rppg_signal, lowcut=0.6, highcut=3.3, fs=self.video_fps, order=1)
+            # rppg_signal = self._detrend(rppg_signal, 100)
+            # rppg_signal = self.bandpass_filter(rppg_signal, lowcut=0.6, highcut=3.3, fs=self.video_fps, order=1)
             window_len_rppg = int(self.hr_window_size * self.video_fps)
             n_windows_rppg = len(rppg_signal) // window_len_rppg
 
             rppg_hr_values = []
             for j in range(n_windows_rppg):
                 segment = rppg_signal[j * window_len_rppg : (j + 1) * window_len_rppg]
-                # segment = self._detrend(segment, 100)
-                # segment = self.bandpass_filter(segment, lowcut=0.6, highcut=3.3, fs=self.video_fps, order=1)
+                segment = self._detrend(segment, 100)
+                segment = self.bandpass_filter(segment, lowcut=0.6, highcut=3.3, fs=self.video_fps, order=1)
                 hr = self._calculate_fft_hr(segment)
                 rppg_hr_values.append(hr)
 
@@ -221,6 +251,103 @@ class rPPGAnalysis:
         print(f"Calculating rPPG HR for {n_windows_rppg} windows")
             
         return hr_rppg
+    
+    def _sync_and_correlate(self, raw_rppg, raw_ppg):
+        try:
+
+            # Tratamento para arquivos com múltiplas linhas (ex: Sinal, HR, Time)
+            if raw_ppg.ndim > 1:
+                raw_ppg = raw_ppg[0, :] if raw_ppg.shape[0] < raw_ppg.shape[1] else raw_ppg[:, 0]
+            if raw_rppg.ndim > 1:
+                raw_rppg = raw_rppg[0, :] if raw_rppg.shape[0] < raw_rppg.shape[1] else raw_rppg[:, 0]
+                
+        except Exception as e:
+            print(f"Erro ao carregar arquivos: {e}")
+            return None, None, None, None
+
+        # 2. Reamostragem baseada no tempo real (considerando frequências diferentes)
+        fs_common = max(self.video_fps, self.gt_ppg_sample_rate)
+        
+        # Duração em segundos baseada na frequência de cada um
+        dur_rppg = (len(raw_rppg) - 1) / self.video_fps
+        dur_ppg = (len(raw_ppg) - 1) / self.gt_ppg_sample_rate
+        
+        t_rppg_orig = np.linspace(0, dur_rppg, len(raw_rppg))
+        t_ppg_orig = np.linspace(0, dur_ppg, len(raw_ppg))
+        
+        # Novos eixos de tempo na frequência comum (usar round e garantir >=1 ponto)
+        n_new_rppg = max(1, int(np.round(dur_rppg * fs_common)))
+        n_new_ppg = max(1, int(np.round(dur_ppg * fs_common)))
+
+        t_new_rppg = np.linspace(0, dur_rppg, n_new_rppg)
+        t_new_ppg = np.linspace(0, dur_ppg, n_new_ppg)
+
+        rppg_resampled = interp1d(t_rppg_orig, raw_rppg, kind='cubic')(t_new_rppg)
+        ppg_resampled = interp1d(t_ppg_orig, raw_ppg, kind='cubic')(t_new_ppg)
+
+        # Garantir mesmo comprimento após reamostragem — cortar pontos extras se necessário
+        if len(rppg_resampled) != len(ppg_resampled):
+            min_len_res = min(len(rppg_resampled), len(ppg_resampled))
+            rppg_resampled = rppg_resampled[:min_len_res]
+            ppg_resampled = ppg_resampled[:min_len_res]
+
+        # 3. Normalização (Essencial para Cross-Correlation e Pearson)
+        rppg_norm = self.normalize_signal(rppg_resampled)
+        ppg_norm = self.normalize_signal(ppg_resampled)
+
+        # 4. Cross-Correlation para Sincronização
+        # A função correlate retorna a correlação para todos os possíveis deslocamentos (lags)
+        correlation = signal.correlate(ppg_norm, rppg_norm, mode='full')
+        lags = signal.correlation_lags(len(ppg_norm), len(rppg_norm), mode='full')
+
+        # Calcular o coeficiente de correlação cruzada normalizado para cada lag
+        coeffs = []
+        for lag in lags:
+            if lag > 0:
+                a = ppg_norm[lag:]
+                b = rppg_norm[:len(a)]
+            elif lag < 0:
+                b = rppg_norm[abs(lag):]
+                a = ppg_norm[:len(b)]
+            else:
+                a = ppg_norm
+                b = rppg_norm
+
+            denom = (np.linalg.norm(a) * np.linalg.norm(b))
+            if denom == 0:
+                coeffs.append(0.0)
+            else:
+                coeffs.append(np.dot(a, b) / denom)
+
+        coeffs = np.array(coeffs)
+
+        # O lag ideal é onde o coeficiente normalizado tem magnitude máxima
+        idx_best = np.argmax(np.abs(coeffs))
+        best_lag = lags[idx_best]
+        best_coeff = coeffs[idx_best]
+        
+        # 5. Alinhamento dos sinais com base no lag
+        if best_lag > 0:
+            # PPG está atrasado em relação ao rPPG
+            synced_ppg = ppg_norm[best_lag:]
+            synced_rppg = rppg_norm[:len(synced_ppg)]
+        elif best_lag < 0:
+            # rPPG está atrasado em relação ao PPG
+            synced_rppg = rppg_norm[abs(best_lag):]
+            synced_ppg = ppg_norm[:len(synced_rppg)]
+        else:
+            synced_rppg = rppg_norm
+            synced_ppg = ppg_norm
+
+        # Garantir que terminem com o mesmo tamanho após o corte
+        min_len = min(len(synced_ppg), len(synced_rppg))
+        synced_ppg = synced_ppg[:min_len]
+        synced_rppg = synced_rppg[:min_len]
+
+        # 6. Usar o coeficiente de correlação cruzada máximo como métrica
+        coef_cross = best_coeff
+
+        return coef_cross, best_lag, synced_rppg, synced_ppg
 
     def compare_hr_rppg_ecg(self):
 
@@ -257,7 +384,24 @@ class rPPGAnalysis:
         return hr_results
 
     def compare_rr_rppg_ref(self):
-        pass
+
+        pass    
 
     def compare_rppg_ppg(self):
-        pass
+        
+        print('Running NCR analysis...')
+
+        gt_ppg_signal = self._load_signal(self.gt_ppg_path)
+
+        NCC_results = {}    
+        
+        for method in self.rppg_hr_values:
+            coef_cross, best_lag, synced_rppg, synced_ppg = self._sync_and_correlate(self.rppg_signals[method], gt_ppg_signal)
+            NCC_results[method] = ({
+                'coef_cross': coef_cross,
+                'best_lag': best_lag,
+                'synced_rppg': synced_rppg,
+                'synced_ppg': synced_ppg
+            })
+        
+        return NCC_results

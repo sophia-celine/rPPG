@@ -1,6 +1,6 @@
 from rPPGAnalysis import rPPGAnalysis
 
-VIDEO_PATH = '../../rPPG-Toolbox/data/ICU/RawData/subject1/vid.avi'
+VIDEO_PATH = r"C:\Users\Sophia\Documents\UTI-11-12-2025\L9-11-12-2025-16-04.avi"
 ECG_DATA_PATH = '../../rPPG_data/pilot/ECG/ecg_signal_L9_16-05-26_16-07-25.csv'
 PPG_DATA_PATH = '../../rPPG_data/pilot/spo2/original_spo2_L9_16-05-26_16-07-25.txt'
 RESPIRATION_DATA_PATH = '../../rPPG_data/pilot/thoracic_impedance/L9_16-05-26_16-07-25.txt'
@@ -18,8 +18,10 @@ if __name__ == '__main__':
                  hr_window_size=HR_WINDOW_SIZE, 
                  respiration_window_size=RESPIRATION_WINDOW_SIZE
                  )
-    print('rppg_signals\n', patient2_analysis.rppg_signals)
+    patient2_analysis.run()
+    # print('rppg_signals\n', patient2_analysis.rppg_signals)
     # print('ecg_hr_values\n', patient2_analysis.ecg_hr_values)
     # print('fps\n', patient2_analysis.video_fps)
     # print('rppg_hr_values\n', patient2_analysis.rppg_hr_values['PhysFormer (PURE)'])
-    print('hr_results\n', patient2_analysis.hr_results)
+    # print('hr_results\n', patient2_analysis.hr_results)
+    print('NCC_results\n', patient2_analysis.NCC_results)
