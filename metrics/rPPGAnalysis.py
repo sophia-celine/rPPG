@@ -47,7 +47,7 @@ class rPPGAnalysis:
         self.ecg_hr_values = None
         self.rppg_hr_values = None
         self.hr_results = None
-        self.NCC_results = None
+        self.correlation_results = None
 
         if auto_run:
             self.run()
@@ -66,7 +66,7 @@ class rPPGAnalysis:
         self.ecg_hr_values = self._estimate_hr_ecg()
         self.rppg_hr_values = self._estimate_hr_rppg()
         self.hr_results = self.compare_hr_rppg_ecg()
-        self.NCC_results = self.compare_rppg_ppg()
+        self.correlation_results = self.compare_rppg_ppg()
 
     def _load_rppg_signals(self):
         rppg_signals = {}
@@ -267,7 +267,7 @@ class rPPGAnalysis:
 
         # 2. Reamostragem baseada no tempo real (considerando frequências diferentes)
         fs_common = max(self.video_fps, self.gt_ppg_sample_rate)
-        
+                
         # Duração em segundos baseada na frequência de cada um
         dur_rppg = (len(raw_rppg) - 1) / self.video_fps
         dur_ppg = (len(raw_ppg) - 1) / self.gt_ppg_sample_rate
@@ -275,21 +275,12 @@ class rPPGAnalysis:
         t_rppg_orig = np.linspace(0, dur_rppg, len(raw_rppg))
         t_ppg_orig = np.linspace(0, dur_ppg, len(raw_ppg))
         
-        # Novos eixos de tempo na frequência comum (usar round e garantir >=1 ponto)
-        n_new_rppg = max(1, int(np.round(dur_rppg * fs_common)))
-        n_new_ppg = max(1, int(np.round(dur_ppg * fs_common)))
-
-        t_new_rppg = np.linspace(0, dur_rppg, n_new_rppg)
-        t_new_ppg = np.linspace(0, dur_ppg, n_new_ppg)
-
+        # Novos eixos de tempo na frequência comum
+        t_new_rppg = np.linspace(0, dur_rppg, int(dur_rppg * fs_common))
+        t_new_ppg = np.linspace(0, dur_ppg, int(dur_ppg * fs_common))
+        
         rppg_resampled = interp1d(t_rppg_orig, raw_rppg, kind='cubic')(t_new_rppg)
         ppg_resampled = interp1d(t_ppg_orig, raw_ppg, kind='cubic')(t_new_ppg)
-
-        # Garantir mesmo comprimento após reamostragem — cortar pontos extras se necessário
-        if len(rppg_resampled) != len(ppg_resampled):
-            min_len_res = min(len(rppg_resampled), len(ppg_resampled))
-            rppg_resampled = rppg_resampled[:min_len_res]
-            ppg_resampled = ppg_resampled[:min_len_res]
 
         # 3. Normalização (Essencial para Cross-Correlation e Pearson)
         rppg_norm = self.normalize_signal(rppg_resampled)
@@ -299,32 +290,9 @@ class rPPGAnalysis:
         # A função correlate retorna a correlação para todos os possíveis deslocamentos (lags)
         correlation = signal.correlate(ppg_norm, rppg_norm, mode='full')
         lags = signal.correlation_lags(len(ppg_norm), len(rppg_norm), mode='full')
-
-        # Calcular o coeficiente de correlação cruzada normalizado para cada lag
-        coeffs = []
-        for lag in lags:
-            if lag > 0:
-                a = ppg_norm[lag:]
-                b = rppg_norm[:len(a)]
-            elif lag < 0:
-                b = rppg_norm[abs(lag):]
-                a = ppg_norm[:len(b)]
-            else:
-                a = ppg_norm
-                b = rppg_norm
-
-            denom = (np.linalg.norm(a) * np.linalg.norm(b))
-            if denom == 0:
-                coeffs.append(0.0)
-            else:
-                coeffs.append(np.dot(a, b) / denom)
-
-        coeffs = np.array(coeffs)
-
-        # O lag ideal é onde o coeficiente normalizado tem magnitude máxima
-        idx_best = np.argmax(np.abs(coeffs))
-        best_lag = lags[idx_best]
-        best_coeff = coeffs[idx_best]
+        
+        # O lag ideal é onde a correlação é máxima
+        best_lag = lags[np.argmax(correlation)]
         
         # 5. Alinhamento dos sinais com base no lag
         if best_lag > 0:
@@ -344,10 +312,10 @@ class rPPGAnalysis:
         synced_ppg = synced_ppg[:min_len]
         synced_rppg = synced_rppg[:min_len]
 
-        # 6. Usar o coeficiente de correlação cruzada máximo como métrica
-        coef_cross = best_coeff
+        # 6. Cálculo do Coeficiente de Pearson
+        coef_pearson, p_valor = pearsonr(synced_ppg, synced_rppg)
 
-        return coef_cross, best_lag, synced_rppg, synced_ppg
+        return coef_pearson, best_lag, synced_rppg, synced_ppg
 
     def compare_hr_rppg_ecg(self):
 
@@ -389,19 +357,19 @@ class rPPGAnalysis:
 
     def compare_rppg_ppg(self):
         
-        print('Running NCR analysis...')
+        print('Running similarity analysis...')
 
         gt_ppg_signal = self._load_signal(self.gt_ppg_path)
 
-        NCC_results = {}    
+        similarity_results = {}    
         
         for method in self.rppg_hr_values:
-            coef_cross, best_lag, synced_rppg, synced_ppg = self._sync_and_correlate(self.rppg_signals[method], gt_ppg_signal)
-            NCC_results[method] = ({
-                'coef_cross': coef_cross,
+            pearson_coef, best_lag, synced_rppg, synced_ppg = self._sync_and_correlate(self.rppg_signals[method], gt_ppg_signal)
+            similarity_results[method] = ({
+                'pearson_coef': pearson_coef,
                 'best_lag': best_lag,
                 'synced_rppg': synced_rppg,
                 'synced_ppg': synced_ppg
             })
         
-        return NCC_results
+        return similarity_results
