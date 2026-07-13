@@ -19,10 +19,11 @@ if __name__ == '__main__':
                  respiration_window_size=RESPIRATION_WINDOW_SIZE
                  )
     patient2_analysis.run()
+    patient2_analysis.plot_gt()
     # print('rppg_signals\n', patient2_analysis.rppg_signals)
     # print('ecg_hr_values\n', patient2_analysis.ecg_hr_values)
     # print('fps\n', patient2_analysis.video_fps)
     # print('rppg_hr_values\n', patient2_analysis.rppg_hr_values['PhysFormer (PURE)'])
     # print('hr_results\n', patient2_analysis.hr_results)
     # print('Correlation_results\n', patient2_analysis.correlation_results)
-    print('Respiratory rate estimation\n', patient2_analysis.rr_results)
+    # print('Respiratory rate estimation\n', patient2_analysis.rr_results)

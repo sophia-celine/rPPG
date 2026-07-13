@@ -1,0 +1,8 @@
+{
+  "raw_ecg": "ECG",
+  "raw_ppg": "PPG",
+  "samples": "Amostras",
+  "amplitude": "Amplitude",
+  "normalized_amplitude": "Amplitude normalizada",
+  "respiration_signal": "Sinal respiratório"
+}

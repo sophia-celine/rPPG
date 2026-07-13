@@ -1,3 +1,4 @@
+import json
 import os
 from pathlib import Path
 import cv2
@@ -21,7 +22,8 @@ class rPPGAnalysis:
                  rPPG_folder_path: Path,
                  hr_window_size: int,
                  respiration_window_size: int,
-                 auto_run: bool = False):
+                 auto_run: bool = False,
+                 language: str = "pt"):
         """Create analysis object.
 
         If `auto_run` is False (default), heavy operations are deferred
@@ -36,6 +38,8 @@ class rPPGAnalysis:
         self.gt_ppg_sample_rate = 62.5
         self.gt_respiration_sample_rate = 125
         self.resp_modulation_resample = 4
+        self.language = language
+        self.translations = self._load_translations(language)
 
         # lightweight config
         self.hr_window_size = hr_window_size
@@ -69,6 +73,23 @@ class rPPGAnalysis:
     def calculate_mape(y_true, y_pred):
         return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
 
+    def _load_translations(self, language):
+        translations_dir = Path(__file__).resolve().parent / "translations"
+        file_path = translations_dir / f"{language}.json"
+
+        if not file_path.exists():
+            fallback_path = translations_dir / "en.json"
+            if fallback_path.exists():
+                file_path = fallback_path
+            else:
+                return {}
+
+        with file_path.open(encoding="utf-8") as handle:
+            return json.load(handle)
+
+    def _t(self, key):
+        return self.translations.get(key, key)
+
     @staticmethod
     def estimate_hr_heartpy(segment, fs):
         try:
@@ -92,7 +113,7 @@ class rPPGAnalysis:
         return 10 * np.log10(mag)
 
     @staticmethod
-    def _load_signal(file_path):
+    def _load_signal_from_txt(file_path):
         data = np.loadtxt(file_path)
         if data.ndim > 1:
             return data[0, :] if data.shape[0] < data.shape[1] else data[:, 0]
@@ -150,7 +171,7 @@ class rPPGAnalysis:
                 else os.path.splitext(file_name)[0]
             )
 
-            signal = self._load_signal(file_path)
+            signal = self._load_signal_from_txt(file_path)
 
             rppg_signals[method_name] = signal
 
@@ -509,7 +530,7 @@ class rPPGAnalysis:
         
         print('Running linear correlation analysis...')
 
-        gt_ppg_signal = self._load_signal(self.gt_ppg_path)
+        gt_ppg_signal = self._load_signal_from_txt(self.gt_ppg_path)
 
         correlation_results = {}    
         
@@ -523,7 +544,55 @@ class rPPGAnalysis:
             })
         
         return correlation_results
+
+    def plot_gt(self, title=True, fontsize='medium', labelsize='medium'):
+
+        if self.gt_ecg_path:
+            ecg = hp.get_data(self.gt_ecg_path)
+
+            fig1, ax1 = plt.subplots()
+            ax1.plot(ecg)
+            if title: ax1.set_title(self._t("raw_ecg"), fontsize=fontsize)
+            ax1.set_xlabel(self._t("samples"), fontsize=fontsize)
+            ax1.set_ylabel(self._t("amplitude"), fontsize=fontsize)
+            ax1.tick_params(axis='both', labelsize=labelsize)
+            plt.tight_layout()
+            plt.show(block=False)
+
+            ecg = self.filter_ecg(ecg, sample_rate=self.ecg_sample_rate)
+            wd, m = hp.process(ecg, self.ecg_sample_rate)
+
+            hp.plotter(wd, m)
+            plt.tight_layout()
+            plt.show(block=False)
+
+        if self.gt_ppg_path:
+            ppg = self._load_signal_from_txt(self.gt_ppg_path)
+            ppg = self.normalize_signal(ppg)
+
+            fig2, ax2 = plt.subplots()
+            ax2.plot(ppg)
+            if title: ax2.set_title(self._t("raw_ppg"), fontsize=fontsize)
+            ax2.set_xlabel(self._t("samples"), fontsize=fontsize)
+            ax2.set_ylabel(self._t("normalized_amplitude"), fontsize=fontsize)
+            ax2.tick_params(axis='both', labelsize=labelsize)
+            plt.tight_layout()
+            plt.show(block=False)
+
+        if self.gt_respiration_path:
+            resp = self._load_signal_from_txt(self.gt_respiration_path)
+
+            fig3, ax3 = plt.subplots()
+            ax3.plot(resp)
+            if title: ax3.set_title(self._t("respiration_signal"), fontsize=fontsize)
+            ax3.set_xlabel(self._t("samples"), fontsize=fontsize)
+            ax3.set_ylabel(self._t("amplitude"), fontsize=fontsize)
+            ax3.tick_params(axis='both', labelsize=labelsize)
+            plt.tight_layout()
     
+        plt.show()
+
+
     def run(self):
         """Execute the heavy loading and processing steps.
 
@@ -534,11 +603,11 @@ class rPPGAnalysis:
         self.video_fps = self._get_video_fps()
 
         # load signals and compute HR values
-        self.rppg_signals = self._load_rppg_signals()
-        self.ecg_hr_values = self._estimate_hr_ecg()
-        self.rppg_hr_values = self._estimate_hr_rppg()
-        self.hr_results = self.compare_hr_rppg_ecg()
-        self.correlation_results = self.compare_rppg_ppg()
-        self.gt_rr_values, self.ref_rr_signal = self._load_respiratory_signal()
-        self.rppg_rr_values = self._estimate_rr_rppg()
-        self.rr_results = self.compare_rr_rppg_respiration()
+        # self.rppg_signals = self._load_rppg_signals()
+        # self.ecg_hr_values = self._estimate_hr_ecg()
+        # self.rppg_hr_values = self._estimate_hr_rppg()
+        # self.hr_results = self.compare_hr_rppg_ecg()
+        # self.correlation_results = self.compare_rppg_ppg()
+        # self.gt_rr_values, self.ref_rr_signal = self._load_respiratory_signal()
+        # self.rppg_rr_values = self._estimate_rr_rppg()
+        # self.rr_results = self.compare_rr_rppg_respiration()
