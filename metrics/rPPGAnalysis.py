@@ -35,6 +35,7 @@ class rPPGAnalysis:
         self.ecg_sample_rate = 250
         self.gt_ppg_sample_rate = 62.5
         self.gt_respiration_sample_rate = 125
+        self.resp_modulation_resample = 4
 
         # lightweight config
         self.hr_window_size = hr_window_size
@@ -48,76 +49,13 @@ class rPPGAnalysis:
         self.rppg_hr_values = None
         self.hr_results = None
         self.correlation_results = None
+        self.gt_rr_values = None
+        self.ref_rr_signal = None
+        self.rppg_rr_values = None
+        self.rr_results = None
 
         if auto_run:
             self.run()
-
-    def run(self):
-        """Execute the heavy loading and processing steps.
-
-        Call this explicitly when you want to perform I/O and compute results.
-        """
-        # populate video metadata
-        self.frame_count = self._get_frame_count()
-        self.video_fps = self._get_video_fps()
-
-        # load signals and compute HR values
-        self.rppg_signals = self._load_rppg_signals()
-        self.ecg_hr_values = self._estimate_hr_ecg()
-        self.rppg_hr_values = self._estimate_hr_rppg()
-        self.hr_results = self.compare_hr_rppg_ecg()
-        self.correlation_results = self.compare_rppg_ppg()
-
-    def _load_rppg_signals(self):
-        rppg_signals = {}
-
-        txt_files = [
-            f for f in os.listdir(self.rPPG_folder_path)
-            if f.endswith('.txt')
-        ]
-
-        for file_name in txt_files:
-            file_path = os.path.join(self.rPPG_folder_path, file_name)
-
-            method_name = (
-                os.path.splitext(file_name)[0].split('_')[1]
-                if '_' in file_name
-                else os.path.splitext(file_name)[0]
-            )
-
-            signal = self._load_signal(file_path)
-
-            rppg_signals[method_name] = signal
-
-        return rppg_signals
-    
-
-    def _get_frame_count(self):
-        capture = cv2.VideoCapture(str(self.video_path))
-        if not capture.isOpened():
-            return None
-        frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
-        capture.release()
-        return frame_count
-    
-    def _get_video_fps(self):
-        capture = cv2.VideoCapture(str(self.video_path))
-        if not capture.isOpened():
-            return None
-        fps = capture.get(cv2.CAP_PROP_FPS)
-        capture.release()
-        return fps
-
-    def _calculate_fft_hr(self, segment, low_pass=0.6, high_pass=3.3):
-        """Calculate heart rate based on PPG using Fast Fourier transform (FFT)."""
-        segment = np.expand_dims(segment, 0)
-        N = self._next_power_of_2(segment.shape[1])     # @TODO colocar zero-padding para resolução de 1 bpm
-        f_ppg, pxx_ppg = scipy.signal.periodogram(segment, fs=self.video_fps, nfft=N, detrend=False)
-        fmask_ppg = np.argwhere((f_ppg >= low_pass) & (f_ppg <= high_pass))
-        mask_ppg = np.take(f_ppg, fmask_ppg)
-        mask_pxx = np.take(pxx_ppg, fmask_ppg)
-        fft_hr = np.take(mask_ppg, np.argmax(mask_pxx, 0))[0] * 60
-        return fft_hr
 
     @staticmethod
     def _next_power_of_2(x):
@@ -153,13 +91,15 @@ class rPPGAnalysis:
         """Convert power to dB."""
         return 10 * np.log10(mag)
 
-    def _load_signal(self, file_path):
+    @staticmethod
+    def _load_signal(file_path):
         data = np.loadtxt(file_path)
         if data.ndim > 1:
             return data[0, :] if data.shape[0] < data.shape[1] else data[:, 0]
         return data
     
-    def _detrend(self, input_signal, lambda_value):
+    @staticmethod
+    def _detrend(input_signal, lambda_value):
         """Detrend PPG signal."""
         signal_length = input_signal.shape[0]
         # observation matrix
@@ -173,6 +113,100 @@ class rPPGAnalysis:
         detrended_signal = np.dot(
             (H - np.linalg.inv(H + (lambda_value ** 2) * np.dot(D.T, D))), input_signal)
         return detrended_signal
+
+    @staticmethod
+    def _berger_algorithm(peak_times, fs_target, duration):
+        """Implementa o Algoritmo de Berger para re-amostragem da modulação de frequência."""
+        t_new = np.arange(0, duration, 1/fs_target)
+        y_new = np.zeros_like(t_new)
+        dt = 1/fs_target
+        
+        for i, t_start in enumerate(t_new):
+            t_end = t_start + dt
+            acc = 0
+            for j in range(len(peak_times) - 1):
+                p1, p2 = peak_times[j], peak_times[j+1]
+                # Calcula a contribuição de cada intervalo IBI na janela do novo passo de tempo
+                overlap = max(0, min(t_end, p2) - max(t_start, p1))
+                if overlap > 0:
+                    acc += overlap * (1.0 / (p2 - p1))
+            y_new[i] = acc / dt
+        return t_new, y_new
+    
+    def _load_rppg_signals(self):
+        rppg_signals = {}
+
+        txt_files = [
+            f for f in os.listdir(self.rPPG_folder_path)
+            if f.endswith('.txt')
+        ]
+
+        for file_name in txt_files:
+            file_path = os.path.join(self.rPPG_folder_path, file_name)
+
+            method_name = (
+                os.path.splitext(file_name)[0].split('_')[1]
+                if '_' in file_name
+                else os.path.splitext(file_name)[0]
+            )
+
+            signal = self._load_signal(file_path)
+
+            rppg_signals[method_name] = signal
+
+        return rppg_signals
+    
+    def _load_respiratory_signal(self):
+        """Lê o arquivo de referência e calcula RR por janelas."""
+        try:
+            sig = np.loadtxt(self.gt_respiration_path)
+            t = np.linspace(0, len(sig)/self.gt_respiration_sample_rate, len(sig))
+            if sig.ndim > 1:
+                sig = sig[0, :] if sig.shape[0] < sig.shape[1] else sig[:, 0]
+                t = np.linspace(0, len(sig)/self.gt_respiration_sample_rate, len(sig))
+        except Exception as e:
+            print(f"Erro ao ler referência {self.gt_respiration_path}: {e}")
+            return None, None
+        win_samples = int(self.respiration_window_size * self.gt_respiration_sample_rate)
+        n_windows = len(sig) // win_samples
+        ref_rr = [self._estimate_rr_fft(sig[i*win_samples : (i+1)*win_samples], self.gt_respiration_sample_rate) 
+                for i in range(n_windows)]
+        return np.array(ref_rr), sig
+    
+    def _get_frame_count(self):
+        capture = cv2.VideoCapture(str(self.video_path))
+        if not capture.isOpened():
+            return None
+        frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
+        capture.release()
+        return frame_count
+    
+    def _get_video_fps(self):
+        capture = cv2.VideoCapture(str(self.video_path))
+        if not capture.isOpened():
+            return None
+        fps = capture.get(cv2.CAP_PROP_FPS)
+        capture.release()
+        return fps
+
+    def _get_bvp_features(self, segment, fs):
+        """Detecta picos e vales no sinal rPPG para extração de modulações."""
+        # Filtro para realçar o sinal de pulso
+        clean_sig = self.bandpass_filter(segment, 0.7, 3.5, fs)
+        
+        # Distância mínima entre picos baseada em fisiologia (~130 RPM)
+        min_dist = int(fs * 0.45)
+        peaks, _ = find_peaks(clean_sig, distance=min_dist)
+        troughs, _ = find_peaks(-clean_sig, distance=min_dist)
+        
+        # Alinhamento de pares (Vale anterior ao Pico correspondente)
+        pairs = []
+        for tr in troughs:
+            next_pks = peaks[peaks > tr]
+            if len(next_pks) > 0:
+                pairs.append((tr, next_pks[0]))
+                
+        return peaks, troughs, pairs
     
     def _calculate_SNR(self, pred_ppg_signal, hr_label, low_pass=0.6, high_pass=3.3):
         """Calculate SNR as the ratio of the area under the curve of the frequency spectrum 
@@ -317,6 +351,105 @@ class rPPGAnalysis:
 
         return coef_pearson, best_lag, synced_rppg, synced_ppg
 
+    def _calculate_fft_hr(self, segment, low_pass=0.6, high_pass=3.3):
+        """Calculate heart rate based on PPG using Fast Fourier transform (FFT)."""
+        segment = np.expand_dims(segment, 0)
+        N = self._next_power_of_2(segment.shape[1])     # @TODO colocar zero-padding para resolução de 1 bpm
+        f_ppg, pxx_ppg = scipy.signal.periodogram(segment, fs=self.video_fps, nfft=N, detrend=False)
+        fmask_ppg = np.argwhere((f_ppg >= low_pass) & (f_ppg <= high_pass))
+        mask_ppg = np.take(f_ppg, fmask_ppg)
+        mask_pxx = np.take(pxx_ppg, fmask_ppg)
+        fft_hr = np.take(mask_ppg, np.argmax(mask_pxx, 0))[0] * 60
+        return fft_hr
+    
+    def _estimate_rr_fft(self, sig, fs, rr_min=4, rr_max=65):
+        """Estima a RR encontrando o pico de energia no espectro usando periodograma."""
+        low_pass = rr_min / 60
+        high_pass = rr_max / 60
+
+        sig_exp = np.expand_dims(sig, 0)
+        N = self._next_power_of_2(sig_exp.shape[1])
+        f_ppg, pxx_ppg = scipy.signal.periodogram(sig_exp, fs=fs, nfft=N, detrend='constant')
+
+        fmask_ppg = np.argwhere((f_ppg >= low_pass) & (f_ppg <= high_pass))
+        if len(fmask_ppg) == 0:
+            return np.nan
+
+        mask_ppg = np.take(f_ppg, fmask_ppg)
+        mask_pxx = np.take(pxx_ppg, fmask_ppg)
+        return np.take(mask_ppg, np.argmax(mask_pxx, 0))[0] * 60
+
+    def _estimate_rr_rppg(self):
+
+        rr_rppg = {}
+        
+        for method in self.rppg_signals:
+            results = {
+            'bw': [], 'am': [], 'fm': [], 'fusion': [],
+            'sig_bw': [], 'sig_am': [], 'sig_fm': []
+            }
+            win_samples = int(self.respiration_window_size * self.video_fps)
+            n_windows = len(self.rppg_signals[method]) // win_samples
+            
+            for i in range(n_windows):
+                seg = self.rppg_signals[method][i*win_samples : (i+1)*win_samples]
+                p_idx, t_idx, pairs = self._get_bvp_features(seg, self.video_fps)
+                
+                if len(pairs) < 8: # Mínimo de pulsos para análise espectral válida
+                    for k in results: results[k].append(np.nan)
+                    continue
+                    
+                t_orig = np.arange(len(seg)) / self.video_fps
+                t_target = np.arange(0, self.respiration_window_size, 1/self.resp_modulation_resample)
+                
+                # --- Extração e Re-amostragem das Modulações ---
+                
+                # 1. Baseline Wander (BW) - Interpolação Linear
+                bw_t = [(t_orig[tr] + t_orig[pk])/2 for tr, pk in pairs]
+                bw_v = [(seg[tr] + seg[pk])/2 for tr, pk in pairs]
+                sig_bw = interp1d(bw_t, bw_v, kind='linear', fill_value='extrapolate')(t_target)
+                
+                # 2. Amplitude (AM) - Interpolação Linear
+                am_t = [(t_orig[tr] + t_orig[pk])/2 for tr, pk in pairs]
+                am_v = [seg[pk] - seg[tr] for tr, pk in pairs]
+                sig_am = interp1d(am_t, am_v, kind='linear', fill_value='extrapolate')(t_target)
+                
+                # 3. Frequência (FM) - Algoritmo de Berger
+                fm_t = t_orig[p_idx]
+                _, sig_fm = self._berger_algorithm(fm_t, self.resp_modulation_resample, self.respiration_window_size)
+
+                results['sig_bw'].append(sig_bw)
+                results['sig_am'].append(sig_am)
+                results['sig_fm'].append(sig_fm)
+                
+                # --- Estimativa Espectral (FFT) ---
+                rr_bw = self._estimate_rr_fft(sig_bw, self.resp_modulation_resample)
+                rr_am = self._estimate_rr_fft(sig_am, self.resp_modulation_resample)
+                rr_fm = self._estimate_rr_fft(sig_fm, self.resp_modulation_resample)
+                
+                # --- Fusão Robusta ---
+                ests = np.array([rr_bw, rr_am, rr_fm])
+                if not np.any(np.isnan(ests)):
+                    mean_rr = np.mean(ests)
+                    # std_rr = np.std(ests)
+                    results['bw'].append(rr_bw)
+                    results['am'].append(rr_am)
+                    results['fm'].append(rr_fm)
+                    results['fusion'].append(mean_rr)
+                else:
+                    for k in results: results[k].append(np.nan)
+
+            # Concatenar sinais para plotagem temporal
+            for k in ['sig_bw', 'sig_am', 'sig_fm']:
+                if results[k]:
+                    results[k] = np.concatenate(results[k])
+                else:
+                    results[k] = np.array([])
+
+            rr_rppg[method] = results
+
+        return rr_rppg
+
     def compare_hr_rppg_ecg(self):
 
         hr_results = {}
@@ -350,26 +483,62 @@ class rPPGAnalysis:
             })
         
         return hr_results
+        
+    def compare_rr_rppg_respiration(self):
+        rr_results = {}
+        
+        for method in self.rppg_rr_values:
+            rr_rppg_values = self.rppg_rr_values[method]['fusion']
+            min_length = min(len(self.gt_rr_values), len(rr_rppg_values))
+            gt_rr_aligned = self.gt_rr_values[:min_length]
+            rppg_rr_aligned = rr_rppg_values[:min_length]
 
-    def compare_rr_rppg_ref(self):
+            mae = mean_absolute_error(gt_rr_aligned, rppg_rr_aligned)
+            rmse = np.sqrt(mean_squared_error(gt_rr_aligned, rppg_rr_aligned))
+            mape = self.calculate_mape(gt_rr_aligned, rppg_rr_aligned)
 
-        pass    
+            rr_results[method] = ({
+                'mae': mae,
+                'rmse': rmse,
+                'mape': mape
+            })
+        
+        return rr_results
 
     def compare_rppg_ppg(self):
         
-        print('Running similarity analysis...')
+        print('Running linear correlation analysis...')
 
         gt_ppg_signal = self._load_signal(self.gt_ppg_path)
 
-        similarity_results = {}    
+        correlation_results = {}    
         
         for method in self.rppg_hr_values:
             pearson_coef, best_lag, synced_rppg, synced_ppg = self._sync_and_correlate(self.rppg_signals[method], gt_ppg_signal)
-            similarity_results[method] = ({
+            correlation_results[method] = ({
                 'pearson_coef': pearson_coef,
                 'best_lag': best_lag,
                 'synced_rppg': synced_rppg,
                 'synced_ppg': synced_ppg
             })
         
-        return similarity_results
+        return correlation_results
+    
+    def run(self):
+        """Execute the heavy loading and processing steps.
+
+        Call this explicitly when you want to perform I/O and compute results.
+        """
+        # populate video metadata
+        self.frame_count = self._get_frame_count()
+        self.video_fps = self._get_video_fps()
+
+        # load signals and compute HR values
+        self.rppg_signals = self._load_rppg_signals()
+        self.ecg_hr_values = self._estimate_hr_ecg()
+        self.rppg_hr_values = self._estimate_hr_rppg()
+        self.hr_results = self.compare_hr_rppg_ecg()
+        self.correlation_results = self.compare_rppg_ppg()
+        self.gt_rr_values, self.ref_rr_signal = self._load_respiratory_signal()
+        self.rppg_rr_values = self._estimate_rr_rppg()
+        self.rr_results = self.compare_rr_rppg_respiration()

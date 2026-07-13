@@ -24,4 +24,5 @@ if __name__ == '__main__':
     # print('fps\n', patient2_analysis.video_fps)
     # print('rppg_hr_values\n', patient2_analysis.rppg_hr_values['PhysFormer (PURE)'])
     # print('hr_results\n', patient2_analysis.hr_results)
-    print('Correlation_results\n', patient2_analysis.correlation_results)
+    # print('Correlation_results\n', patient2_analysis.correlation_results)
+    print('Respiratory rate estimation\n', patient2_analysis.rr_results)
