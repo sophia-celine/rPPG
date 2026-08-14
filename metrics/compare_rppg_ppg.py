@@ -144,13 +144,13 @@ if __name__ == "__main__":
     # CONFIGURAÇÃO
     # =========================
     # Caminho para o seu arquivo PPG fixo (Ground Truth)
-    PPG_PATH = "../get_ground_truth/spo2/original_spo2_L7_16-22-48_16-24-47.txt" 
-    # PPG_PATH = r"../get_ground_truth/spo2/original_spo2_L9_16-05-26_16-07-25.txt" 
-    # PPG_PATH = "/home/soph/rppg/rPPG/get_ground_truth/spo2/original_spo2_L9_16-05-26_16-07-25.txt"
+    PPG_PATH = "../../rPPG_data/pilot/spo2/original_spo2_L7_16-22-48_16-24-47.txt" 
+    # PPG_PATH = r"../../rPPG_data/pilot/spo2/original_spo2_L9_16-05-26_16-07-25.txt" 
+    # PPG_PATH = "../../rPPG_data/pilot/spo2/original_spo2_L9_16-05-26_16-07-25.txt"
     
     
     # Pasta contendo os arquivos rPPG (.txt)
-    RPPG_FOLDER = "/home/soph/rppg/rPPG/preliminary_results/examples" 
+    RPPG_FOLDER = "../../rPPG_data/pilot/preliminary_results/examples" 
     
     # Frequências de amostragem originais
     FS_RPPG = 25      # Câmera (rPPG)
@@ -210,10 +210,13 @@ if __name__ == "__main__":
                 ax.plot(time_axis, res['ppg'][:actual_limit], label='PPG', color='blue', alpha=0.6)
                 ax.plot(time_axis, res['rppg'][:actual_limit], label='rPPG', color='red', alpha=0.8)
                 
-                ax.set_title(f"{res['name']}\nPearson: {res['pearson']:.4f}")
-                ax.set_xlabel("Tempo (s)")
-                ax.set_ylabel("Amplitude normalizada (u.a.)")
-                # ax.tick_params(axis='both', labelsize=16)
+                ax.set_title(f"{res['name']}\nCorrelation coefficient: {res['pearson']:.4f}", fontsize='xx-large')
+                # ax.set_title(f"{res['name']}\nCoeficiente de correlação: {res['pearson']:.4f}")
+                # ax.set_xlabel("Tempo (s)")
+                ax.set_xlabel("Time (s)", fontsize='xx-large')
+                # ax.set_ylabel("Amplitude normalizada (u.a.)")
+                ax.set_ylabel("Normalized amplitude", fontsize='xx-large')
+                ax.tick_params(axis='both', labelsize=16)
                 ax.legend(loc='upper right')
                 ax.grid(True, linestyle='--', alpha=0.5)
 
