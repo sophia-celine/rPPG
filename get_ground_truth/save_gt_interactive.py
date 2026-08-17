@@ -16,6 +16,9 @@ import heartpy as hp
 from scipy.interpolate import interp1d
 from scipy.signal import resample
 
+REMOTE_PARAMS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQi0TexCrRMbHHODBHKEWmoA8ipixOkFQqgVdHiznKbn19cBa6VignR47r90AweuomdhyQFCBInDE9y/pub?output=csv"
+UTI_DATA_PATH = r"\\10.8.0.1\uti\Data"
+
 # =============================================================================
 # CONFIGURAÇÕES DA EXTRAÇÃO
 # =============================================================================
@@ -24,10 +27,10 @@ from scipy.signal import resample
 class Config:
     file_path: str = ""
     date: str = ""
-    start_time: str = "16:00:00"
-    end_time: str = "16:02:00"
+    # start_time: str = "16:00:00"
+    # end_time: str = "16:02:00"
     bed: str = ""
-    output_dir: str = "../../rPPG_data/ground_truth"
+    # output_dir: str = "../../rPPG_data/ground_truth"
     video_source_path: str = ""
     save_ecg: bool = True
     save_spo2_wave: bool = True
@@ -424,12 +427,213 @@ class SignalExtractorApp:
 
         btn_visualize_signals = tk.Button(btn_frame, text="3. Visualizar Sinais", command=self.visualize_saved_signals_for_selected, bg="#FF9800", fg="white", font=("Arial", 11, "bold"), width=18)
         btn_visualize_signals.pack(side=tk.LEFT, padx=15)
+
+        btn_sync_remote = tk.Button(btn_frame, text="4. Sincronizar Planilha", command=self.sync_local_dataset_with_remote, bg="#9C27B0", fg="white", font=("Arial", 11, "bold"), width=20)
+        btn_sync_remote.pack(side=tk.LEFT, padx=15)
         
         btn_refresh = tk.Button(btn_frame, text="Recarregar Planilha", command=self.load_data, font=("Arial", 10))
         btn_refresh.pack(side=tk.RIGHT, padx=20)
         
         # Carregar Dados
         self.load_data()
+
+    def _normalize_sheet_like_get_h5(self, df):
+        if df is None or df.empty:
+            return pd.DataFrame()
+
+        df_norm = df.copy()
+
+        try:
+
+            df_norm = df_norm.iloc[:, 1:]
+            df_norm = df_norm.T.reset_index()
+            df_norm.columns = df_norm.iloc[0]
+            df_norm = df_norm.iloc[1:].reset_index(drop=True)
+            print('df norm', df_norm)
+            return df_norm
+        except Exception:
+            return df_norm
+
+    def _normalize_remote_sheet(self, df):
+        """Aplica o mesmo tratamento usado em get_h5.py:
+        remove a coluna de índice, transpõe o DataFrame, usa a primeira linha como cabeçalho
+        e reinicia o índice.
+        """
+        return self._normalize_sheet_like_get_h5(df)
+
+    @staticmethod
+    def _coerce_remote_value(value):
+        if value is None or (isinstance(value, float) and pd.isna(value)):
+            return pd.NA
+
+        if isinstance(value, str):
+            value = value.strip()
+            if value == "":
+                return pd.NA
+            normalized = value.lower()
+            if normalized in {"true", "false"}:
+                return normalized == "true"
+            if normalized in {"nan", "none", "null"}:
+                return pd.NA
+
+            try:
+                if value.startswith("0") and value[1:].isdigit() and len(value) > 1:
+                    return int(value)
+            except Exception:
+                pass
+
+            try:
+                return int(value)
+            except (TypeError, ValueError):
+                pass
+
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                pass
+
+            return value
+
+        return value
+
+    def _get_bed_ip(self, bed, ip_ids_file):
+        bed_norm = str(bed).strip()
+        if bed_norm.isdigit():
+            bed_norm = bed_norm.zfill(2)
+
+        with open(ip_ids_file, 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                if f"LEITO {bed_norm}" in line:
+                    return line.split(',')[1].strip()
+        raise ValueError(f"Bed {bed} not found in {ip_ids_file}")
+
+    def _build_h5_path_from_row(self, row):
+        date = str(row.get("Dia", "")).strip()
+        bed = str(row.get("Leito", "")).strip()
+        time_value = str(row.get("Hora", "")).strip()
+        if not date or not bed or not time_value:
+            return ""
+
+        if "/" in date:
+            date_parts = [p.strip() for p in date.split("/")]
+        elif "-" in date:
+            date_parts = [p.strip() for p in date.split("-")]
+        else:
+            return ""
+
+        if len(date_parts) != 3:
+            return ""
+
+        day, month, year = date_parts
+        day_folder = f"{year}{month}{day}"
+
+        try:
+            time = str(int(float(str(time_value).split(":")[0]))).strip()
+        except Exception:
+            return ""
+
+        try:
+            bed_norm = str(int(float(bed))).zfill(2)
+        except Exception:
+            bed_norm = bed
+
+        ip_ids_file = f"{UTI_DATA_PATH}/{day_folder}/{day_folder}_{int(time) + 1}_onLineDevices.log"
+
+        try:
+            bed_ip = self._get_bed_ip(bed_norm, ip_ids_file)
+        except Exception:
+            return ""
+
+        return f"{UTI_DATA_PATH}/{day_folder}/{bed_ip}_{day_folder}_{time}.h5"
+
+    def sync_local_dataset_with_remote(self):
+        try:
+            remote_df = pd.read_csv(REMOTE_PARAMS_URL)
+        except Exception as exc:
+            messagebox.showerror("Erro de sincronização", f"Não foi possível ler a planilha remota:\n{exc}")
+            return
+
+        remote_df = self._normalize_remote_sheet(remote_df)
+        if remote_df.empty:
+            messagebox.showwarning("Sincronização", "A planilha remota está vazia.")
+            return
+
+        if not os.path.exists(self.dataset_raw_file):
+            base_df = remote_df.copy()
+        else:
+            base_df = pd.read_csv(self.dataset_raw_file)
+
+
+        local_specific_cols = [
+            "init_time", "end_time", "sinal_ECG", "sinal_PPG", "sinal_resp",
+            "video_path", "video_duration", "h5_file"
+        ]
+        for col in local_specific_cols:
+            if col not in base_df.columns:
+                base_df[col] = pd.NA
+
+        shared_cols = [c for c in remote_df.columns if c in base_df.columns and c != "h5_file"]
+        added_count = 0
+        updated_count = 0
+
+        for idx, row in remote_df.iterrows():
+            patient_id = str(row.get("Id do paciente", "")).strip()
+            if patient_id in ("", "nan", "None"):
+                continue
+
+            match_mask = base_df["Id do paciente"].astype(str).str.strip() == patient_id
+            if match_mask.any():
+                target_idx = base_df.index[match_mask][0]
+                patient_updated = False
+                for col in shared_cols:
+                    if col not in row.index:
+                        continue
+                    value = self._coerce_remote_value(row[col])
+                    if pd.isna(value):
+                        continue
+
+                    current_value = base_df.at[target_idx, col]
+                    current_text = "" if pd.isna(current_value) else str(current_value).strip()
+                    remote_text = str(value).strip()
+                    if current_text != remote_text:
+                        base_df.at[target_idx, col] = value
+                        patient_updated = True
+
+                if "h5_file" not in base_df.columns:
+                    base_df["h5_file"] = pd.NA
+                existing_h5 = str(base_df.at[target_idx, "h5_file"]).strip() if pd.notna(base_df.at[target_idx, "h5_file"]) else ""
+                if not existing_h5 or not os.path.exists(existing_h5):
+                    built_h5 = self._build_h5_path_from_row(base_df.loc[target_idx].to_dict())
+                    if built_h5:
+                        base_df.at[target_idx, "h5_file"] = built_h5
+
+                if patient_updated:
+                    updated_count += 1
+            else:
+                new_row = {col: pd.NA for col in local_specific_cols}
+                for col in remote_df.columns:
+                    if col in base_df.columns:
+                        new_row[col] = self._coerce_remote_value(row[col])
+                if "h5_file" in new_row:
+                    new_row["h5_file"] = self._build_h5_path_from_row(new_row)
+                base_df = pd.concat([base_df, pd.DataFrame([new_row])], ignore_index=True)
+                added_count += 1
+
+        if "Id do paciente" in base_df.columns:
+            base_df["Id do paciente"] = base_df["Id do paciente"].astype(str)
+
+        base_df.to_csv(self.dataset_raw_file, index=False)
+        self.df = base_df
+        self.update_treeview()
+
+        message = (
+            "Sincronização concluída.\n\n"
+            f"Pacientes adicionados: {added_count}\n"
+            f"Pacientes com informações atualizadas: {updated_count}\n\n"
+            f"Arquivo salvo em: {self.dataset_raw_file}"
+        )
+        messagebox.showinfo("Sincronização concluída", message)
 
     def load_data(self):
         if not os.path.exists(self.dataset_raw_file):
