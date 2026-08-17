@@ -1,6 +1,6 @@
 import os
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, filedialog, simpledialog
 from dataclasses import dataclass
 from pathlib import Path
 from datetime import datetime
@@ -42,7 +42,7 @@ class Config:
     spo2_id: int = 458768
     resp_id: int = 327688
     interactive_select_time: bool = True
-    duration_seconds: int = 120
+    duration_seconds: float = 120.0  # Aceita casas decimais da duração do vídeo
     selected_start_index: Optional[int] = None
     selected_end_index: Optional[int] = None
     selected_start_ts: Optional[float] = None
@@ -136,19 +136,19 @@ def process_ecg(config, datas, ids, seqs, seqsts):
     dates_np = np.array([datetime.fromtimestamp(ts_value) for ts_value in time_vector])
     
     def select_start_point_interactive(dates, signal, time_vector, fs):
-        fig, ax = plt.subplots(figsize=(12, 3))
-        ax.plot(dates, signal, color='tab:blue')
+        fig, ax = plt.subplots(figsize=(12, 4))
+        ax.plot(dates, signal, color='tab:blue', alpha=0.8)
         ax.set_xlabel('Horário')
         ax.set_ylabel('Amplitude')
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
         ax.grid(True)
-        plt.title('Passe o mouse para preview. Clique para selecionar INÍCIO. Pressione y para confirmar, n para cancelar.')
+        plt.title(f'Clique no INÍCIO dos sinais. Duração do corte: {config.duration_seconds:.1f}s. "y" p/ salvar, "n" p/ cancelar.')
         plt.tight_layout()
 
         dnums = mdates.date2num(dates)
         vline = ax.axvline(dnums[0], color='gray', linewidth=1, linestyle='--')
         hover_ann = ax.annotate('', xy=(0,0), xytext=(15,15), textcoords='offset points', bbox=dict(boxstyle='round', fc='w'), visible=False)
-        sel_marker, = ax.plot([], [], 'ro', markersize=12, visible=False)
+        sel_marker, = ax.plot([], [], 'o', color='red', markersize=10, markeredgecolor='black', visible=False)
 
         selected = {'index': None, 'confirmed': False}
 
@@ -277,11 +277,12 @@ def process_rr(config, datas, ids, seqs, seqsts):
     
     return str(output_file)
 
-def run_extraction_for_patient(h5_file, bed, date_str):
+def run_extraction_for_patient(h5_file, bed, date_str, duration_seconds=120.0):
     config = Config(
         file_path=h5_file,
         bed=bed,
-        date=date_str.replace("/", "-")
+        date=date_str.replace("/", "-"),
+        duration_seconds=duration_seconds
     )
     
     try:
@@ -322,7 +323,7 @@ class SignalExtractorApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Extrator de Sinais - UTI")
-        self.root.geometry("800x500")
+        self.root.geometry("850x500")
         
         self.dataset_raw_file = r"C:\Users\Sophia\Documents\rPPG_data\ground_truth\dataset_raw.csv"
         self.df = None
@@ -335,22 +336,24 @@ class SignalExtractorApp:
         header_frame = tk.Frame(self.root, pady=10)
         header_frame.grid(row=0, column=0, sticky="ew")
         
-        tk.Label(header_frame, text="Selecione um paciente para extrair os sinais", font=("Arial", 14, "bold")).pack()
+        tk.Label(header_frame, text="Selecione um paciente para Processar Sinais ou Cortar Vídeo", font=("Arial", 14, "bold")).pack()
         
         # Treeview (Tabela)
-        columns = ("index", "id", "leito", "data", "status")
+        columns = ("index", "id", "leito", "data", "status", "video_status")
         self.tree = ttk.Treeview(self.root, columns=columns, show="headings", selectmode="browse")
         self.tree.heading("index", text="Índice")
         self.tree.heading("id", text="ID Paciente")
         self.tree.heading("leito", text="Leito")
         self.tree.heading("data", text="Data")
-        self.tree.heading("status", text="Status")
+        self.tree.heading("status", text="Status (Sinais)")
+        self.tree.heading("video_status", text="Vídeo")
         
         self.tree.column("index", width=50, anchor="center")
         self.tree.column("id", width=120, anchor="center")
-        self.tree.column("leito", width=100, anchor="center")
+        self.tree.column("leito", width=80, anchor="center")
         self.tree.column("data", width=100, anchor="center")
-        self.tree.column("status", width=150, anchor="center")
+        self.tree.column("status", width=120, anchor="center")
+        self.tree.column("video_status", width=120, anchor="center")
         
         self.tree.grid(row=1, column=0, sticky="nsew", padx=20)
         
@@ -367,11 +370,14 @@ class SignalExtractorApp:
         btn_frame = tk.Frame(self.root, pady=15)
         btn_frame.grid(row=2, column=0, sticky="ew")
         
-        btn_process = tk.Button(btn_frame, text="Processar Selecionado", command=self.process_selected, bg="#4CAF50", fg="white", font=("Arial", 11, "bold"), width=20)
-        btn_process.pack(side=tk.LEFT, padx=20)
+        btn_cut_video = tk.Button(btn_frame, text="1. Cortar Vídeo", command=self.cut_video_for_selected, bg="#2196F3", fg="white", font=("Arial", 11, "bold"), width=15)
+        btn_cut_video.pack(side=tk.LEFT, padx=15)
+        
+        btn_process_signals = tk.Button(btn_frame, text="2. Processar Sinais", command=self.process_signals_for_selected, bg="#4CAF50", fg="white", font=("Arial", 11, "bold"), width=18)
+        btn_process_signals.pack(side=tk.LEFT, padx=15)
         
         btn_refresh = tk.Button(btn_frame, text="Recarregar Planilha", command=self.load_data, font=("Arial", 10))
-        btn_refresh.pack(side=tk.LEFT, padx=10)
+        btn_refresh.pack(side=tk.RIGHT, padx=20)
         
         # Carregar Dados
         self.load_data()
@@ -384,8 +390,8 @@ class SignalExtractorApp:
         try:
             self.df = pd.read_csv(self.dataset_raw_file)
             
-            # Garante colunas
-            novas_colunas = ["init_time", "end_time", "sinal_ECG", "sinal_PPG", "sinal_resp"]
+            # Garante a existência das colunas, incluindo video_duration
+            novas_colunas = ["init_time", "end_time", "sinal_ECG", "sinal_PPG", "sinal_resp", "video_path", "video_duration"]
             for col in novas_colunas:
                 if col not in self.df.columns:
                     self.df[col] = pd.NA
@@ -403,6 +409,7 @@ class SignalExtractorApp:
             leito = row.get("Leito", "N/A")
             data = row.get("Dia", "N/A")
             
+            # Verifica Sinais
             if pd.notna(row["init_time"]) and str(row["init_time"]).strip() != "":
                 status = "Preenchido"
                 tag = "preenchido"
@@ -410,9 +417,111 @@ class SignalExtractorApp:
                 status = "Pendente"
                 tag = "pendente"
                 
-            self.tree.insert("", tk.END, values=(idx, id_pac, leito, data, status), tags=(tag,))
+            # Verifica Vídeo
+            video_status = "Cortado" if pd.notna(row.get("video_path")) and str(row.get("video_path")).strip() != "" else "Sem vídeo"
+                
+            self.tree.insert("", tk.END, values=(idx, id_pac, leito, data, status, video_status), tags=(tag,))
 
-    def process_selected(self):
+    def cut_video_dialog(self):
+        """Abre caixa de diálogo para escolher vídeo, definir frames e criar versão cortada."""
+        input_path = filedialog.askopenfilename(
+            title="Selecione o vídeo original (.avi, .mp4)", 
+            filetypes=[("Video files", "*.avi *.mp4 *.mkv")]
+        )
+        if not input_path:
+            return None, 120.0
+
+        cap = cv2.VideoCapture(input_path)
+        if not cap.isOpened():
+            messagebox.showerror("Erro", "Não foi possível abrir o vídeo selecionado.")
+            return None, 120.0
+
+        frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        
+        if fps == 0:
+            fps = 30.0 # fallback
+
+        start_frame = simpledialog.askinteger(
+            "Corte de Vídeo - Início", 
+            f"O vídeo tem {frame_count} frames no total.\n\nDigite o FRAME INICIAL (0 a {frame_count}):",
+            minvalue=0, maxvalue=frame_count, initialvalue=0
+        )
+        if start_frame is None: 
+            cap.release()
+            return None, 120.0
+
+        end_frame = simpledialog.askinteger(
+            "Corte de Vídeo - Fim", 
+            f"Digite o FRAME FINAL ({start_frame} a {frame_count}):",
+            minvalue=start_frame, maxvalue=frame_count, initialvalue=frame_count
+        )
+        if end_frame is None:
+            cap.release()
+            return None, 120.0
+
+        wait_window = tk.Toplevel(self.root)
+        wait_window.title("Processando...")
+        wait_window.geometry("300x100")
+        tk.Label(wait_window, text="Cortando vídeo...\nPor favor, aguarde.", font=("Arial", 11)).pack(expand=True)
+        wait_window.update()
+
+        output_path = input_path.rsplit('.', 1)[0] + "_cropped.avi"
+        fourcc = cv2.VideoWriter_fourcc(*'I420') 
+        out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
+
+        cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
+        current_frame = start_frame
+
+        while current_frame < end_frame:
+            ret, frame = cap.read()
+            if not ret: break
+            out.write(frame)
+            current_frame += 1
+
+        cap.release()
+        out.release()
+        wait_window.destroy()
+
+        duration_seconds = (current_frame - start_frame) / fps
+        messagebox.showinfo("Sucesso", f"Vídeo cortado e salvo com sucesso!\nDuração final: {duration_seconds:.2f} segundos.")
+        
+        return output_path, duration_seconds
+
+    def cut_video_for_selected(self):
+        selected_item = self.tree.selection()
+        if not selected_item:
+            messagebox.showwarning("Aviso", "Selecione um paciente na lista primeiro.")
+            return
+            
+        item_values = self.tree.item(selected_item[0], "values")
+        idx = int(item_values[0])
+        paciente = self.df.loc[idx]
+        
+        # Verifica se já existe vídeo salvo no df
+        video_existente = str(paciente.get("video_path", ""))
+        
+        if video_existente and video_existente != "nan" and os.path.exists(video_existente):
+            sobrescrever = messagebox.askyesno("Vídeo já existente", f"Já existe um vídeo cortado para este paciente:\n{video_existente}\n\nDeseja sobrescrever com um novo corte?")
+            if not sobrescrever:
+                return
+
+        # Roda o Dialog de corte
+        res_path, res_dur = self.cut_video_dialog()
+        
+        # Salva se concluiu
+        if res_path:
+            self.df.at[idx, "video_path"] = res_path
+            self.df.at[idx, "video_duration"] = res_dur
+            try:
+                self.df.to_csv(self.dataset_raw_file, index=False)
+                self.update_treeview()
+            except Exception as e:
+                messagebox.showerror("Erro ao Salvar", f"Não foi possível salvar o CSV:\n{e}")
+
+    def process_signals_for_selected(self):
         selected_item = self.tree.selection()
         if not selected_item:
             messagebox.showwarning("Aviso", "Selecione um paciente na lista primeiro.")
@@ -423,36 +532,42 @@ class SignalExtractorApp:
         status = item_values[4]
         
         if status == "Preenchido":
-            if not messagebox.askyesno("Sobrescrever", "Este paciente já possui dados extraídos. Deseja sobrescrever os dados existentes?"):
+            if not messagebox.askyesno("Sobrescrever Sinais", "Este paciente já possui dados extraídos. Deseja sobrescrever os dados existentes?"):
                 return
                 
         paciente = self.df.loc[idx]
         h5_file = paciente.get("h5_file", "")
         
-        if not h5_file or pd.isna(h5_file) or not os.path.exists(h5_file):
+        if not h5_file or pd.isna(h5_file) or not os.path.exists(str(h5_file)):
             messagebox.showerror("Erro", f"Arquivo H5 não encontrado:\n{h5_file}")
             return
             
-        messagebox.showinfo("Instruções", "A janela do gráfico vai abrir.\n\n1. Passe o mouse para ver o momento.\n2. Clique para marcar o Início.\n3. Pressione a tecla 'y' para confirmar ou 'n' para cancelar.")
+        # Pega a duração salva ou usa 120
+        video_dur = paciente.get("video_duration", pd.NA)
+        if pd.notna(video_dur) and str(video_dur).strip() != "" and float(video_dur) > 0:
+            duration_for_signals = float(video_dur)
+            messagebox.showinfo("Duração Sincronizada", f"Sinais serão cortados para {duration_for_signals:.2f}s, acompanhando a duração do vídeo salvo.")
+        else:
+            duration_for_signals = 120.0
+            messagebox.showinfo("Duração Padrão", "Nenhum vídeo cortado encontrado para este paciente. Sinais usarão o tempo padrão de 120s.")
+
+        messagebox.showinfo("Instruções de Sinais", f"A janela do gráfico do ECG vai abrir.\n\n1. Passe o mouse para ver o momento.\n2. Clique para marcar o Início (O final será calculado para {duration_for_signals:.1f}s automaticamente).\n3. Pressione 'y' para confirmar ou 'n' para cancelar.")
         
-        # Esconde a janela principal para focar no matplotlib (opcional)
         self.root.iconify()
         
-        # Roda extração
         resultados = run_extraction_for_patient(
             h5_file=str(h5_file),
             bed=str(paciente.get("Leito", "")).strip(),
-            date_str=str(paciente.get("Dia", "")).strip()
+            date_str=str(paciente.get("Dia", "")).strip(),
+            duration_seconds=duration_for_signals
         )
         
-        # Restaura a janela
         self.root.deiconify()
         
         if resultados.get("error"):
             messagebox.showwarning("Extração Interrompida", resultados["error"])
             return
             
-        # Salva dados no DataFrame
         self.df.at[idx, "init_time"] = resultados["init_time"]
         self.df.at[idx, "end_time"] = resultados["end_time"]
         self.df.at[idx, "sinal_ECG"] = resultados["sinal_ECG"]
@@ -461,8 +576,8 @@ class SignalExtractorApp:
         
         try:
             self.df.to_csv(self.dataset_raw_file, index=False)
-            messagebox.showinfo("Sucesso", "Dados extraídos e salvos na planilha com sucesso!")
-            self.update_treeview() # Atualiza interface
+            messagebox.showinfo("Sucesso", "Sinais extraídos e salvos na planilha com sucesso!")
+            self.update_treeview()
         except Exception as e:
             messagebox.showerror("Erro ao Salvar", f"Não foi possível salvar o CSV:\n{e}")
 
