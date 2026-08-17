@@ -29,11 +29,8 @@ class Config:
     bed: str = ""
     output_dir: str = "../../rPPG_data/ground_truth"
     video_source_path: str = ""
-    n_points: int = 2997
     save_ecg: bool = True
     save_spo2_wave: bool = True
-    resample_spo2: bool = False
-    save3lines: bool = False
     save_rr: bool = True
     show_plots: bool = True
     data_pack_head: bytes = b"\x02\x0B\x00\x00"
@@ -53,11 +50,53 @@ class Config:
         self.hora_fim = self.end_time.replace(':', '-')
         self.output_path = Path(self.output_dir)
         self.output_path.mkdir(parents=True, exist_ok=True)
-        self.ecg_dir = self.output_path / "ECG"
-        self.spo2_dir = self.output_path / "spo2"
-        self.rr_dir = self.output_path / "thoracic_impedance"
+        self.ecg_dir = self.output_path
+        self.spo2_dir = self.output_path
+        self.rr_dir = self.output_path
         for folder in (self.ecg_dir, self.spo2_dir, self.rr_dir):
             folder.mkdir(parents=True, exist_ok=True)
+
+
+def human_filename(path):
+    base = os.path.basename(path)
+    name, _ = os.path.splitext(base)
+    return name
+
+
+def write_cut_video(input_path, start_frame, output_path=None, codec='I420'):
+    cap = cv2.VideoCapture(input_path)
+    if not cap.isOpened():
+        raise RuntimeError(f"Can't open input: {input_path}")
+
+    total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0)
+    fps = cap.get(cv2.CAP_PROP_FPS) or 30.0
+    w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH) or 0)
+    h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT) or 0)
+
+    if output_path is None:
+        dirname = os.path.dirname(input_path)
+        name = human_filename(input_path)
+        output_path = os.path.join(dirname, f"{name}_cut_{start_frame:06d}.avi")
+    elif not str(output_path).lower().endswith(".avi"):
+        output_path = str(output_path).rsplit(".", 1)[0] + ".avi"
+
+    os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
+
+    fourcc = cv2.VideoWriter_fourcc(*codec)
+    writer = cv2.VideoWriter(output_path, fourcc, fps, (w, h))
+
+    cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
+    print(f"Writing from frame {start_frame} to end into: {output_path}")
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+        writer.write(frame)
+
+    writer.release()
+    cap.release()
+    print(f"Saved cut video: {output_path}")
+    return output_path
 
 
 # =============================================================================
@@ -224,7 +263,7 @@ def process_ecg(config, datas, ids, seqs, seqsts):
 
     output_file = ""
     if config.save_ecg:
-        output_file = config.ecg_dir / f"ecg_signal_{config.date}_{config.bed}_{config.hora_inicio}_{config.hora_fim}.csv"
+        output_file = config.ecg_dir / f"ecg_{config.date}_{config.bed}_{config.hora_inicio}_{config.hora_fim}.csv"
         np.savetxt(output_file, sig[mask], delimiter=",", fmt="%d")
 
     return selected_info, str(output_file)
@@ -249,7 +288,7 @@ def process_spo2(config, datas, ids, seqs, seqsts):
     output_file = ""
     if config.save_spo2_wave:
         sig_m = sig[mask].astype(float)
-        output_file = config.spo2_dir / f"original_spo2_{config.date}_{config.bed}_{config.hora_inicio}_{config.hora_fim}.txt"
+        output_file = config.spo2_dir / f"ppg_{config.date}_{config.bed}_{config.hora_inicio}_{config.hora_fim}.txt"
         np.savetxt(output_file, sig_m, fmt="%.7e")
     
     return str(output_file)
@@ -272,18 +311,25 @@ def process_rr(config, datas, ids, seqs, seqsts):
         mask = get_window_mask(dates_np, config.start_time, config.end_time)
 
     sig_m = sig[mask].astype(float)
-    output_file = config.rr_dir / f"{config.date}_{config.bed}_{config.hora_inicio}_{config.hora_fim}.txt"
+    output_file = config.rr_dir / f"respiration_{config.date}_{config.bed}_{config.hora_inicio}_{config.hora_fim}.txt"
     np.savetxt(output_file, sig_m, fmt="%.7e")
     
     return str(output_file)
 
-def run_extraction_for_patient(h5_file, bed, date_str, duration_seconds=120.0):
+def run_extraction_for_patient(h5_file, bed, date_str, duration_seconds=120.0, patient_output_dir=None):
+    output_dir = str(patient_output_dir) if patient_output_dir is not None else "../../rPPG_data/ground_truth"
     config = Config(
         file_path=h5_file,
         bed=bed,
         date=date_str.replace("/", "-"),
-        duration_seconds=duration_seconds
+        duration_seconds=duration_seconds,
+        output_dir=output_dir
     )
+    config.output_path = Path(output_dir)
+    config.output_path.mkdir(parents=True, exist_ok=True)
+    config.ecg_dir = config.output_path
+    config.spo2_dir = config.output_path
+    config.rr_dir = config.output_path
     
     try:
         datas, ids, seqs, seqsts = load_hdf5_packets(
@@ -375,6 +421,9 @@ class SignalExtractorApp:
         
         btn_process_signals = tk.Button(btn_frame, text="2. Processar Sinais", command=self.process_signals_for_selected, bg="#4CAF50", fg="white", font=("Arial", 11, "bold"), width=18)
         btn_process_signals.pack(side=tk.LEFT, padx=15)
+
+        btn_visualize_signals = tk.Button(btn_frame, text="3. Visualizar Sinais", command=self.visualize_saved_signals_for_selected, bg="#FF9800", fg="white", font=("Arial", 11, "bold"), width=18)
+        btn_visualize_signals.pack(side=tk.LEFT, padx=15)
         
         btn_refresh = tk.Button(btn_frame, text="Recarregar Planilha", command=self.load_data, font=("Arial", 10))
         btn_refresh.pack(side=tk.RIGHT, padx=20)
@@ -422,10 +471,47 @@ class SignalExtractorApp:
                 
             self.tree.insert("", tk.END, values=(idx, id_pac, leito, data, status, video_status), tags=(tag,))
 
-    def cut_video_dialog(self):
-        """Abre caixa de diálogo para escolher vídeo, definir frames e criar versão cortada."""
+    def _select_row_by_idx(self, target_idx):
+        """Função auxiliar para restaurar a seleção do paciente na tabela"""
+        for item in self.tree.get_children():
+            if int(self.tree.item(item, "values")[0]) == target_idx:
+                self.tree.selection_set(item)
+                self.tree.focus(item)
+                self.tree.see(item)
+                break
+
+    def _build_video_output_path(self, patient_row=None, start_time=None, end_time=None):
+        """Salva o vídeo em .avi diretamente na pasta dataset_raw, sem subpastas."""
+        base_dir = Path(self.dataset_raw_file).resolve().parent / "dataset_raw"
+        base_dir.mkdir(parents=True, exist_ok=True)
+
+        if patient_row is not None:
+            date_str = str(patient_row.get("Dia", "")).strip()
+            bed_str = str(patient_row.get("Leito", "")).strip()
+            start_time_str = str(patient_row.get("init_time", "") if start_time is None else start_time).strip()
+            end_time_str = str(patient_row.get("end_time", "") if end_time is None else end_time).strip()
+
+            if date_str and bed_str:
+                if not start_time_str:
+                    start_time_str = "00-00-00"
+                if not end_time_str:
+                    end_time_str = "00-00-00"
+
+                date_str = date_str.replace("/", "-")
+                bed_str = bed_str.replace(" ", "")
+                start_time_str = start_time_str.replace(":", "-")
+                end_time_str = end_time_str.replace(":", "-")
+                return base_dir / f"{date_str}_{bed_str}_{start_time_str}_{end_time_str}.avi"
+
+            return base_dir / "video_cropped.avi"
+
+        fallback_name = "video_cropped.avi"
+        return base_dir / fallback_name
+
+    def cut_video_dialog(self, patient_row=None):
+        """Abre janela interativa para navegar pelo vídeo e escolher o frame inicial."""
         input_path = filedialog.askopenfilename(
-            title="Selecione o vídeo original (.avi, .mp4)", 
+            title="Selecione o vídeo original (.avi, .mp4)",
             filetypes=[("Video files", "*.avi *.mp4 *.mkv")]
         )
         if not input_path:
@@ -436,59 +522,88 @@ class SignalExtractorApp:
             messagebox.showerror("Erro", "Não foi possível abrir o vídeo selecionado.")
             return None, 120.0
 
-        frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        fps = cap.get(cv2.CAP_PROP_FPS)
-        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        
-        if fps == 0:
-            fps = 30.0 # fallback
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0)
+        fps = cap.get(cv2.CAP_PROP_FPS) or 30.0
+        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH) or 0)
+        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT) or 0)
 
-        start_frame = simpledialog.askinteger(
-            "Corte de Vídeo - Início", 
-            f"O vídeo tem {frame_count} frames no total.\n\nDigite o FRAME INICIAL (0 a {frame_count}):",
-            minvalue=0, maxvalue=frame_count, initialvalue=0
-        )
-        if start_frame is None: 
-            cap.release()
-            return None, 120.0
+        current = 0
+        start_frame = None
+        win = "Cut Video"
+        cv2.namedWindow(win, cv2.WINDOW_NORMAL)
 
-        end_frame = simpledialog.askinteger(
-            "Corte de Vídeo - Fim", 
-            f"Digite o FRAME FINAL ({start_frame} a {frame_count}):",
-            minvalue=start_frame, maxvalue=frame_count, initialvalue=frame_count
-        )
-        if end_frame is None:
-            cap.release()
-            return None, 120.0
+        instructions = [
+            "Controls: a - prev, d - next, s - select start",
+            "w - write cut video, q - quit"
+        ]
 
-        wait_window = tk.Toplevel(self.root)
-        wait_window.title("Processando...")
-        wait_window.geometry("300x100")
-        tk.Label(wait_window, text="Cortando vídeo...\nPor favor, aguarde.", font=("Arial", 11)).pack(expand=True)
-        wait_window.update()
-
-        output_path = input_path.rsplit('.', 1)[0] + "_cropped.avi"
-        fourcc = cv2.VideoWriter_fourcc(*'I420') 
-        out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
-
-        cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
-        current_frame = start_frame
-
-        while current_frame < end_frame:
+        while True:
+            cap.set(cv2.CAP_PROP_POS_FRAMES, current)
             ret, frame = cap.read()
-            if not ret: break
-            out.write(frame)
-            current_frame += 1
+            if not ret:
+                print("End of video or read error")
+                break
+
+            display = frame.copy()
+            lines = [f"Frame: {current + 1}/{total_frames}  FPS:{fps:.2f}"]
+            if start_frame is not None:
+                lines.append(f"Selected start: {start_frame + 1}")
+            else:
+                lines.append("Selected start: -")
+            lines.extend(instructions)
+
+            for i, line in enumerate(lines):
+                cv2.putText(display, line, (10, 20 + i * 18), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+
+            if start_frame is not None and current >= start_frame:
+                cv2.rectangle(display, (0, 0), (width - 1, height - 1), (0, 0, 255), 4)
+
+            cv2.imshow(win, display)
+            key = cv2.waitKey(0) & 0xFF
+
+            if key in (ord('d'), 83):
+                if current < total_frames - 1:
+                    current += 1
+            elif key in (ord('a'), 81):
+                if current > 0:
+                    current -= 1
+            elif key == ord('s'):
+                start_frame = current
+                print(f"Selected start frame: {start_frame}")
+            elif key == ord('w'):
+                if start_frame is None:
+                    print("No start selected; using current frame as start")
+                    start_frame = current
+
+                output_path = self._build_video_output_path(
+                    patient_row=patient_row,
+                    start_time=(patient_row.get("init_time") if patient_row is not None else None),
+                    end_time=(patient_row.get("end_time") if patient_row is not None else None),
+                )
+                try:
+                    output_path = write_cut_video(input_path, start_frame, str(output_path), codec='I420')
+                    duration_seconds = (total_frames - start_frame) / fps if fps else 0.0
+                    messagebox.showinfo(
+                        "Sucesso",
+                        f"Vídeo cortado e salvo com sucesso!\nDuração final: {duration_seconds:.2f} segundos."
+                    )
+                    cap.release()
+                    cv2.destroyAllWindows()
+                    return output_path, duration_seconds
+                except Exception as exc:
+                    messagebox.showerror("Erro", f"Não foi possível cortar o vídeo:\n{exc}")
+                    cap.release()
+                    cv2.destroyAllWindows()
+                    return None, 120.0
+            elif key == ord('q'):
+                break
+            else:
+                if key != 255:
+                    pass
 
         cap.release()
-        out.release()
-        wait_window.destroy()
-
-        duration_seconds = (current_frame - start_frame) / fps
-        messagebox.showinfo("Sucesso", f"Vídeo cortado e salvo com sucesso!\nDuração final: {duration_seconds:.2f} segundos.")
-        
-        return output_path, duration_seconds
+        cv2.destroyAllWindows()
+        return None, 120.0
 
     def cut_video_for_selected(self):
         selected_item = self.tree.selection()
@@ -509,7 +624,7 @@ class SignalExtractorApp:
                 return
 
         # Roda o Dialog de corte
-        res_path, res_dur = self.cut_video_dialog()
+        res_path, res_dur = self.cut_video_dialog(patient_row=paciente)
         
         # Salva se concluiu
         if res_path:
@@ -518,10 +633,128 @@ class SignalExtractorApp:
             try:
                 self.df.to_csv(self.dataset_raw_file, index=False)
                 self.update_treeview()
+                
+                # Restaura a seleção para que a função de sinais saiba quem usar
+                self._select_row_by_idx(idx)
+                
+                # VERIFICAÇÃO DE SINCRONIA: Se já existiam sinais, sugere reprocessar
+                if pd.notna(paciente.get("init_time")) and str(paciente.get("init_time")).strip() != "":
+                    reprocessar = messagebox.askyesno(
+                        "Sincronia Recomendada", 
+                        "Este paciente já possuía sinais extraídos anteriormente.\n\n"
+                        f"Como você acabou de salvar um novo vídeo (com duração de {res_dur:.1f}s), "
+                        "é altamente recomendável reprocessar os sinais para que a duração deles "
+                        "seja perfeitamente igual ao vídeo cortado.\n\n"
+                        "Deseja reprocessar os sinais agora?"
+                    )
+                    
+                    if reprocessar:
+                        # Chama o processamento de sinais ignorando o aviso comum de sobrescrita, 
+                        # pois o usuário acabou de aceitar a sincronia.
+                        self.process_signals_for_selected(skip_overwrite_warning=True)
+                        
             except Exception as e:
                 messagebox.showerror("Erro ao Salvar", f"Não foi possível salvar o CSV:\n{e}")
 
-    def process_signals_for_selected(self):
+    def _read_signal_file(self, file_path):
+        file_path = str(file_path)
+        if not file_path or file_path == "nan" or not os.path.exists(file_path):
+            return None
+
+        try:
+            data = np.loadtxt(file_path, delimiter=",", ndmin=1)
+            if data.size == 0:
+                return None
+            return np.asarray(data).ravel()
+        except Exception:
+            try:
+                data = np.loadtxt(file_path, ndmin=1)
+                if data.size == 0:
+                    return None
+                return np.asarray(data).ravel()
+            except Exception:
+                return None
+
+    def _load_full_signal_by_id(self, h5_file, signal_id, date_str, start_time, end_time):
+        try:
+            datas, ids, seqs, seqsts = load_hdf5_packets(h5_file, b"\x02\x0B\x00\x00", 36)
+        except Exception:
+            return None, None, None, None
+
+        signal_indices = np.where(ids == signal_id)[0]
+        if len(signal_indices) == 0:
+            return None, None, None, None
+
+        sig = np.concatenate([datas[i] for i in signal_indices])
+        ts = seqsts[signal_indices]
+        fs = len(datas[signal_indices[0]]) / np.median(np.diff(ts))
+        time_vector = build_time_vectors(ts, [datas[i] for i in signal_indices], fs)
+        dates_np = np.array([datetime.fromtimestamp(ts_value) for ts_value in time_vector])
+
+        start_dt = datetime.combine(datetime.strptime(date_str, "%d/%m/%Y").date(), datetime.strptime(start_time, "%H:%M:%S").time())
+        end_dt = datetime.combine(datetime.strptime(date_str, "%d/%m/%Y").date(), datetime.strptime(end_time, "%H:%M:%S").time())
+
+        mask = (dates_np >= start_dt) & (dates_np <= end_dt)
+
+        return dates_np, sig, mask, time_vector
+
+    def visualize_saved_signals_for_selected(self):
+        selected_item = self.tree.selection()
+        if not selected_item:
+            messagebox.showwarning("Aviso", "Selecione um paciente na lista primeiro.")
+            return
+
+        idx = int(self.tree.item(selected_item[0], "values")[0])
+        paciente = self.df.loc[idx]
+
+        h5_file = paciente.get("h5_file", "")
+        date_str = str(paciente.get("Dia", "")).strip()
+        init_time = str(paciente.get("init_time", "")).strip()
+        end_time = str(paciente.get("end_time", "")).strip()
+
+        if not h5_file or str(h5_file) == "nan" or not os.path.exists(str(h5_file)):
+            messagebox.showwarning("Aviso", "Arquivo H5 do paciente não encontrado para visualizar os sinais.")
+            return
+
+        if not init_time or not end_time:
+            messagebox.showwarning("Aviso", "O paciente ainda não possui intervalo de sinal selecionado.")
+            return
+
+        signal_info = {
+            "ECG": Config.ecg_id,
+            "PPG": Config.spo2_id,
+            "Respiração": Config.resp_id,
+        }
+
+        fig, axes = plt.subplots(len(signal_info), 1, figsize=(14, 4 * len(signal_info)), sharex=True)
+        if len(signal_info) == 1:
+            axes = [axes]
+
+        for ax, (name, signal_id) in zip(axes, signal_info.items()):
+            dates_np, sig, mask, _ = self._load_full_signal_by_id(
+                str(h5_file),
+                signal_id,
+                date_str,
+                init_time,
+                end_time,
+            )
+            if dates_np is None or sig is None:
+                continue
+
+            ax.plot(dates_np, sig, color='tab:blue', linewidth=1.5, label='sinal completo')
+            if np.any(mask):
+                ax.plot(dates_np[mask], sig[mask], color='tab:red', linewidth=2.5, label='intervalo salvo')
+            ax.set_title(f"{name} - sinal completo e intervalo salvo")
+            ax.set_ylabel('Amplitude')
+            ax.grid(True, alpha=0.3)
+            ax.legend(loc='upper right')
+
+        axes[-1].set_xlabel('Horário')
+        fig.autofmt_xdate()
+        fig.tight_layout()
+        plt.show()
+
+    def process_signals_for_selected(self, skip_overwrite_warning=False):
         selected_item = self.tree.selection()
         if not selected_item:
             messagebox.showwarning("Aviso", "Selecione um paciente na lista primeiro.")
@@ -531,7 +764,8 @@ class SignalExtractorApp:
         idx = int(item_values[0])
         status = item_values[4]
         
-        if status == "Preenchido":
+        # Adicionei a variável "skip_overwrite_warning" para evitar perguntar duas vezes no caso de sincronia
+        if status == "Preenchido" and not skip_overwrite_warning:
             if not messagebox.askyesno("Sobrescrever Sinais", "Este paciente já possui dados extraídos. Deseja sobrescrever os dados existentes?"):
                 return
                 
@@ -553,13 +787,21 @@ class SignalExtractorApp:
 
         messagebox.showinfo("Instruções de Sinais", f"A janela do gráfico do ECG vai abrir.\n\n1. Passe o mouse para ver o momento.\n2. Clique para marcar o Início (O final será calculado para {duration_for_signals:.1f}s automaticamente).\n3. Pressione 'y' para confirmar ou 'n' para cancelar.")
         
+        video_path = str(paciente.get("video_path", "")).strip()
+        if video_path and video_path != "nan" and os.path.exists(video_path):
+            patient_output_dir = Path(video_path).resolve().parent
+        else:
+            patient_output_dir = Path(self.dataset_raw_file).resolve().parent / "dataset_raw"
+            patient_output_dir.mkdir(parents=True, exist_ok=True)
+
         self.root.iconify()
         
         resultados = run_extraction_for_patient(
             h5_file=str(h5_file),
             bed=str(paciente.get("Leito", "")).strip(),
             date_str=str(paciente.get("Dia", "")).strip(),
-            duration_seconds=duration_for_signals
+            duration_seconds=duration_for_signals,
+            patient_output_dir=patient_output_dir
         )
         
         self.root.deiconify()
@@ -578,6 +820,14 @@ class SignalExtractorApp:
             self.df.to_csv(self.dataset_raw_file, index=False)
             messagebox.showinfo("Sucesso", "Sinais extraídos e salvos na planilha com sucesso!")
             self.update_treeview()
+            self._select_row_by_idx(idx) # Restaura seleção visual
+
+            visualizar = messagebox.askyesno(
+                "Visualizar sinais salvos",
+                "Deseja abrir as janelas com os sinais ECG, PPG e respiração salvos?"
+            )
+            if visualizar:
+                self.visualize_saved_signals_for_selected()
         except Exception as e:
             messagebox.showerror("Erro ao Salvar", f"Não foi possível salvar o CSV:\n{e}")
 
