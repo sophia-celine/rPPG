@@ -15,7 +15,7 @@ from scipy.signal import resample
 
 @dataclass
 class Config:
-    file_path: str = "../../rppG_data/pilot/ground_truth/10.10.10.129_20251211_16.h5"
+    file_path: str = "../../rPPG_data/pilot/ground_truth/10.10.10.129_20251211_16.h5"
     date: str = '11-12-2025'
     start_time: str = "16:45:38"
     end_time: str = "16:47:38"
@@ -34,6 +34,15 @@ class Config:
     ecg_id: int = 65796
     spo2_id: int = 458768
     resp_id: int = 327688
+    interactive_select_time: bool = True
+    # duration (seconds) to extract after the selected start time
+    duration_seconds: int = 120
+    # optional selected indices (filled after interactive selection)
+    selected_start_index: Optional[int] = None
+    selected_end_index: Optional[int] = None
+    # optional selected timestamps (seconds since epoch)
+    selected_start_ts: Optional[float] = None
+    selected_end_ts: Optional[float] = None
 
     def __post_init__(self):
         self.hora_inicio = self.start_time.replace(':', '-')
@@ -61,6 +70,7 @@ class Config:
             self.n_points = frame_count
         else:
             print(f"Warning: unable to determine frame count for video {video_path}. Using n_points={self.n_points}")
+
 
 
 def estimate_hr_heartpy(segment, fs):
@@ -155,7 +165,105 @@ def process_ecg(config, datas, ids, seqs, seqsts):
     sig = np.concatenate([datas[i] for i in indices])
     time_vector = build_time_vectors(ts, [datas[i] for i in indices], fs)
     dates_np = np.array([datetime.fromtimestamp(ts_value) for ts_value in time_vector])
-    mask = get_window_mask(dates_np, config.start_time, config.end_time)
+    # interactive selection: pick a START point only; END is start + duration_seconds*fs
+    def select_start_point_interactive(dates, signal, time_vector, fs):
+        fig, ax = plt.subplots(figsize=(12, 3))
+        ax.plot(dates, signal, color='tab:blue')
+        ax.set_xlabel('Horário')
+        ax.set_ylabel('Amplitude')
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
+        ax.grid(True)
+        plt.title('Hover to preview. Click to select START. Press y to confirm, n to cancel.')
+        plt.tight_layout()
+
+        dnums = mdates.date2num(dates)
+
+        vline = ax.axvline(dnums[0], color='gray', linewidth=1, linestyle='--')
+        hover_ann = ax.annotate('', xy=(0,0), xytext=(15,15), textcoords='offset points', bbox=dict(boxstyle='round', fc='w'), visible=False)
+        sel_marker, = ax.plot([], [], 'ro', markersize=6, visible=False)
+
+        selected = {'index': None, 'confirmed': False}
+
+        def on_move(event):
+            if event.inaxes != ax or event.xdata is None:
+                return
+            x = event.xdata
+            vline.set_xdata(x)
+            # preview nearest point
+            idx = int(np.argmin(np.abs(dnums - x)))
+            tstr = datetime.fromtimestamp(time_vector[idx]).strftime('%H:%M:%S')
+            hover_ann.set_text(f'{tstr} [{idx}]')
+            hover_ann.xy = (dnums[idx], signal[idx])
+            hover_ann.set_visible(True)
+            fig.canvas.draw_idle()
+
+        def on_click(event):
+            if event.inaxes != ax or event.xdata is None:
+                return
+            x = event.xdata
+            idx = int(np.argmin(np.abs(dnums - x)))
+            selected['index'] = idx
+            sel_marker.set_data(dnums[idx], signal[idx])
+            sel_marker.set_visible(True)
+            fig.canvas.draw_idle()
+            print(f"Picked START index {idx}, time {datetime.fromtimestamp(time_vector[idx]).strftime('%H:%M:%S')}. Press 'y' to confirm, 'n' to cancel.")
+
+        def on_key(event):
+            if selected['index'] is None:
+                return
+            if event.key == 'y':
+                selected['confirmed'] = True
+                plt.close(fig)
+            elif event.key == 'n':
+                selected['index'] = None
+                sel_marker.set_visible(False)
+                fig.canvas.draw_idle()
+
+        cid_move = fig.canvas.mpl_connect('motion_notify_event', on_move)
+        cid_click = fig.canvas.mpl_connect('button_press_event', on_click)
+        cid_key = fig.canvas.mpl_connect('key_press_event', on_key)
+
+        plt.show()
+
+        # disconnect callbacks
+        try:
+            fig.canvas.mpl_disconnect(cid_move)
+            fig.canvas.mpl_disconnect(cid_click)
+            fig.canvas.mpl_disconnect(cid_key)
+        except Exception:
+            pass
+
+        if selected['confirmed'] and selected['index'] is not None:
+            start_idx = selected['index']
+            # compute end index based on duration and fs
+            end_idx = min(start_idx + int(config.duration_seconds * fs), len(signal) - 1)
+            start_time_dt = datetime.fromtimestamp(time_vector[start_idx])
+            end_time_dt = datetime.fromtimestamp(time_vector[end_idx])
+            return start_time_dt.strftime('%H:%M:%S'), end_time_dt.strftime('%H:%M:%S'), start_idx, end_idx
+        return None, None, None, None
+
+    selected_info = (None, None, None, None)
+    if config.interactive_select_time and config.show_plots:
+        s, e, si, ei = select_start_point_interactive(dates_np, sig, time_vector, fs)
+        if s is not None and e is not None:
+            # update config so other signal processors use the same window
+            config.start_time = s
+            config.end_time = e
+            config.hora_inicio = config.start_time.replace(':', '-')
+            config.hora_fim = config.end_time.replace(':', '-')
+            config.selected_start_index = si
+            config.selected_end_index = ei
+            # store epoch timestamps for exact mapping to other signals
+            config.selected_start_ts = time_vector[si]
+            config.selected_end_ts = time_vector[ei]
+            selected_info = (s, e, si, ei)
+            print(f"Selected window: {config.start_time} -> {config.end_time} (indices {si}:{ei})")
+
+    # use exact epoch timestamps if set, otherwise fall back to formatted time window
+    if config.selected_start_ts is not None and config.selected_end_ts is not None:
+        mask = (time_vector >= config.selected_start_ts) & (time_vector <= config.selected_end_ts)
+    else:
+        mask = get_window_mask(dates_np, config.start_time, config.end_time)
 
     if config.save_ecg:
         output_file = config.ecg_dir / f"ecg_signal_{config.date}_{config.bed}_{config.hora_inicio}_{config.hora_fim}.csv"
@@ -175,6 +283,8 @@ def process_ecg(config, datas, ids, seqs, seqsts):
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%H:%M:%S"))
     show_or_close(show_plots=config.show_plots)
 
+    return selected_info
+
 
 def process_spo2(config, datas, ids, seqs, seqsts):
     indices = np.where(ids == config.spo2_id)[0]
@@ -188,7 +298,11 @@ def process_spo2(config, datas, ids, seqs, seqsts):
 
     time_vector = build_time_vectors(ts, [datas[i] for i in indices], fs)
     dates_np = np.array([datetime.fromtimestamp(ts_value) for ts_value in time_vector])
-    mask = get_window_mask(dates_np, config.start_time, config.end_time)
+    # prefer exact timestamp selection from ECG if available
+    if config.selected_start_ts is not None and config.selected_end_ts is not None:
+        mask = (time_vector >= config.selected_start_ts) & (time_vector <= config.selected_end_ts)
+    else:
+        mask = get_window_mask(dates_np, config.start_time, config.end_time)
 
     if config.save_spo2_wave:
         sig_m = sig[mask].astype(float)
@@ -244,7 +358,11 @@ def process_rr(config, datas, ids, seqs, seqsts):
 
     time_vector = build_time_vectors(ts, [datas[i] for i in indices], fs)
     dates_np = np.array([datetime.fromtimestamp(ts_value) for ts_value in time_vector])
-    mask = get_window_mask(dates_np, config.start_time, config.end_time)
+    # use ECG-selected epoch timestamps if present
+    if config.selected_start_ts is not None and config.selected_end_ts is not None:
+        mask = (time_vector >= config.selected_start_ts) & (time_vector <= config.selected_end_ts)
+    else:
+        mask = get_window_mask(dates_np, config.start_time, config.end_time)
 
     sig_m = sig[mask].astype(float)
     np.savetxt(config.rr_dir / f"{config.date}_{config.bed}_{config.hora_inicio}_{config.hora_fim}.txt", sig_m, fmt="%.7e")
@@ -271,7 +389,15 @@ def save_gt_data(config=None):
     if not datas:
         raise ValueError("No data packets were parsed from the HDF5 file.")
 
-    process_ecg(config, datas, ids, seqs, seqsts)
+    # process ECG first; it may update config.start_time/end_time via interactive selection
+    sel = process_ecg(config, datas, ids, seqs, seqsts)
+    # if selection returned, ensure config is updated (process_ecg already does this)
+    if sel and sel[0] is not None:
+        # propagate selection to config (already set inside process_ecg) for clarity
+        config.start_time, config.end_time = sel[0], sel[1]
+        config.hora_inicio = config.start_time.replace(':', '-')
+        config.hora_fim = config.end_time.replace(':', '-')
+
     process_spo2(config, datas, ids, seqs, seqsts)
     if config.save_rr:
         process_rr(config, datas, ids, seqs, seqsts)
