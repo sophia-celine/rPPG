@@ -12,6 +12,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import heartpy as hp
 from scipy.interpolate import interp1d
 from scipy.signal import resample
@@ -444,6 +446,9 @@ class SignalExtractorApp:
 
         btn_load_reference = tk.Button(btn_frame, text="5. Carregar Sinais de Referência", command=self.load_reference_signals_for_selected, bg="#607D8B", fg="white", font=("Arial", 11, "bold"), width=28)
         btn_load_reference.pack(side=tk.LEFT, padx=15)
+
+        btn_analyze_dataset = tk.Button(btn_frame, text="6. Analisar Planilha", command=self.show_dataset_analysis, bg="#795548", fg="white", font=("Arial", 11, "bold"), width=18)
+        btn_analyze_dataset.pack(side=tk.LEFT, padx=15)
         
         btn_refresh = tk.Button(btn_frame, text="Recarregar Planilha", command=self.load_data, font=("Arial", 10))
         btn_refresh.pack(side=tk.RIGHT, padx=20)
@@ -733,6 +738,232 @@ class SignalExtractorApp:
             self.update_treeview()
         except Exception as e:
             messagebox.showerror("Erro de Leitura", f"Erro ao ler o CSV:\n{e}")
+
+    @staticmethod
+    def _format_analysis_value(value):
+        if isinstance(value, (bool, np.bool_)):
+            return "Verdadeiro" if value else "Falso"
+        if isinstance(value, (float, np.floating)) and float(value).is_integer():
+            return str(int(value))
+        return str(value)
+
+    @staticmethod
+    def _analysis_distribution(series):
+        valid = series.dropna()
+        valid = valid[valid.astype(str).str.strip() != ""]
+        if valid.empty:
+            return [], 0, int(series.size)
+
+        counts = valid.value_counts(dropna=False)
+        total = int(valid.size)
+        distribution = [
+            (SignalExtractorApp._format_analysis_value(value), int(count), count / total * 100)
+            for value, count in counts.items()
+        ]
+        return distribution, total, int(series.size - total)
+
+    def show_dataset_analysis(self):
+        if self.df is None:
+            messagebox.showwarning("Análise", "A planilha local ainda não foi carregada.")
+            return
+
+        analysis_columns = [
+            "Distância horizontal da câmera ao rosto (cm)",
+            "Iluminação (lux)",
+            "Luz direta natural",
+            "Luz indireta natural",
+            "Luz direta artificial",
+            "Luz indireta artificial",
+            "Sexo biológico",
+            "Fototipo",
+        ]
+        signal_columns = {
+            "ECG": "ECG",
+            "PPG": "PPG",
+            "Sinal respiratório": "Sinal respiratório",
+        }
+        report_lines = [
+            "ANÁLISE DA PLANILHA LOCAL",
+            f"Arquivo: {self.dataset_raw_file}",
+            f"Registros analisados: {len(self.df)}",
+            "",
+        ]
+
+        figure = Figure(figsize=(16, 12), dpi=100)
+        figure.patch.set_facecolor("#F5F7FA")
+        figure.suptitle("Panorama dos dados da planilha", fontsize=16, fontweight="bold", color="#263238")
+        axes = figure.subplots(3, 4).ravel()
+        for axis in axes:
+            axis.set_facecolor("#F5F7FA")
+        distance_column = analysis_columns[0]
+        distance_values = pd.to_numeric(
+            self.df[distance_column].astype(str).str.replace(",", ".", regex=False),
+            errors="coerce",
+        ).dropna() if distance_column in self.df.columns else pd.Series(dtype=float)
+        distance_axis = axes[0]
+        if distance_values.empty:
+            distance_axis.text(0.5, 0.5, "Sem dados", ha="center", va="center")
+        else:
+            distance_summary = [distance_values.min(), distance_values.mean(), distance_values.max()]
+            distance_axis.bar(["Mínimo", "Média", "Máximo"], distance_summary, color=["#4C78A8", "#59A14F", "#E15759"])
+            distance_axis.set_ylabel("cm")
+            for position, value in enumerate(distance_summary):
+                distance_axis.text(position, value, f"{value:.2f}", ha="center", va="bottom")
+        distance_axis.set_title("Distância da câmera")
+        distance_axis.grid(axis="y", alpha=0.3)
+        report_lines.extend([
+            distance_column.upper(),
+            f"  Válidos: {int(distance_values.size)} | Ausentes: {int(len(self.df) - distance_values.size)}",
+        ])
+        if distance_values.empty:
+            report_lines.append("  Nenhum valor disponível.")
+        else:
+            report_lines.append(f"  Mínimo: {distance_values.min():.2f} cm")
+            report_lines.append(f"  Média: {distance_values.mean():.2f} cm")
+            report_lines.append(f"  Máximo: {distance_values.max():.2f} cm")
+        report_lines.append("")
+
+        for chart_index, column in enumerate(analysis_columns[1:], start=1):
+            report_lines.append(column.upper())
+            if column not in self.df.columns:
+                report_lines.append("  Coluna não encontrada.")
+                report_lines.append("")
+                axes[chart_index].set_title(column)
+                axes[chart_index].text(0.5, 0.5, "Coluna não encontrada", ha="center", va="center")
+                continue
+
+            axis = axes[chart_index]
+            if column == "Iluminação (lux)":
+                illumination_values = pd.to_numeric(
+                    self.df[column].astype(str).str.replace(",", ".", regex=False),
+                    errors="coerce",
+                ).dropna()
+                if illumination_values.empty:
+                    axis.text(0.5, 0.5, "Sem dados", ha="center", va="center")
+                    report_lines.append("  Nenhum valor disponível.")
+                else:
+                    illumination_summary = [
+                        illumination_values.min(),
+                        illumination_values.mean(),
+                        illumination_values.max(),
+                    ]
+                    axis.bar(
+                        ["Mínimo", "Média", "Máximo"],
+                        illumination_summary,
+                        color=["#4C78A8", "#59A14F", "#E15759"],
+                    )
+                    axis.set_ylabel("lux")
+                    axis.grid(axis="y", alpha=0.3)
+                    for position, value in enumerate(illumination_summary):
+                        axis.text(position, value, f"{value:.2f}", ha="center", va="bottom")
+                    report_lines.append(
+                        f"  Válidos: {int(illumination_values.size)} | Ausentes: {int(len(self.df) - illumination_values.size)}"
+                    )
+                    report_lines.append(f"  Mínimo: {illumination_values.min():.2f} lux")
+                    report_lines.append(f"  Média: {illumination_values.mean():.2f} lux")
+                    report_lines.append(f"  Máximo: {illumination_values.max():.2f} lux")
+                axis.set_title("Iluminação")
+                report_lines.append("")
+                continue
+
+            distribution, valid_count, missing_count = self._analysis_distribution(self.df[column])
+            if distribution:
+                labels = [item[0] for item in distribution]
+                percentages = [item[2] for item in distribution]
+                axis.pie(
+                    percentages,
+                    labels=labels,
+                    autopct="%1.1f%%",
+                    startangle=90,
+                    counterclock=False,
+                    wedgeprops={"edgecolor": "white", "linewidth": 1.5},
+                    textprops={"fontsize": 8},
+                )
+            else:
+                axis.text(0.5, 0.5, "Sem dados", ha="center", va="center")
+            axis.set_title(column.replace(" (cm)", "").replace(" (lux)", ""))
+            report_lines.append(f"  Válidos: {valid_count} | Ausentes: {missing_count}")
+            if not distribution:
+                report_lines.append("  Nenhum valor disponível.")
+            else:
+                for value, count, percentage in distribution:
+                    report_lines.append(f"  {value}: {count} ({percentage:.2f}%)")
+            report_lines.append("")
+
+        report_lines.append("CAPTURA DOS SINAIS")
+        for signal_index, (label, column) in enumerate(signal_columns.items(), start=8):
+            if column not in self.df.columns:
+                report_lines.append(f"{label}: coluna não encontrada.")
+                axes[signal_index].set_title(label)
+                axes[signal_index].text(0.5, 0.5, "Coluna não encontrada", ha="center", va="center")
+                continue
+
+            normalized = self.df[column].map(self._normalize_boolean_value)
+            valid = normalized.dropna()
+            total = int(valid.size)
+            missing = int(len(self.df) - total)
+            report_lines.append(f"{label}")
+            if total == 0:
+                report_lines.append("  Nenhum valor booleano disponível.")
+                axes[signal_index].set_title(label)
+                axes[signal_index].text(0.5, 0.5, "Sem dados", ha="center", va="center")
+            else:
+                captured = int((valid == True).sum())
+                not_captured = int((valid == False).sum())
+                axes[signal_index].pie(
+                    [captured, not_captured],
+                    labels=["Capturado", "Não capturado"],
+                    autopct="%1.1f%%",
+                    startangle=90,
+                    counterclock=False,
+                    colors=["#59A14F", "#E15759"],
+                    wedgeprops={"edgecolor": "white", "linewidth": 1.5},
+                    textprops={"fontsize": 8},
+                )
+                axes[signal_index].set_title(label)
+                report_lines.append(f"  Capturado (Verdadeiro): {captured} ({captured / total * 100:.2f}%)")
+                report_lines.append(f"  Não capturado (Falso): {not_captured} ({not_captured / total * 100:.2f}%)")
+                report_lines.append(f"  Ausentes ou inválidos: {missing}")
+        figure.tight_layout(rect=(0, 0, 1, 0.97), h_pad=2.0, w_pad=1.5)
+        self._open_analysis_window("Análise da Planilha", "\n".join(report_lines), figure)
+
+    @staticmethod
+    def _normalize_boolean_value(value):
+        if value is None or pd.isna(value):
+            return pd.NA
+        if isinstance(value, (bool, np.bool_)):
+            return bool(value)
+        normalized = str(value).strip().lower()
+        if normalized in {"true", "verdadeiro", "sim", "1"}:
+            return True
+        if normalized in {"false", "falso", "não", "nao", "0"}:
+            return False
+        return pd.NA
+
+    def _open_analysis_window(self, title, content, figure=None):
+        window = tk.Toplevel(self.root)
+        window.title(title)
+        window.geometry("1200x900")
+        window.columnconfigure(0, weight=1)
+        window.rowconfigure(0, weight=3)
+        window.rowconfigure(1, weight=1)
+
+        if figure is not None:
+            chart_frame = tk.Frame(window)
+            chart_frame.grid(row=0, column=0, columnspan=2, sticky="nsew")
+            chart_frame.columnconfigure(0, weight=1)
+            chart_frame.rowconfigure(0, weight=1)
+            canvas = FigureCanvasTkAgg(figure, master=chart_frame)
+            canvas.draw()
+            canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew")
+
+        text = tk.Text(window, wrap=tk.WORD, font=("Consolas", 10))
+        text.grid(row=1, column=0, sticky="nsew")
+        scrollbar = ttk.Scrollbar(window, orient=tk.VERTICAL, command=text.yview)
+        scrollbar.grid(row=1, column=1, sticky="ns")
+        text.configure(yscrollcommand=scrollbar.set)
+        text.insert("1.0", content)
+        text.configure(state=tk.DISABLED)
 
     def load_reference_signals_for_selected(self):
         selected_item = self.tree.selection()
