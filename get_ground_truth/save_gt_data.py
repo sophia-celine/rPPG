@@ -15,19 +15,19 @@ from scipy.signal import resample
 
 @dataclass
 class Config:
-    file_path: str = r"\\10.8.0.1\uti\Data\20260820\10.10.10.129_20260820_15.h5"
+    file_path: str = r"\\10.8.0.1\uti\Data/20260820/10.10.10.139_20260820_16.h5"
     date: str = '20-08-2026'
-    start_time: str = "15:00:00"
-    end_time: str = "16:00:00"
-    bed: str = "L8"
+    start_time: str = "16:00:00"
+    end_time: str = "16:10:00"
+    bed: str = "L6"
     output_dir: str = "../../rPPG_data/ground_truth"
     video_source_path: str = ""
     n_points: int = 2997
-    save_ecg: bool = False
+    save_ecg: bool = True
     save_spo2_wave: bool = False
     resample_spo2: bool = False
     save3lines: bool = False
-    save_rr: bool = False
+    save_rr: bool = True
     show_plots: bool = True
     data_pack_head: bytes = b"\x02\x0B\x00\x00"
     data_add: int = 36
@@ -347,11 +347,14 @@ def process_spo2(config, datas, ids, seqs, seqsts):
 
 
 def process_rr(config, datas, ids, seqs, seqsts):
+    print('process rr')
     indices = np.where(ids == config.resp_id)[0]
     if len(indices) == 0:
+        print('no sig')
         return
 
     sig = np.concatenate([datas[i] for i in indices])
+    print(sig)
     ts = seqsts[indices]
     fs = len(datas[indices[0]]) / np.median(np.diff(ts))
     print("rr fs:", fs)
@@ -400,6 +403,7 @@ def save_gt_data(config=None):
 
     process_spo2(config, datas, ids, seqs, seqsts)
     if config.save_rr:
+        print('saving rr')
         process_rr(config, datas, ids, seqs, seqsts)
 
 
