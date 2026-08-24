@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox, filedialog, simpledialog
 from dataclasses import dataclass
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 
 import cv2
@@ -18,6 +18,11 @@ from scipy.signal import resample
 
 REMOTE_PARAMS_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQi0TexCrRMbHHODBHKEWmoA8ipixOkFQqgVdHiznKbn19cBa6VignR47r90AweuomdhyQFCBInDE9y/pub?output=csv"
 UTI_DATA_PATH = r"\\10.8.0.1\uti\Data"
+SIGNAL_TIME_OFFSET = timedelta(hours=-5)
+
+
+def signal_timestamp_to_datetime(timestamp):
+    return datetime.fromtimestamp(timestamp) + SIGNAL_TIME_OFFSET
 
 # =============================================================================
 # CONFIGURAÇÕES DA EXTRAÇÃO
@@ -27,10 +32,11 @@ UTI_DATA_PATH = r"\\10.8.0.1\uti\Data"
 class Config:
     file_path: str = ""
     date: str = ""
-    # start_time: str = "16:00:00"
-    # end_time: str = "16:02:00"
+    start_time: str = "00:00:00"
+    end_time: str = "00:00:00"
     bed: str = ""
-    # output_dir: str = "../../rPPG_data/ground_truth"
+    recording_time: str = ""
+    output_dir: str = "../../rPPG_data/ground_truth"
     video_source_path: str = ""
     save_ecg: bool = True
     save_spo2_wave: bool = True
@@ -175,7 +181,17 @@ def process_ecg(config, datas, ids, seqs, seqsts):
     
     sig = np.concatenate([datas[i] for i in indices])
     time_vector = build_time_vectors(ts, [datas[i] for i in indices], fs)
-    dates_np = np.array([datetime.fromtimestamp(ts_value) for ts_value in time_vector])
+    dates_np = np.array([signal_timestamp_to_datetime(ts_value) for ts_value in time_vector])
+    if config.recording_time and config.recording_time.lower() not in {"nan", "none"}:
+        try:
+            recording_date = datetime.strptime(config.date, "%d-%m-%Y").date()
+            recording_dt = datetime.combine(
+                recording_date,
+                datetime.strptime(config.recording_time[:5], "%H:%M").time(),
+            )
+            dates_np = dates_np + (recording_dt - dates_np[0])
+        except (TypeError, ValueError):
+            pass
     
     def select_start_point_interactive(dates, signal, time_vector, fs):
         fig, ax = plt.subplots(figsize=(12, 4))
@@ -199,7 +215,7 @@ def process_ecg(config, datas, ids, seqs, seqsts):
             x = event.xdata
             vline.set_xdata([x, x])
             idx = int(np.argmin(np.abs(dnums - x)))
-            tstr = datetime.fromtimestamp(time_vector[idx]).strftime('%H:%M:%S')
+            tstr = dates[idx].strftime('%H:%M:%S')
             hover_ann.set_text(f'{tstr} [{idx}]')
             hover_ann.xy = (dnums[idx], signal[idx])
             hover_ann.set_visible(True)
@@ -240,8 +256,8 @@ def process_ecg(config, datas, ids, seqs, seqsts):
         if selected['confirmed'] and selected['index'] is not None:
             start_idx = selected['index']
             end_idx = min(start_idx + int(config.duration_seconds * fs), len(signal) - 1)
-            start_time_dt = datetime.fromtimestamp(time_vector[start_idx])
-            end_time_dt = datetime.fromtimestamp(time_vector[end_idx])
+            start_time_dt = dates[start_idx]
+            end_time_dt = dates[end_idx]
             return start_time_dt.strftime('%H:%M:%S'), end_time_dt.strftime('%H:%M:%S'), start_idx, end_idx
         return None, None, None, None
 
@@ -281,7 +297,7 @@ def process_spo2(config, datas, ids, seqs, seqsts):
     fs = len(datas[indices[0]]) / np.median(np.diff(ts))
 
     time_vector = build_time_vectors(ts, [datas[i] for i in indices], fs)
-    dates_np = np.array([datetime.fromtimestamp(ts_value) for ts_value in time_vector])
+    dates_np = np.array([signal_timestamp_to_datetime(ts_value) for ts_value in time_vector])
     
     if config.selected_start_ts is not None and config.selected_end_ts is not None:
         mask = (time_vector >= config.selected_start_ts) & (time_vector <= config.selected_end_ts)
@@ -306,7 +322,7 @@ def process_rr(config, datas, ids, seqs, seqsts):
     fs = len(datas[indices[0]]) / np.median(np.diff(ts))
 
     time_vector = build_time_vectors(ts, [datas[i] for i in indices], fs)
-    dates_np = np.array([datetime.fromtimestamp(ts_value) for ts_value in time_vector])
+    dates_np = np.array([signal_timestamp_to_datetime(ts_value) for ts_value in time_vector])
     
     if config.selected_start_ts is not None and config.selected_end_ts is not None:
         mask = (time_vector >= config.selected_start_ts) & (time_vector <= config.selected_end_ts)
@@ -319,11 +335,12 @@ def process_rr(config, datas, ids, seqs, seqsts):
     
     return str(output_file)
 
-def run_extraction_for_patient(h5_file, bed, date_str, duration_seconds=120.0, patient_output_dir=None):
+def run_extraction_for_patient(h5_file, bed, date_str, duration_seconds=120.0, patient_output_dir=None, recording_time=""):
     output_dir = str(patient_output_dir) if patient_output_dir is not None else "../../rPPG_data/ground_truth"
     config = Config(
         file_path=h5_file,
         bed=bed,
+        recording_time=str(recording_time).strip(),
         date=date_str.replace("/", "-"),
         duration_seconds=duration_seconds,
         output_dir=output_dir
@@ -372,7 +389,7 @@ class SignalExtractorApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Extrator de Sinais - UTI")
-        self.root.geometry("850x500")
+        self.root.geometry("1200x500")
         
         self.dataset_raw_file = r"C:\Users\Sophia\Documents\rPPG_data\ground_truth\dataset_raw.csv"
         self.df = None
@@ -388,20 +405,24 @@ class SignalExtractorApp:
         tk.Label(header_frame, text="Selecione um paciente para Processar Sinais ou Cortar Vídeo", font=("Arial", 14, "bold")).pack()
         
         # Treeview (Tabela)
-        columns = ("index", "id", "leito", "data", "status", "video_status")
+        columns = ("index", "id", "leito", "data", "hora", "status", "reference_status", "video_status")
         self.tree = ttk.Treeview(self.root, columns=columns, show="headings", selectmode="browse")
         self.tree.heading("index", text="Índice")
         self.tree.heading("id", text="ID Paciente")
         self.tree.heading("leito", text="Leito")
         self.tree.heading("data", text="Data")
+        self.tree.heading("hora", text="Hora")
         self.tree.heading("status", text="Status (Sinais)")
+        self.tree.heading("reference_status", text="Sinais de referência carregados")
         self.tree.heading("video_status", text="Vídeo")
         
         self.tree.column("index", width=50, anchor="center")
         self.tree.column("id", width=120, anchor="center")
         self.tree.column("leito", width=80, anchor="center")
         self.tree.column("data", width=100, anchor="center")
+        self.tree.column("hora", width=80, anchor="center")
         self.tree.column("status", width=120, anchor="center")
+        self.tree.column("reference_status", width=220, anchor="center")
         self.tree.column("video_status", width=120, anchor="center")
         
         self.tree.grid(row=1, column=0, sticky="nsew", padx=20)
@@ -430,6 +451,9 @@ class SignalExtractorApp:
 
         btn_sync_remote = tk.Button(btn_frame, text="4. Sincronizar Planilha", command=self.sync_local_dataset_with_remote, bg="#9C27B0", fg="white", font=("Arial", 11, "bold"), width=20)
         btn_sync_remote.pack(side=tk.LEFT, padx=15)
+
+        btn_load_reference = tk.Button(btn_frame, text="5. Carregar Sinais de Referência", command=self.load_reference_signals_for_selected, bg="#607D8B", fg="white", font=("Arial", 11, "bold"), width=28)
+        btn_load_reference.pack(side=tk.LEFT, padx=15)
         
         btn_refresh = tk.Button(btn_frame, text="Recarregar Planilha", command=self.load_data, font=("Arial", 10))
         btn_refresh.pack(side=tk.RIGHT, padx=20)
@@ -449,6 +473,14 @@ class SignalExtractorApp:
             df_norm = df_norm.T.reset_index()
             df_norm.columns = df_norm.iloc[0]
             df_norm = df_norm.iloc[1:].reset_index(drop=True)
+            df_norm.columns = [
+                "" if pd.isna(column) else str(column).strip()
+                for column in df_norm.columns
+            ]
+            df_norm = df_norm.loc[:, [
+                column and not column.lower().startswith("unnamed")
+                for column in df_norm.columns
+            ]]
             print('df norm', df_norm)
             return df_norm
         except Exception:
@@ -495,6 +527,49 @@ class SignalExtractorApp:
             return value
 
         return value
+
+    @staticmethod
+    def _is_filled(value):
+        if value is None or pd.isna(value):
+            return False
+        normalized = str(value).strip().lower()
+        return (
+            normalized not in {"", "nan", "none", "null", "<na>"}
+            and not normalized.startswith("unnamed")
+        )
+
+    @staticmethod
+    def _normalize_patient_id(value):
+        normalized = str(value).strip().lower()
+        if normalized.endswith(".0") and normalized[:-2].isdigit():
+            return normalized[:-2]
+        return normalized
+
+    @staticmethod
+    def _patient_folder_name(value):
+        patient_id = str(value).strip().lower()
+        if "." in patient_id:
+            base_id, index = patient_id.rsplit(".", 1)
+            if base_id and index.isdigit():
+                patient_id = f"{base_id}_{index}"
+        return "".join(char if char.isalnum() or char == "_" else "_" for char in patient_id)
+
+    def _patient_data_dir(self, patient_id):
+        dataset_dir = Path(self.dataset_raw_file).resolve().parent / "dataset_raw"
+        return dataset_dir / self._patient_folder_name(patient_id)
+
+    @staticmethod
+    def _normalize_hour(value):
+        if not SignalExtractorApp._is_filled(value):
+            return ""
+
+        parts = str(value).strip().split(":")
+        if len(parts) >= 2:
+            try:
+                return f"{int(parts[0]):02d}:{int(parts[1]):02d}"
+            except ValueError:
+                pass
+        return str(value).strip().lower()
 
     def _get_bed_ip(self, bed, ip_ids_file):
         bed_norm = str(bed).strip()
@@ -559,6 +634,15 @@ class SignalExtractorApp:
             messagebox.showwarning("Sincronização", "A planilha remota está vazia.")
             return
 
+        if "Id do paciente" not in remote_df.columns:
+            messagebox.showerror("Erro de sincronização", "A planilha remota não possui a coluna 'Id do paciente'.")
+            return
+
+        remote_df = remote_df[remote_df["Id do paciente"].apply(self._is_filled)].copy()
+        if remote_df.empty:
+            messagebox.showwarning("Sincronização", "A planilha remota não possui pacientes com ID preenchido.")
+            return
+
         if not os.path.exists(self.dataset_raw_file):
             base_df = remote_df.copy()
         else:
@@ -573,16 +657,23 @@ class SignalExtractorApp:
             if col not in base_df.columns:
                 base_df[col] = pd.NA
 
+        if "Id do paciente" not in base_df.columns:
+            messagebox.showerror("Erro de sincronização", "A planilha local não possui a coluna 'Id do paciente'.")
+            return
+        base_df = base_df[base_df["Id do paciente"].apply(self._is_filled)].copy()
+        if "Hora" not in base_df.columns:
+            base_df["Hora"] = pd.NA
+
         shared_cols = [c for c in remote_df.columns if c in base_df.columns and c != "h5_file"]
         added_count = 0
         updated_count = 0
 
         for idx, row in remote_df.iterrows():
-            patient_id = str(row.get("Id do paciente", "")).strip()
-            if patient_id in ("", "nan", "None"):
-                continue
-
-            match_mask = base_df["Id do paciente"].astype(str).str.strip() == patient_id
+            patient_id = self._normalize_patient_id(row["Id do paciente"])
+            patient_hour = self._normalize_hour(row.get("Hora", ""))
+            normalized_ids = base_df["Id do paciente"].apply(self._normalize_patient_id)
+            normalized_hours = base_df["Hora"].apply(self._normalize_hour)
+            match_mask = (normalized_ids == patient_id) & (normalized_hours == patient_hour)
             if match_mask.any():
                 target_idx = base_df.index[match_mask][0]
                 patient_updated = False
@@ -653,6 +744,75 @@ class SignalExtractorApp:
         except Exception as e:
             messagebox.showerror("Erro de Leitura", f"Erro ao ler o CSV:\n{e}")
 
+    def load_reference_signals_for_selected(self):
+        selected_item = self.tree.selection()
+        if not selected_item:
+            messagebox.showwarning("Aviso", "Selecione um paciente na lista primeiro.")
+            return
+
+        idx = int(self.tree.item(selected_item[0], "values")[0])
+        paciente = self.df.loc[idx]
+        patient_id = paciente.get("Id do paciente", "")
+        if not self._is_filled(patient_id):
+            messagebox.showwarning("Aviso", "O paciente selecionado não possui ID preenchido.")
+            return
+
+        h5_file = str(paciente.get("h5_file", "")).strip()
+        if not self._is_filled(h5_file) or not os.path.exists(h5_file):
+            h5_file = self._build_h5_path_from_row(paciente.to_dict())
+
+        if not h5_file or not os.path.exists(h5_file):
+            messagebox.showerror("Erro", f"Arquivo H5 do paciente não encontrado:\n{h5_file or 'caminho não calculado'}")
+            return
+
+        try:
+            datas, ids, _, _ = load_hdf5_packets(h5_file, b"\x02\x0B\x00\x00", 36)
+        except Exception as exc:
+            messagebox.showerror("Erro", f"Não foi possível ler o H5:\n{exc}")
+            return
+
+        signal_info = {
+            "sinal_ECG": (Config.ecg_id, "ecg"),
+            "sinal_PPG": (Config.spo2_id, "ppg"),
+            "sinal_resp": (Config.resp_id, "respiration"),
+        }
+        patient_folder = self._patient_folder_name(patient_id)
+        output_dir = self._patient_data_dir(patient_id)
+        output_dir.mkdir(parents=True, exist_ok=True)
+        safe_id = "".join(char if char.isalnum() else "_" for char in patient_folder)
+        saved_paths = {}
+        missing_signals = []
+
+        for column, (signal_id, filename_prefix) in signal_info.items():
+            signal_indices = np.where(ids == signal_id)[0]
+            if len(signal_indices) == 0:
+                missing_signals.append(filename_prefix)
+                continue
+
+            signal = np.concatenate([datas[i] for i in signal_indices])
+            output_file = output_dir / f"{filename_prefix}_referencia_{safe_id}.txt"
+            np.savetxt(output_file, signal, fmt="%.7e")
+            self.df.at[idx, column] = str(output_file)
+            saved_paths[column] = str(output_file)
+
+        self.df.at[idx, "h5_file"] = h5_file
+        if not saved_paths:
+            messagebox.showwarning("Aviso", "Nenhum sinal de referência foi encontrado no H5.")
+            return
+
+        try:
+            self.df.to_csv(self.dataset_raw_file, index=False)
+            self.update_treeview()
+            self._select_row_by_idx(idx)
+        except Exception as exc:
+            messagebox.showerror("Erro ao Salvar", f"Não foi possível atualizar o CSV:\n{exc}")
+            return
+
+        message = f"Sinais de referência salvos em:\n{output_dir}"
+        if missing_signals:
+            message += f"\n\nNão encontrados: {', '.join(missing_signals)}"
+        messagebox.showinfo("Sucesso", message)
+
     def update_treeview(self):
         for item in self.tree.get_children():
             self.tree.delete(item)
@@ -661,6 +821,15 @@ class SignalExtractorApp:
             id_pac = row.get("Id do paciente", "N/A")
             leito = row.get("Leito", "N/A")
             data = row.get("Dia", "N/A")
+            hora = row.get("Hora", "N/A")
+            reference_paths = [row.get(column) for column in ("sinal_ECG", "sinal_PPG", "sinal_resp")]
+            loaded_reference_count = sum(self._is_filled(path) for path in reference_paths)
+            if loaded_reference_count == len(reference_paths):
+                reference_status = "Carregados"
+            elif loaded_reference_count > 0:
+                reference_status = "Parcial"
+            else:
+                reference_status = "Pendente"
             
             # Verifica Sinais
             if pd.notna(row["init_time"]) and str(row["init_time"]).strip() != "":
@@ -673,7 +842,7 @@ class SignalExtractorApp:
             # Verifica Vídeo
             video_status = "Cortado" if pd.notna(row.get("video_path")) and str(row.get("video_path")).strip() != "" else "Sem vídeo"
                 
-            self.tree.insert("", tk.END, values=(idx, id_pac, leito, data, status, video_status), tags=(tag,))
+            self.tree.insert("", tk.END, values=(idx, id_pac, leito, data, hora, status, reference_status, video_status), tags=(tag,))
 
     def _select_row_by_idx(self, target_idx):
         """Função auxiliar para restaurar a seleção do paciente na tabela"""
@@ -685,27 +854,30 @@ class SignalExtractorApp:
                 break
 
     def _build_video_output_path(self, patient_row=None, start_time=None, end_time=None):
-        """Salva o vídeo em .avi diretamente na pasta dataset_raw, sem subpastas."""
+        """Monta o caminho do vídeo cortado usando o horário da planilha."""
         base_dir = Path(self.dataset_raw_file).resolve().parent / "dataset_raw"
         base_dir.mkdir(parents=True, exist_ok=True)
 
         if patient_row is not None:
             date_str = str(patient_row.get("Dia", "")).strip()
             bed_str = str(patient_row.get("Leito", "")).strip()
-            start_time_str = str(patient_row.get("init_time", "") if start_time is None else start_time).strip()
-            end_time_str = str(patient_row.get("end_time", "") if end_time is None else end_time).strip()
+            patient_id = patient_row.get("Id do paciente", "")
+            sheet_hour = str(patient_row.get("Hora", "") if start_time is None else start_time).strip()
 
-            if date_str and bed_str:
-                if not start_time_str:
-                    start_time_str = "00-00-00"
-                if not end_time_str:
-                    end_time_str = "00-00-00"
-
+            if date_str and bed_str and self._is_filled(patient_id):
                 date_str = date_str.replace("/", "-")
                 bed_str = bed_str.replace(" ", "")
-                start_time_str = start_time_str.replace(":", "-")
-                end_time_str = end_time_str.replace(":", "-")
-                return base_dir / f"{date_str}_{bed_str}_{start_time_str}_{end_time_str}.avi"
+                if bed_str.isdigit():
+                    bed_str = f"L{int(bed_str):02d}"
+                elif not bed_str.upper().startswith("L"):
+                    bed_str = f"L{bed_str}"
+
+                hour_str = self._normalize_hour(sheet_hour).replace(":", "-")
+                if not hour_str:
+                    hour_str = "00-00"
+                patient_dir = self._patient_data_dir(patient_id)
+                patient_dir.mkdir(parents=True, exist_ok=True)
+                return patient_dir / f"{bed_str}-{date_str}-{hour_str}.avi"
 
             return base_dir / "video_cropped.avi"
 
@@ -781,8 +953,7 @@ class SignalExtractorApp:
 
                 output_path = self._build_video_output_path(
                     patient_row=patient_row,
-                    start_time=(patient_row.get("init_time") if patient_row is not None else None),
-                    end_time=(patient_row.get("end_time") if patient_row is not None else None),
+                    start_time=(patient_row.get("Hora") if patient_row is not None else None),
                 )
                 try:
                     output_path = write_cut_video(input_path, start_frame, str(output_path), codec='I420')
@@ -879,7 +1050,23 @@ class SignalExtractorApp:
             except Exception:
                 return None
 
-    def _load_full_signal_by_id(self, h5_file, signal_id, date_str, start_time, end_time):
+    def _build_saved_interval_mask(self, dates_np, date_str, local_init_time, local_end_time):
+        try:
+            signal_date = datetime.strptime(date_str, "%d/%m/%Y").date()
+            start_dt = datetime.combine(
+                signal_date,
+                datetime.strptime(local_init_time, "%H:%M:%S").time(),
+            )
+            end_dt = datetime.combine(
+                signal_date,
+                datetime.strptime(local_end_time, "%H:%M:%S").time(),
+            )
+        except (TypeError, ValueError):
+            return np.zeros(len(dates_np), dtype=bool)
+
+        return (dates_np >= start_dt) & (dates_np <= end_dt)
+
+    def _load_full_signal_by_id(self, h5_file, signal_id, date_str, local_init_time, local_end_time, recording_time=None):
         try:
             datas, ids, seqs, seqsts = load_hdf5_packets(h5_file, b"\x02\x0B\x00\x00", 36)
         except Exception:
@@ -893,12 +1080,25 @@ class SignalExtractorApp:
         ts = seqsts[signal_indices]
         fs = len(datas[signal_indices[0]]) / np.median(np.diff(ts))
         time_vector = build_time_vectors(ts, [datas[i] for i in signal_indices], fs)
-        dates_np = np.array([datetime.fromtimestamp(ts_value) for ts_value in time_vector])
+        dates_np = np.array([signal_timestamp_to_datetime(ts_value) for ts_value in time_vector])
 
-        start_dt = datetime.combine(datetime.strptime(date_str, "%d/%m/%Y").date(), datetime.strptime(start_time, "%H:%M:%S").time())
-        end_dt = datetime.combine(datetime.strptime(date_str, "%d/%m/%Y").date(), datetime.strptime(end_time, "%H:%M:%S").time())
+        try:
+            signal_date = datetime.strptime(date_str, "%d/%m/%Y").date()
+            if self._is_filled(recording_time):
+                recording_dt = datetime.combine(
+                    signal_date,
+                    datetime.strptime(self._normalize_hour(recording_time), "%H:%M").time(),
+                )
+                dates_np = dates_np + (recording_dt - dates_np[0])
+        except (TypeError, ValueError):
+            return dates_np, sig, np.zeros(len(dates_np), dtype=bool), time_vector
 
-        mask = (dates_np >= start_dt) & (dates_np <= end_dt)
+        mask = self._build_saved_interval_mask(
+            dates_np,
+            date_str,
+            local_init_time,
+            local_end_time,
+        )
 
         return dates_np, sig, mask, time_vector
 
@@ -913,6 +1113,7 @@ class SignalExtractorApp:
 
         h5_file = paciente.get("h5_file", "")
         date_str = str(paciente.get("Dia", "")).strip()
+        recording_time = str(paciente.get("Hora", "")).strip()
         init_time = str(paciente.get("init_time", "")).strip()
         end_time = str(paciente.get("end_time", "")).strip()
 
@@ -920,7 +1121,7 @@ class SignalExtractorApp:
             messagebox.showwarning("Aviso", "Arquivo H5 do paciente não encontrado para visualizar os sinais.")
             return
 
-        if not init_time or not end_time:
+        if not self._is_filled(date_str) or not self._is_filled(init_time) or not self._is_filled(end_time):
             messagebox.showwarning("Aviso", "O paciente ainda não possui intervalo de sinal selecionado.")
             return
 
@@ -941,6 +1142,7 @@ class SignalExtractorApp:
                 date_str,
                 init_time,
                 end_time,
+                recording_time,
             )
             if dates_np is None or sig is None:
                 continue
@@ -966,7 +1168,7 @@ class SignalExtractorApp:
             
         item_values = self.tree.item(selected_item[0], "values")
         idx = int(item_values[0])
-        status = item_values[4]
+        status = item_values[5]
         
         # Adicionei a variável "skip_overwrite_warning" para evitar perguntar duas vezes no caso de sincronia
         if status == "Preenchido" and not skip_overwrite_warning:
@@ -995,7 +1197,7 @@ class SignalExtractorApp:
         if video_path and video_path != "nan" and os.path.exists(video_path):
             patient_output_dir = Path(video_path).resolve().parent
         else:
-            patient_output_dir = Path(self.dataset_raw_file).resolve().parent / "dataset_raw"
+            patient_output_dir = self._patient_data_dir(paciente.get("Id do paciente", ""))
             patient_output_dir.mkdir(parents=True, exist_ok=True)
 
         self.root.iconify()
@@ -1004,6 +1206,7 @@ class SignalExtractorApp:
             h5_file=str(h5_file),
             bed=str(paciente.get("Leito", "")).strip(),
             date_str=str(paciente.get("Dia", "")).strip(),
+            recording_time=str(paciente.get("Hora", "")).strip(),
             duration_seconds=duration_for_signals,
             patient_output_dir=patient_output_dir
         )
