@@ -181,17 +181,7 @@ def process_ecg(config, datas, ids, seqs, seqsts):
     
     sig = np.concatenate([datas[i] for i in indices])
     time_vector = build_time_vectors(ts, [datas[i] for i in indices], fs)
-    dates_np = np.array([signal_timestamp_to_datetime(ts_value) for ts_value in time_vector])
-    if config.recording_time and config.recording_time.lower() not in {"nan", "none"}:
-        try:
-            recording_date = datetime.strptime(config.date, "%d-%m-%Y").date()
-            recording_dt = datetime.combine(
-                recording_date,
-                datetime.strptime(config.recording_time[:5], "%H:%M").time(),
-            )
-            dates_np = dates_np + (recording_dt - dates_np[0])
-        except (TypeError, ValueError):
-            pass
+    dates_np = np.array([datetime.fromtimestamp(ts_value) for ts_value in time_vector])
     
     def select_start_point_interactive(dates, signal, time_vector, fs):
         fig, ax = plt.subplots(figsize=(12, 4))
@@ -1066,7 +1056,7 @@ class SignalExtractorApp:
 
         return (dates_np >= start_dt) & (dates_np <= end_dt)
 
-    def _load_full_signal_by_id(self, h5_file, signal_id, date_str, local_init_time, local_end_time, recording_time=None):
+    def _load_full_signal_by_id(self, h5_file, signal_id, date_str, local_init_time, local_end_time):
         try:
             datas, ids, seqs, seqsts = load_hdf5_packets(h5_file, b"\x02\x0B\x00\x00", 36)
         except Exception:
@@ -1080,18 +1070,7 @@ class SignalExtractorApp:
         ts = seqsts[signal_indices]
         fs = len(datas[signal_indices[0]]) / np.median(np.diff(ts))
         time_vector = build_time_vectors(ts, [datas[i] for i in signal_indices], fs)
-        dates_np = np.array([signal_timestamp_to_datetime(ts_value) for ts_value in time_vector])
-
-        try:
-            signal_date = datetime.strptime(date_str, "%d/%m/%Y").date()
-            if self._is_filled(recording_time):
-                recording_dt = datetime.combine(
-                    signal_date,
-                    datetime.strptime(self._normalize_hour(recording_time), "%H:%M").time(),
-                )
-                dates_np = dates_np + (recording_dt - dates_np[0])
-        except (TypeError, ValueError):
-            return dates_np, sig, np.zeros(len(dates_np), dtype=bool), time_vector
+        dates_np = np.array([datetime.fromtimestamp(ts_value) for ts_value in time_vector])
 
         mask = self._build_saved_interval_mask(
             dates_np,
@@ -1113,7 +1092,6 @@ class SignalExtractorApp:
 
         h5_file = paciente.get("h5_file", "")
         date_str = str(paciente.get("Dia", "")).strip()
-        recording_time = str(paciente.get("Hora", "")).strip()
         init_time = str(paciente.get("init_time", "")).strip()
         end_time = str(paciente.get("end_time", "")).strip()
 
@@ -1142,7 +1120,6 @@ class SignalExtractorApp:
                 date_str,
                 init_time,
                 end_time,
-                recording_time,
             )
             if dates_np is None or sig is None:
                 continue

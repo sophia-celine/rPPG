@@ -15,26 +15,26 @@ from scipy.signal import resample
 
 @dataclass
 class Config:
-    file_path: str = "../../rPPG_data/pilot/ground_truth/10.10.10.129_20251211_16.h5"
-    date: str = '11-12-2025'
-    start_time: str = "16:45:38"
-    end_time: str = "16:47:38"
+    file_path: str = r"\\10.8.0.1\uti\Data\20260820\10.10.10.129_20260820_15.h5"
+    date: str = '20-08-2026'
+    start_time: str = "15:00:00"
+    end_time: str = "16:00:00"
     bed: str = "L8"
     output_dir: str = "../../rPPG_data/ground_truth"
     video_source_path: str = ""
     n_points: int = 2997
-    save_ecg: bool = True
-    save_spo2_wave: bool = True
+    save_ecg: bool = False
+    save_spo2_wave: bool = False
     resample_spo2: bool = False
     save3lines: bool = False
-    save_rr: bool = True
+    save_rr: bool = False
     show_plots: bool = True
     data_pack_head: bytes = b"\x02\x0B\x00\x00"
     data_add: int = 36
     ecg_id: int = 65796
     spo2_id: int = 458768
     resp_id: int = 327688
-    interactive_select_time: bool = True
+    interactive_select_time: bool = False
     # duration (seconds) to extract after the selected start time
     duration_seconds: int = 120
     # optional selected indices (filled after interactive selection)
