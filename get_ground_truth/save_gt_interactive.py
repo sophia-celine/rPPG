@@ -297,7 +297,7 @@ def process_ecg(config, datas, ids, seqsts):
         )
         np.savetxt(output_file, sig[mask], delimiter=",", fmt="%d")
 
-    return selected_info, str(output_file)
+    return selected_info, output_file.name if output_file else ""
 
 def process_spo2(config, datas, ids, seqsts):
     indices = np.where(ids == config.spo2_id)[0]
@@ -324,7 +324,7 @@ def process_spo2(config, datas, ids, seqsts):
         )
         np.savetxt(output_file, sig_m, fmt="%.7e")
     
-    return str(output_file)
+    return output_file.name if output_file else ""
 
 def process_rr(config, datas, ids, seqsts):
     indices = np.where(ids == config.resp_id)[0]
@@ -349,7 +349,7 @@ def process_rr(config, datas, ids, seqsts):
     )
     np.savetxt(output_file, sig_m, fmt="%.7e")
     
-    return str(output_file)
+    return output_file.name if output_file else ""
 
 def run_extraction_for_patient(h5_file, bed, date_str, duration_seconds=120.0, patient_output_dir=None):
     output_dir = str(patient_output_dir) if patient_output_dir is not None else str(Path(APP_SETTINGS.patient_data_root))
@@ -655,7 +655,37 @@ class SignalExtractorApp:
         except Exception:
             return ""
 
-        return f"{APP_SETTINGS.uti_data_path}/{day_folder}/{bed_ip}_{day_folder}_{time}.h5"
+        return f"{bed_ip}_{day_folder}_{time}.h5"
+
+    def _get_absolute_path(self, row, column_name):
+        """Constrói o caminho completo baseado no nome salvo na planilha e nas globais."""
+        filename = str(row.get(column_name, "")).strip()
+        
+        # Verifica se está vazio
+        if not self._is_filled(filename) or filename == "nan":
+            return ""
+            
+        # Retrocompatibilidade: Se já for um caminho absoluto legado, mantém
+        if os.path.isabs(filename):
+            return filename
+
+        # Para arquivos h5 (UTI Data)
+        if column_name == "h5_file":
+            date = str(row.get("Dia", "")).strip()
+            if not date: return ""
+            date_parts = [p.strip() for p in date.replace("-", "/").split("/")]
+            if len(date_parts) == 3:
+                day, month, year = date_parts
+                day_folder = f"{year}{month}{day}"
+                return f"{APP_SETTINGS.uti_data_path}/{day_folder}/{filename}"
+            return ""
+            
+        # Para sinais e vídeos (Patient Data)
+        else:
+            patient_id = row.get("Id do paciente", "")
+            if self._is_filled(patient_id):
+                return str(self._patient_data_dir(patient_id) / filename)
+            return ""
 
     def sync_local_dataset_with_remote(self):
         try:
@@ -728,7 +758,8 @@ class SignalExtractorApp:
 
                 if "h5_file" not in base_df.columns:
                     base_df["h5_file"] = pd.NA
-                existing_h5 = str(base_df.at[target_idx, "h5_file"]).strip() if pd.notna(base_df.at[target_idx, "h5_file"]) else ""
+                existing_h5_name = str(base_df.at[target_idx, "h5_file"]).strip() if pd.notna(base_df.at[target_idx, "h5_file"]) else ""
+                existing_h5 = self._get_absolute_path(base_df.loc[target_idx], "h5_file") if existing_h5_name else ""       
                 if not existing_h5 or not os.path.exists(existing_h5):
                     built_h5 = self._build_h5_path_from_row(base_df.loc[target_idx].to_dict())
                     if built_h5:
@@ -1032,7 +1063,7 @@ class SignalExtractorApp:
             messagebox.showwarning("Aviso", "O paciente selecionado não possui ID preenchido.")
             return
 
-        h5_file = str(paciente.get("h5_file", "")).strip()
+        h5_file = self._get_absolute_path(paciente, "h5_file")
         if not self._is_filled(h5_file) or not os.path.exists(h5_file):
             h5_file = self._build_h5_path_from_row(paciente.to_dict())
 
@@ -1070,7 +1101,7 @@ class SignalExtractorApp:
                 patient_id=safe_id,
             )
             np.savetxt(output_file, signal, fmt="%.7e")
-            self.df.at[idx, column] = str(output_file)
+            self.df.at[idx, column] = output_file.name
             saved_paths[column] = str(output_file)
 
         self.df.at[idx, "h5_file"] = h5_file
@@ -1245,7 +1276,7 @@ class SignalExtractorApp:
                     )
                     cap.release()
                     cv2.destroyAllWindows()
-                    return output_path, duration_seconds
+                    return Path(output_path).name, duration_seconds
                 except Exception as exc:
                     messagebox.showerror("Erro", f"Não foi possível cortar o vídeo:\n{exc}")
                     cap.release()
@@ -1272,7 +1303,7 @@ class SignalExtractorApp:
         paciente = self.df.loc[idx]
         
         # Verifica se já existe vídeo salvo no df
-        video_existente = str(paciente.get("video_path", ""))
+        video_existente = self._get_absolute_path(paciente, "video_path")
         
         if video_existente and video_existente != "nan" and os.path.exists(video_existente):
             sobrescrever = messagebox.askyesno("Vídeo já existente", f"Já existe um vídeo cortado para este paciente:\n{video_existente}\n\nDeseja sobrescrever com um novo corte?")
@@ -1381,7 +1412,7 @@ class SignalExtractorApp:
         idx = int(self.tree.item(selected_item[0], "values")[0])
         paciente = self.df.loc[idx]
 
-        h5_file = paciente.get("h5_file", "")
+        h5_file = self._get_absolute_path(paciente, "h5_file")
         date_str = str(paciente.get("Dia", "")).strip()
         init_time = str(paciente.get("init_time", "")).strip()
         end_time = str(paciente.get("end_time", "")).strip()
@@ -1445,8 +1476,8 @@ class SignalExtractorApp:
                 return
                 
         paciente = self.df.loc[idx]
-        previous_signal_paths = [paciente.get(column, "") for column in ("sinal_ECG", "sinal_PPG", "sinal_resp")]
-        h5_file = paciente.get("h5_file", "")
+        previous_signal_paths = [self._get_absolute_path(paciente, column) for column in ("sinal_ECG", "sinal_PPG", "sinal_resp")]
+        h5_file = self._get_absolute_path(paciente, "h5_file")
         
         if not h5_file or pd.isna(h5_file) or not os.path.exists(str(h5_file)):
             messagebox.showerror("Erro", f"Arquivo H5 não encontrado:\n{h5_file}")
@@ -1487,9 +1518,12 @@ class SignalExtractorApp:
         self.df.at[idx, "sinal_ECG"] = resultados["sinal_ECG"]
         self.df.at[idx, "sinal_PPG"] = resultados["sinal_PPG"]
         self.df.at[idx, "sinal_resp"] = resultados["sinal_resp"]
+        current_absolute_paths = [
+            str(patient_output_dir / res) for res in [resultados["sinal_ECG"], resultados["sinal_PPG"], resultados["sinal_resp"]] if res
+        ]
         self._delete_previous_processed_signals(
             previous_signal_paths,
-            [resultados["sinal_ECG"], resultados["sinal_PPG"], resultados["sinal_resp"]],
+            current_absolute_paths,
         )
         
         try:
