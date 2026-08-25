@@ -4,6 +4,7 @@ from tkinter import ttk, messagebox, filedialog
 from dataclasses import dataclass, field
 from pathlib import Path
 from datetime import datetime, timedelta
+import platform
 
 import cv2
 import h5py
@@ -21,9 +22,18 @@ SIGNAL_TIME_OFFSET = timedelta(hours=-5)
 @dataclass(frozen=True)
 class AppSettings:
     remote_params_url: str = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQi0TexCrRMbHHODBHKEWmoA8ipixOkFQqgVdHiznKbn19cBa6VignR47r90AweuomdhyQFCBInDE9y/pub?output=csv"
-    uti_data_path: str = r"\\10.8.0.1\uti\Data"
-    dataset_raw_file: str = r"C:\Users\Sophia\Documents\rPPG_data\ground_truth\dataset_raw.csv"
-    patient_data_root: str = r"A:\dataset_raw"
+
+
+    if platform.system() == "Windows":
+        uti_data_path = Path(r"\\10.8.0.1\uti\Data")
+        dataset_raw_file = Path.home() / "Documents" / "rPPG_data" / "ground_truth" / "dataset_raw.csv"
+        patient_data_root = Path(r"A:\dataset_raw")
+
+    else:
+        uti_data_path = "/mnt/10.8.0.1/uti/Data"
+        dataset_raw_file = Path.home() / "rppg" / "rPPG_data" / "ground_truth" / "dataset_raw.csv"
+        patient_data_root = Path.home() / "ssd" / "dataset_raw"
+
     default_video_filename: str = "video_cropped.avi"
     signal_filename_templates: dict[str, str] = field(default_factory=lambda: {
         "ecg": "ecg_{date}_{bed}_{start}_{end}.csv",
@@ -1377,6 +1387,7 @@ class SignalExtractorApp:
         end_time = str(paciente.get("end_time", "")).strip()
 
         if not h5_file or str(h5_file) == "nan" or not os.path.exists(str(h5_file)):
+            print(h5_file)
             messagebox.showwarning("Aviso", "Arquivo H5 do paciente não encontrado para visualizar os sinais.")
             return
 
