@@ -12,8 +12,9 @@ from mediapipe.tasks.python import vision
 # CONFIGURAÇÕES
 # ============================================================
 
-INPUT_VIDEO = r"C:\Users\Sophia\Pictures\Camera Roll\WIN_20260826_19_21_02_Pro.mp4"
-OUTPUT_VIDEO = "output_bg_normal.mp4"
+# INPUT_VIDEO = r"C:\Users\Sophia\Pictures\Camera Roll\WIN_20260826_19_21_02_Pro.mp4"
+INPUT_VIDEO = r"A:\UTI-20-08-2026\L06-20-08-2026-15-54.avi"
+OUTPUT_VIDEO = "output_bg_normal.avi"
 
 MODEL_PATH = "face_landmarker.task"
 
@@ -104,6 +105,8 @@ def create_black_mask(face_landmarks, width, height):
 
         163,
         7,
+        35,
+        228,
 
         # ----------------------------------------------------
         # Sobrancelha esquerda
@@ -113,7 +116,8 @@ def create_black_mask(face_landmarks, width, height):
         53,
         52,
         65,
-        55
+        55,
+        70, 63, 105, 66, 107, 24
     ]
 
     # ========================================================
@@ -141,6 +145,9 @@ def create_black_mask(face_landmarks, width, height):
 
         390,
         249,
+        383,
+        449,
+        464,
 
         # ----------------------------------------------------
         # Sobrancelha direita
@@ -150,7 +157,10 @@ def create_black_mask(face_landmarks, width, height):
         283,
         282,
         295,
-        285
+        285,
+        336,
+        296,
+        334
     ]
 
     # ========================================================
@@ -310,8 +320,8 @@ def main():
     # --------------------------------------------------------
 
     fourcc = cv2.VideoWriter_fourcc(
-        # *"XVID"
-        *"mp4v"
+        *"XVID"
+        # *"mp4v"
     )
 
     writer = cv2.VideoWriter(

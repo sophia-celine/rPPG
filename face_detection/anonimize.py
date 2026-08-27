@@ -12,8 +12,8 @@ from mediapipe.tasks.python import vision
 # CONFIGURAÇÕES
 # ============================================================
 
-INPUT_VIDEO = r"C:\Users\Sophia\Pictures\Camera Roll\WIN_20260826_19_21_02_Pro.mp4"
-OUTPUT_VIDEO = "output_face_only.mp4"
+INPUT_VIDEO = r"A:\UTI-20-08-2026\L06-20-08-2026-15-54.avi"
+OUTPUT_VIDEO = "output_face_only.avi"
 
 MODEL_PATH = "face_landmarker.task"
 
@@ -260,8 +260,8 @@ def main():
     # --------------------------------------------------------
 
     fourcc = cv2.VideoWriter_fourcc(
-        # *"XVID"
-        *"mp4v"
+        *"XVID"
+        # *"mp4v"
     )
 
     writer = cv2.VideoWriter(
