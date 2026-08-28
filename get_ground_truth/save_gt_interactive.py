@@ -499,7 +499,6 @@ class SignalExtractorApp:
                 column and not column.lower().startswith("unnamed")
                 for column in df_norm.columns
             ]]
-            print('df norm', df_norm)
             return df_norm
         except Exception:
             return df_norm
@@ -655,7 +654,7 @@ class SignalExtractorApp:
         except Exception:
             return ""
 
-        return f"{bed_ip}_{day_folder}_{time}.h5"
+        return f"{APP_SETTINGS.uti_data_path}/{day_folder}/{bed_ip}_{day_folder}_{time}.h5"
 
     def _get_absolute_path(self, row, column_name):
         """Constrói o caminho completo baseado no nome salvo na planilha e nas globais."""
@@ -1418,7 +1417,6 @@ class SignalExtractorApp:
         end_time = str(paciente.get("end_time", "")).strip()
 
         if not h5_file or str(h5_file) == "nan" or not os.path.exists(str(h5_file)):
-            print(h5_file)
             messagebox.showwarning("Aviso", "Arquivo H5 do paciente não encontrado para visualizar os sinais.")
             return
 
