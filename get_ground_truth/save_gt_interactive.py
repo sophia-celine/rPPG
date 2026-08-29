@@ -351,7 +351,7 @@ def process_rr(config, datas, ids, seqsts):
     
     return output_file.name if output_file else ""
 
-def run_extraction_for_patient(h5_file, bed, date_str, duration_seconds=120.0, patient_output_dir=None):
+def run_extraction_for_patient(h5_file, bed, date_str, duration_seconds=120.0, patient_output_dir=None, patient_time=None):
     output_dir = str(patient_output_dir) if patient_output_dir is not None else str(Path(APP_SETTINGS.patient_data_root))
     config = Config(
         file_path=h5_file,
@@ -365,18 +365,67 @@ def run_extraction_for_patient(h5_file, bed, date_str, duration_seconds=120.0, p
     config.ecg_dir = config.output_path
     config.spo2_dir = config.output_path
     config.rr_dir = config.output_path
-    
-    try:
-        datas, ids, _, seqsts = load_hdf5_packets(
-            config.file_path,
-            config.data_pack_head,
-            config.data_add,
-        )
-    except Exception as e:
-        return {"error": f"Erro ao ler H5: {e}"}
 
-    if not datas:
+    h5_files = [h5_file]
+    print('patient time', patient_time)
+    if patient_time is not None:
+        try:
+            time_parts = [part.strip() for part in str(patient_time).split(":")]
+            print(time_parts)
+            if len(time_parts) >= 2:
+                hour = int(time_parts[0])
+                minute = int(time_parts[1])
+                print(f"{0 <= minute <= 59 and 60 - minute <= 3}")
+                if 0 <= minute <= 59 and 60 - minute <= 3:
+                    print("Adding next hour H5 file for extraction...")
+                    date_parts = [p.strip() for p in str(date_str).replace("-", "/").split("/")]
+                    print(date_parts)
+                    if len(date_parts) == 3:
+                        day, month, year = date_parts
+                        day_folder = f"{year}{month}{day}"
+                        file_stem = Path(h5_file).stem
+                        if f"_{day_folder}_" in file_stem:
+                            bed_ip = file_stem.rsplit(f"_{day_folder}_", 1)[0]
+                        elif f"{day_folder}" in file_stem:
+                            bed_ip = file_stem.rsplit(f"{day_folder}", 1)[0]
+                        else:
+                            bed_ip = file_stem.rsplit("_", 1)[0]
+                        next_h5_file = f"{APP_SETTINGS.uti_data_path}/{day_folder}/{bed_ip}_{day_folder}_{hour + 1}.h5"
+                        print(next_h5_file)
+                        if os.path.exists(next_h5_file):
+                            h5_files.append(next_h5_file)
+        except Exception:
+            pass
+
+    combined_datas = []
+    combined_ids = []
+    combined_seqsts = []
+
+    for current_h5 in h5_files:
+        try:
+            datas, ids, _, seqsts = load_hdf5_packets(
+                current_h5,
+                config.data_pack_head,
+                config.data_add,
+            )
+        except Exception as e:
+            if current_h5 == h5_file:
+                return {"error": f"Erro ao ler H5: {e}"}
+            continue
+
+        if not datas:
+            continue
+
+        combined_datas.extend(datas)
+        combined_ids.extend(ids.tolist())
+        combined_seqsts.extend(seqsts.tolist())
+
+    if not combined_datas:
         return {"error": "Nenhum pacote de dados encontrado no H5."}
+
+    datas = combined_datas
+    ids = np.asarray(combined_ids)
+    seqsts = np.asarray(combined_seqsts)
 
     sel, ecg_path = process_ecg(config, datas, ids, seqsts)
     if not sel or sel[0] is None:
@@ -1070,11 +1119,22 @@ class SignalExtractorApp:
             messagebox.showerror("Erro", f"Arquivo H5 do paciente não encontrado:\n{h5_file or 'caminho não calculado'}")
             return
 
+        h5_files = [h5_file]
+        time_value = str(paciente.get("Hora", "")).strip()
         try:
-            datas, ids, _, _ = load_hdf5_packets(h5_file, b"\x02\x0B\x00\x00", 36)
-        except Exception as exc:
-            messagebox.showerror("Erro", f"Não foi possível ler o H5:\n{exc}")
-            return
+            time_parts = [part.strip() for part in time_value.split(":")]
+            if len(time_parts) >= 2:
+                hour = int(time_parts[0])
+                minute = int(time_parts[1])
+                minutes_to_next_hour = 60 - minute
+                if 0 <= minute <= 59 and 0 < minutes_to_next_hour <= 3:
+                    next_row = paciente.to_dict()
+                    next_row["Hora"] = f"{hour + 1}:00"
+                    next_h5_file = self._build_h5_path_from_row(next_row)
+                    if next_h5_file and os.path.exists(next_h5_file):
+                        h5_files.append(next_h5_file)
+        except Exception:
+            pass
 
         signal_info = {
             "sinal_ECG": (Config.ecg_id, "ecg"),
@@ -1087,14 +1147,29 @@ class SignalExtractorApp:
         safe_id = "".join(char if char.isalnum() else "_" for char in patient_folder)
         saved_paths = {}
         missing_signals = []
+        aggregated_signals = {column: [] for column in signal_info}
+
+        for current_h5_file in h5_files:
+            try:
+                datas, ids, _, _ = load_hdf5_packets(current_h5_file, b"\x02\x0B\x00\x00", 36)
+            except Exception as exc:
+                if current_h5_file == h5_file:
+                    messagebox.showerror("Erro", f"Não foi possível ler o H5:\n{exc}")
+                    return
+                continue
+
+            for column, (signal_id, _) in signal_info.items():
+                signal_indices = np.where(ids == signal_id)[0]
+                if len(signal_indices) == 0:
+                    continue
+                aggregated_signals[column].append(np.concatenate([datas[i] for i in signal_indices]))
 
         for column, (signal_id, filename_prefix) in signal_info.items():
-            signal_indices = np.where(ids == signal_id)[0]
-            if len(signal_indices) == 0:
+            if not aggregated_signals[column]:
                 missing_signals.append(filename_prefix)
                 continue
 
-            signal = np.concatenate([datas[i] for i in signal_indices])
+            signal = np.concatenate(aggregated_signals[column])
             output_file = output_dir / APP_SETTINGS.reference_filename_template.format(
                 signal=filename_prefix,
                 patient_id=safe_id,
@@ -1103,7 +1178,7 @@ class SignalExtractorApp:
             self.df.at[idx, column] = output_file.name
             saved_paths[column] = str(output_file)
 
-        self.df.at[idx, "h5_file"] = h5_file
+        self.df.at[idx, "h5_file"] = h5_file.split('/')[-1]
         if not saved_paths:
             messagebox.showwarning("Aviso", "Nenhum sinal de referência foi encontrado no H5.")
             return
@@ -1377,9 +1452,59 @@ class SignalExtractorApp:
 
         return (dates_np >= start_dt) & (dates_np <= end_dt)
 
-    def _load_full_signal_by_id(self, h5_file, signal_id, date_str, local_init_time, local_end_time):
+    def _load_full_signal_by_id(self, paciente, h5_file, signal_id, date_str, local_init_time, local_end_time):
         try:
-            datas, ids, _, seqsts = load_hdf5_packets(h5_file, b"\x02\x0B\x00\x00", 36)
+            # datas, ids, _, seqsts = load_hdf5_packets(h5_file, b"\x02\x0B\x00\x00", 36)
+            h5_files = [h5_file]
+            time_value = str(paciente.get("Hora", "")).strip()
+            time_parts = [part.strip() for part in time_value.split(":")]
+            if len(time_parts) >= 2:
+                hour = int(time_parts[0])
+                minute = int(time_parts[1])
+                minutes_to_next_hour = 60 - minute
+                if 0 <= minute <= 59 and 0 < minutes_to_next_hour <= 3:
+                    next_row = paciente.to_dict()
+                    next_row["Hora"] = f"{hour + 1}:00"
+                    next_h5_file = self._build_h5_path_from_row(next_row)
+                    if next_h5_file and os.path.exists(next_h5_file):
+                        h5_files.append(next_h5_file)
+
+            signal_info = {
+                "sinal_ECG": (Config.ecg_id, "ecg"),
+                "sinal_PPG": (Config.spo2_id, "ppg"),
+                "sinal_resp": (Config.resp_id, "respiration"),
+            }
+
+            aggregated_signals = {column: [] for column in signal_info}
+            combined_datas = []
+            combined_ids = []
+            combined_seqsts = []
+
+            for current_h5 in h5_files:
+                try:
+                    datas, ids, _, seqsts = load_hdf5_packets(
+                        current_h5,
+                        b"\x02\x0B\x00\x00", 
+                        36
+                    )
+                except Exception as e:
+                    if current_h5 == h5_file:
+                        return {"error": f"Erro ao ler H5: {e}"}
+                    continue
+
+                if not datas:
+                    continue
+
+                combined_datas.extend(datas)
+                combined_ids.extend(ids.tolist())
+                combined_seqsts.extend(seqsts.tolist())
+
+            if not combined_datas:
+                return {"error": "Nenhum pacote de dados encontrado no H5."}
+
+            datas = combined_datas
+            ids = np.asarray(combined_ids)
+            seqsts = np.asarray(combined_seqsts)
         except Exception:
             return None, None, None, None
 
@@ -1436,6 +1561,7 @@ class SignalExtractorApp:
 
         for ax, (name, signal_id) in zip(axes, signal_info.items()):
             dates_np, sig, mask, _ = self._load_full_signal_by_id(
+                paciente,
                 str(h5_file),
                 signal_id,
                 date_str,
@@ -1480,7 +1606,7 @@ class SignalExtractorApp:
         if not h5_file or pd.isna(h5_file) or not os.path.exists(str(h5_file)):
             messagebox.showerror("Erro", f"Arquivo H5 não encontrado:\n{h5_file}")
             return
-            
+
         # Pega a duração salva ou usa 120
         video_dur = paciente.get("video_duration", pd.NA)
         if pd.notna(video_dur) and str(video_dur).strip() != "" and float(video_dur) > 0:
@@ -1502,7 +1628,8 @@ class SignalExtractorApp:
             bed=str(paciente.get("Leito", "")).strip(),
             date_str=str(paciente.get("Dia", "")).strip(),
             duration_seconds=duration_for_signals,
-            patient_output_dir=patient_output_dir
+            patient_output_dir=patient_output_dir,
+            patient_time=str(paciente.get("Hora", "")).strip(),
         )
         
         self.root.deiconify()
