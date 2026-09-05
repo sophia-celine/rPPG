@@ -1,10 +1,10 @@
 from rPPGAnalysis import rPPGAnalysis
 
-VIDEO_PATH = r"C:\Users\Sophia\Documents\UTI-11-12-2025\L9-11-12-2025-16-04.avi"
-ECG_DATA_PATH = '../../rPPG_data/pilot/ECG/ecg_signal_L9_16-05-26_16-07-25.csv'
-PPG_DATA_PATH = '../../rPPG_data/pilot/spo2/original_spo2_L9_16-05-26_16-07-25.txt'
-RESPIRATION_DATA_PATH = '../../rPPG_data/pilot/thoracic_impedance/L9_16-05-26_16-07-25.txt'
-RPPG_FOLDER_PATH = '../../rPPG_data/patient2'
+VIDEO_PATH = r"/home/soph/rppg/rPPG-Toolbox/data/test/RawData/subject1/vid.avi"
+ECG_DATA_PATH = '/home/soph/ssd/dataset_raw/2356759_2/ecg_20-08-2026_3_16-34-55_16-37-00.csv'
+PPG_DATA_PATH = '/home/soph/ssd/dataset_raw/2356759_2/ppg_20-08-2026_3_16-34-55_16-37-00.txt'
+RESPIRATION_DATA_PATH = '/home/soph/ssd/dataset_raw/2356759_2/respiration_20-08-2026_3_16-34-55_16-37-00.txt'
+RPPG_FOLDER_PATH = '/home/soph/rppg/rPPG-Toolbox/BVPresults'
 HR_WINDOW_SIZE = 15
 RESPIRATION_WINDOW_SIZE = 30
 
@@ -19,11 +19,11 @@ if __name__ == '__main__':
                  respiration_window_size=RESPIRATION_WINDOW_SIZE
                  )
     patient2_analysis.run()
-    patient2_analysis.plot_gt()
+    # patient2_analysis.plot_gt()
     # print('rppg_signals\n', patient2_analysis.rppg_signals)
-    # print('ecg_hr_values\n', patient2_analysis.ecg_hr_values)
+    print('ecg_hr_values\n', patient2_analysis.ecg_hr_values)
     # print('fps\n', patient2_analysis.video_fps)
-    # print('rppg_hr_values\n', patient2_analysis.rppg_hr_values['PhysFormer (PURE)'])
+    print('rppg_hr_values\n', patient2_analysis.rppg_hr_values)
     # print('hr_results\n', patient2_analysis.hr_results)
-    # print('Correlation_results\n', patient2_analysis.correlation_results)
+    print('Correlation_results\n', patient2_analysis.correlation_results)
     # print('Respiratory rate estimation\n', patient2_analysis.rr_results)

@@ -4,12 +4,13 @@ from scipy import signal
 from scipy.stats import pearsonr
 from scipy.interpolate import interp1d
 import os
+from scipy.signal import butter
 
 def normalize_signal(s):
     """Normalização Z-score (média 0, desvio padrão 1)."""
     return (s - np.mean(s)) / np.std(s)
 
-def sync_and_correlate(rppg_path, ppg_path, fs_rppg=25, fs_ppg=62.5):
+def sync_and_correlate(rppg_path, ppg_path, fs_rppg=50, fs_ppg=62.5):
     """
     Analisa a correlação entre rPPG e PPG com sincronização por cross-correlation.
     Retorna o coeficiente de Pearson e o melhor lag.
@@ -26,6 +27,12 @@ def sync_and_correlate(rppg_path, ppg_path, fs_rppg=25, fs_ppg=62.5):
             raw_ppg = raw_ppg[0, :] if raw_ppg.shape[0] < raw_ppg.shape[1] else raw_ppg[:, 0]
         if raw_rppg.ndim > 1:
             raw_rppg = raw_rppg[0, :] if raw_rppg.shape[0] < raw_rppg.shape[1] else raw_rppg[:, 0]
+        b, a = butter(
+        1,
+        [0.2 / fs_rppg * 2, 3.3 / fs_rppg * 2],
+        btype="bandpass"
+        )
+        if method_name != "CHROM": raw_rppg = signal.filtfilt(b, a, np.double(raw_rppg))
         
         print(f"Pontos originais - rPPG: {len(raw_rppg)}, PPG: {len(raw_ppg)}")
 
@@ -144,16 +151,16 @@ if __name__ == "__main__":
     # CONFIGURAÇÃO
     # =========================
     # Caminho para o seu arquivo PPG fixo (Ground Truth)
-    PPG_PATH = "../../rPPG_data/pilot/spo2/original_spo2_L7_16-22-48_16-24-47.txt" 
+    PPG_PATH = '/home/soph/ssd/dataset_raw/2356759_2/ppg_20-08-2026_3_16-34-55_16-37-00.txt'
     # PPG_PATH = r"../../rPPG_data/pilot/spo2/original_spo2_L9_16-05-26_16-07-25.txt" 
     # PPG_PATH = "../../rPPG_data/pilot/spo2/original_spo2_L9_16-05-26_16-07-25.txt"
     
     
     # Pasta contendo os arquivos rPPG (.txt)
-    RPPG_FOLDER = "../../rPPG_data/pilot/preliminary_results/examples" 
+    RPPG_FOLDER = '/home/soph/rppg/rPPG-Toolbox/BVPresults'
     
     # Frequências de amostragem originais
-    FS_RPPG = 25      # Câmera (rPPG)
+    FS_RPPG = 50      # Câmera (rPPG)
     FS_PPG = 62.5     # Sensor (Ground Truth - ex: SpO2)
 
     # Geração de dados sintéticos para demonstração (caso os arquivos não existam)
@@ -201,7 +208,7 @@ if __name__ == "__main__":
                 ax = axes[i]
                 # Plotamos um trecho (ex: primeiros 10 segundos na fs_common) para melhor visibilidade
                 fs_common = max(FS_RPPG, FS_PPG)
-                limit = int(10 * fs_common)
+                limit = int(20 * fs_common)
 
                 # Criar vetor de tempo para o trecho selecionado
                 actual_limit = min(limit, len(res['ppg']))

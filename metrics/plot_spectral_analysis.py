@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal
 
-def bandpass_filter(data, lowcut, highcut, fs, order=4):
+def bandpass_filter(data, lowcut, highcut, fs, order=3):
     """Aplica um filtro passa-banda Butterworth."""
     nyq = 0.5 * fs
     low = lowcut / nyq
@@ -67,12 +67,22 @@ def plot_spectral_analysis(folder_paths, fs=25.0, lowcut=0.6, highcut=3.3):
         method_name = filename.split('_')[1] if '_' in filename else filename
         folder_label = os.path.basename(folder.rstrip(os.sep)) if len(folder_paths) > 1 else ""
         display_name = f"{folder_label}: {method_name}" if folder_label else method_name
+        filtered_methods = {
+                    'CHROM', 
+                    # 'POS',
+                    'ICA'
+                }
 
         try:
             sig = load_signal(file_path)
             # Normalização e Filtragem
             sig = sig - np.mean(sig)
-            sig_filt = bandpass_filter(sig, lowcut, highcut, fs)
+            sig = sig[750:1500]
+            if method_name not in filtered_methods:
+                print(method_name)
+                sig_filt = bandpass_filter(sig, lowcut, highcut, fs)
+            else:
+                sig_filt = sig 
             
             # Definir NFFT para alta resolução (Zero-padding)
             nfft_val = _next_power_of_2(len(sig_filt)) * 2
@@ -139,16 +149,16 @@ if __name__ == "__main__":
     # Para usar duas pastas: FOLDERS = ["/caminho/pasta1", "/caminho/pasta2"]
     
     FOLDERS = [
-        "../preliminary_results/examples",
+        '/home/soph/rppg/rPPG-Toolbox/BVPresults',
         # "../preliminary_results/L9/bvp"
         # "/home/soph/rppg/rPPG/preliminary_results/L9/outra_pasta" # Exemplo de segunda pasta
     ]
     
     # Frequência de amostragem da câmera
-    SAMPLING_RATE = 25 
+    SAMPLING_RATE = 50 
     
     # Banda de interesse (0.6 a 3.3 Hz corresponde a ~36 a 198 BPM)
-    LOW_HZ = 0.6
+    LOW_HZ = 0.2
     HIGH_HZ = 3.3
 
     plot_spectral_analysis(

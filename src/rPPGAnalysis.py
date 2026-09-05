@@ -119,21 +119,6 @@ class rPPGAnalysis:
             return data[0, :] if data.shape[0] < data.shape[1] else data[:, 0]
         return data
     
-    @staticmethod
-    def _detrend(input_signal, lambda_value):
-        """Detrend PPG signal."""
-        signal_length = input_signal.shape[0]
-        # observation matrix
-        H = np.identity(signal_length)
-        ones = np.ones(signal_length)
-        minus_twos = -2 * np.ones(signal_length)
-        diags_data = np.array([ones, minus_twos, ones])
-        diags_index = np.array([0, 1, 2])
-        D = spdiags(diags_data, diags_index,
-                    (signal_length - 2), signal_length).toarray()
-        detrended_signal = np.dot(
-            (H - np.linalg.inv(H + (lambda_value ** 2) * np.dot(D.T, D))), input_signal)
-        return detrended_signal
 
     @staticmethod
     def _berger_algorithm(peak_times, fs_target, duration):
@@ -285,19 +270,26 @@ class rPPGAnalysis:
     def _estimate_hr_rppg(self):
 
         hr_rppg = {}
+        filtered_methods = {
+            'CHROM', 
+            # 'POS',
+            # 'ICA'
+        }
 
         for i in self.rppg_signals:
             rppg_signal = self.rppg_signals[i]
             # rppg_signal = self._detrend(rppg_signal, 100)
-            # rppg_signal = self.bandpass_filter(rppg_signal, lowcut=0.6, highcut=3.3, fs=self.video_fps, order=1)
+            print('----------------- ESTIMATING HR FOR METHOD:', i, '-----------------')
+            if i not in filtered_methods:
+                rppg_signal = self.bandpass_filter(rppg_signal, lowcut=0.2, highcut=3.3, fs=self.video_fps, order=3)
             window_len_rppg = int(self.hr_window_size * self.video_fps)
             n_windows_rppg = len(rppg_signal) // window_len_rppg
 
             rppg_hr_values = []
             for j in range(n_windows_rppg):
                 segment = rppg_signal[j * window_len_rppg : (j + 1) * window_len_rppg]
-                segment = self._detrend(segment, 100)
-                segment = self.bandpass_filter(segment, lowcut=0.6, highcut=3.3, fs=self.video_fps, order=1)
+                # segment = self._detrend(segment, 100)
+                # segment = self.bandpass_filter(segment, lowcut=0.3, highcut=3.3, fs=self.video_fps, order=1)
                 hr = self._calculate_fft_hr(segment)
                 rppg_hr_values.append(hr)
 
@@ -374,9 +366,30 @@ class rPPGAnalysis:
 
     def _calculate_fft_hr(self, segment, low_pass=0.6, high_pass=3.3):
         """Calculate heart rate based on PPG using Fast Fourier transform (FFT)."""
-        segment = np.expand_dims(segment, 0)
-        N = self._next_power_of_2(segment.shape[1])     # @TODO colocar zero-padding para resolução de 1 bpm
-        f_ppg, pxx_ppg = scipy.signal.periodogram(segment, fs=self.video_fps, nfft=N, detrend=False)
+        seg_td = np.asarray(segment).flatten()
+        seg_exp = np.expand_dims(seg_td, 0)
+        N = self._next_power_of_2(seg_td.shape[0])     # @TODO colocar zero-padding para resolução de 1 bpm
+        f_ppg, pxx_ppg = scipy.signal.periodogram(seg_exp, fs=self.video_fps, nfft=N, detrend='constant')
+        pxx_ppg = np.squeeze(pxx_ppg)
+        plot_window = False
+        if plot_window:
+            # Create a figure with two stacked plots: time-domain signal and spectrum
+            fig, (ax_sig, ax_spec) = plt.subplots(2, 1, figsize=(8, 6), sharex=False)
+
+            # Time-domain signal (top)
+            t = np.arange(seg_td.shape[0]) / float(self.video_fps)
+            ax_sig.plot(t, seg_td)
+            ax_sig.set_ylabel(self._t("amplitude") if hasattr(self, "_t") else "Amplitude")
+            ax_sig.set_title(self._t("ppg_signal_and_spectrum") if hasattr(self, "_t") else "PPG Signal and Spectrum")
+
+            # Frequency-domain (bottom) limited to 0-3 Hz
+            ax_spec.plot(f_ppg, pxx_ppg)
+            ax_spec.set_xlim(0, 3.0)
+            ax_spec.set_xlabel(self._t("frequency_hz") if hasattr(self, "_t") else "Frequency (Hz)")
+            ax_spec.set_ylabel(self._t("power") if hasattr(self, "_t") else "Power")
+
+            plt.tight_layout()
+            plt.show(block=True)
         fmask_ppg = np.argwhere((f_ppg >= low_pass) & (f_ppg <= high_pass))
         mask_ppg = np.take(f_ppg, fmask_ppg)
         mask_pxx = np.take(pxx_ppg, fmask_ppg)
@@ -603,11 +616,11 @@ class rPPGAnalysis:
         self.video_fps = self._get_video_fps()
 
         # load signals and compute HR values
-        # self.rppg_signals = self._load_rppg_signals()
-        # self.ecg_hr_values = self._estimate_hr_ecg()
-        # self.rppg_hr_values = self._estimate_hr_rppg()
+        self.rppg_signals = self._load_rppg_signals()
+        self.ecg_hr_values = self._estimate_hr_ecg()
+        self.rppg_hr_values = self._estimate_hr_rppg()
         # self.hr_results = self.compare_hr_rppg_ecg()
-        # self.correlation_results = self.compare_rppg_ppg()
+        self.correlation_results = self.compare_rppg_ppg()
         # self.gt_rr_values, self.ref_rr_signal = self._load_respiratory_signal()
         # self.rppg_rr_values = self._estimate_rr_rppg()
         # self.rr_results = self.compare_rr_rppg_respiration()
