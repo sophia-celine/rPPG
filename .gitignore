@@ -2,3 +2,5 @@ videos/
 data/
 *avi
 *mp4
+get_ground_truth/__pycache__/
+get_ground_truth/process_gt_data/__pycache__/
