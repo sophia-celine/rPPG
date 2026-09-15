@@ -60,7 +60,7 @@ class SignalExtractorApp:
 
         tk.Label(header_frame, text="Selecione um paciente para Processar Sinais ou Cortar Vídeo", font=("Arial", 14, "bold")).pack()
 
-        columns = ("index", "id", "leito", "data", "hora", "status", "reference_status", "video_status")
+        columns = ("index", "id", "leito", "data", "hora", "status", "video_status")
         self.tree = ttk.Treeview(self.root, columns=columns, show="headings", selectmode="browse")
         self.tree.heading("index", text="Índice")
         self.tree.heading("id", text="ID Paciente")
@@ -68,7 +68,6 @@ class SignalExtractorApp:
         self.tree.heading("data", text="Data")
         self.tree.heading("hora", text="Hora")
         self.tree.heading("status", text="Status (Sinais)")
-        self.tree.heading("reference_status", text="Sinais de referência carregados")
         self.tree.heading("video_status", text="Vídeo")
 
         self.tree.column("index", width=50, anchor="center")
@@ -77,7 +76,6 @@ class SignalExtractorApp:
         self.tree.column("data", width=100, anchor="center")
         self.tree.column("hora", width=80, anchor="center")
         self.tree.column("status", width=120, anchor="center")
-        self.tree.column("reference_status", width=220, anchor="center")
         self.tree.column("video_status", width=120, anchor="center")
 
         self.tree.grid(row=1, column=0, sticky="nsew", padx=20)
@@ -341,6 +339,19 @@ class SignalExtractorApp:
         if self._is_filled(patient_id):
             return str(self._patient_data_dir(patient_id) / filename)
         return ""
+
+    def _resolve_h5_path(self, row, row_index):
+        h5_file = self._get_absolute_path(row, "h5_file")
+        if self._is_filled(row.get("h5_file", "")):
+            return h5_file
+
+        built_h5_file = self._build_h5_path_from_row(row.to_dict())
+        if not built_h5_file:
+            return ""
+
+        self.df.at[row_index, "h5_file"] = Path(built_h5_file).name
+        self.df.to_csv(self.dataset_raw_file, index=False)
+        return built_h5_file
 
     def sync_local_dataset_with_remote(self):
         try:
@@ -884,15 +895,6 @@ class SignalExtractorApp:
             leito = row.get("Leito", "N/A")
             data = row.get("Dia", "N/A")
             hora = row.get("Hora", "N/A")
-            reference_paths = [row.get(column) for column in ("sinal_ECG", "sinal_PPG", "sinal_resp")]
-            loaded_reference_count = sum(self._is_filled(path) for path in reference_paths)
-            if loaded_reference_count == len(reference_paths):
-                reference_status = "Carregados"
-            elif loaded_reference_count > 0:
-                reference_status = "Parcial"
-            else:
-                reference_status = "Pendente"
-
             if pd.notna(row["init_time"]) and str(row["init_time"]).strip() != "":
                 status = "Preenchido"
                 tag = "preenchido"
@@ -901,7 +903,7 @@ class SignalExtractorApp:
                 tag = "pendente"
 
             video_status = "Cortado" if pd.notna(row.get("video_path")) and str(row.get("video_path")).strip() != "" else "Sem vídeo"
-            self.tree.insert("", tk.END, values=(idx, id_pac, leito, data, hora, status, reference_status, video_status), tags=(tag,))
+            self.tree.insert("", tk.END, values=(idx, id_pac, leito, data, hora, status, video_status), tags=(tag,))
 
     def _select_row_by_idx(self, target_idx):
         for item in self.tree.get_children():
@@ -1193,7 +1195,7 @@ class SignalExtractorApp:
         idx = int(self.tree.item(selected_item[0], "values")[0])
         paciente = self.df.loc[idx]
 
-        h5_file = self._get_absolute_path(paciente, "h5_file")
+        h5_file = self._resolve_h5_path(paciente, idx)
         date_str = str(paciente.get("Dia", "")).strip()
         init_time = str(paciente.get("init_time", "")).strip()
         end_time = str(paciente.get("end_time", "")).strip()
@@ -1257,7 +1259,8 @@ class SignalExtractorApp:
 
         paciente = self.df.loc[idx]
         previous_signal_paths = [self._get_absolute_path(paciente, column) for column in ("sinal_ECG", "sinal_PPG", "sinal_resp")]
-        h5_file = self._get_absolute_path(paciente, "h5_file")
+        
+        h5_file = self._resolve_h5_path(paciente, idx)
 
         if not h5_file or pd.isna(h5_file) or not os.path.exists(str(h5_file)):
             messagebox.showerror("Erro", f"Arquivo H5 não encontrado:\n{h5_file}")
