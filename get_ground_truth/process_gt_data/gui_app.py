@@ -223,7 +223,6 @@ class SignalExtractorApp:
 
         complete_age = line.split('|')[-1].strip()
         age_in_years = complete_age.split('a')[0]
-        print('age', age_in_years)
 
         return int(age_in_years) if age_in_years.isdigit() else None
 
@@ -840,36 +839,55 @@ class SignalExtractorApp:
             return
 
         evolution_root = Path(APP_SETTINGS.evolucoes_path) / folder_name
-        if not evolution_root.exists():
-            messagebox.showerror("Erro", f"Diretório de evoluções não encontrado:\n{evolution_root}")
-            return
-
-        txt_files = sorted(evolution_root.glob("*.txt"))
-        if not txt_files:
-            messagebox.showerror("Erro", f"Nenhum arquivo .txt encontrado em:\n{evolution_root}")
-            return
-
         found_file = None
-        for txt_file in txt_files:
-            try:
-                with open(txt_file, "r", encoding="utf-8", errors="ignore") as handle:
-                    lines = handle.readlines()
-            except Exception:
-                continue
+        registered_evolution = paciente.get("evolucoes_path", "")
+        if self._is_filled(registered_evolution):
+            registered_path = Path(str(registered_evolution).strip())
+            found_file = registered_path if registered_path.is_absolute() else evolution_root / registered_path
+            if not found_file.is_file():
+                messagebox.showerror("Erro", f"Arquivo de evolução registrado não encontrado:\n{found_file}")
+                return
+        else:
+            if not evolution_root.exists():
+                messagebox.showerror("Erro", f"Diretório de evoluções não encontrado:\n{evolution_root}")
+                return
 
-            if len(lines) < 2:
-                continue
+            txt_files = sorted(evolution_root.glob("*.txt"))
+            if not txt_files:
+                messagebox.showerror("Erro", f"Nenhum arquivo .txt encontrado em:\n{evolution_root}")
+                return
 
-            extracted_id = self._extract_patient_id_from_evolution_line(lines[1])
-            if extracted_id is None:
-                continue
+            for txt_file in txt_files:
+                try:
+                    with open(txt_file, "r", encoding="utf-8", errors="ignore") as handle:
+                        lines = handle.readlines()
+                except Exception:
+                    continue
 
-            if self._normalize_patient_id(extracted_id) == patient_id:
-                found_file = txt_file
-                break
+                if len(lines) < 2:
+                    continue
+
+                extracted_id = self._extract_patient_id_from_evolution_line(lines[1])
+                if extracted_id is None:
+                    continue
+
+                if self._normalize_patient_id(extracted_id) == patient_id:
+                    found_file = txt_file
+                    break
 
         if found_file is None:
             messagebox.showerror("Erro", f"Nenhum arquivo de evolução foi encontrado para o paciente {patient_id} na pasta {folder_name}.")
+            return
+
+        try:
+            with open(found_file, "r", encoding="utf-8", errors="ignore") as handle:
+                lines = handle.readlines()
+        except Exception as exc:
+            messagebox.showerror("Erro", f"Não foi possível ler o arquivo de evolução:\n{found_file}\n\n{exc}")
+            return
+
+        if len(lines) <= 9:
+            messagebox.showerror("Erro", f"O arquivo de evolução não possui dados clínicos suficientes:\n{found_file}")
             return
 
         self.df.at[idx, "evolucoes_path"] = found_file.name
