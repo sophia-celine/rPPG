@@ -21,11 +21,33 @@ from signal_processing import (
 )
 
 
+def classify_cid(cid):
+    cid = cid.upper().strip()
+
+    if cid.startswith(("A", "B")):
+        return "Doença infecciosa"
+
+    elif cid.startswith("I"):
+        return "Doença cardiovascular"
+
+    elif cid.startswith("J"):
+        return "Doença respiratória"
+
+    elif cid.startswith("G"):
+        return "Doença neurológica"
+
+    elif cid.startswith(("S", "T", "V")):
+        return "Trauma"
+
+    else:
+        return "Outro"
+
+
 class SignalExtractorApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Extrator de Sinais - UTI")
-        self.root.geometry("1200x500")
+        self.root.geometry("1920x1080")
 
         self.dataset_raw_file = APP_SETTINGS.dataset_raw_file
         self.df = None
@@ -82,8 +104,8 @@ class SignalExtractorApp:
         btn_sync_remote = tk.Button(btn_frame, text="4. Sincronizar Planilha", command=self.sync_local_dataset_with_remote, bg="#9C27B0", fg="white", font=("Arial", 11, "bold"), width=20)
         btn_sync_remote.pack(side=tk.LEFT, padx=15)
 
-        btn_load_reference = tk.Button(btn_frame, text="5. Carregar Sinais de Referência", command=self.load_reference_signals_for_selected, bg="#607D8B", fg="white", font=("Arial", 11, "bold"), width=28)
-        btn_load_reference.pack(side=tk.LEFT, padx=15)
+        # btn_load_reference = tk.Button(btn_frame, text="5. Carregar Sinais de Referência", command=self.load_reference_signals_for_selected, bg="#607D8B", fg="white", font=("Arial", 11, "bold"), width=28)
+        # btn_load_reference.pack(side=tk.LEFT, padx=15)
 
         btn_analyze_dataset = tk.Button(btn_frame, text="6. Analisar Planilha", command=self.show_dataset_analysis, bg="#795548", fg="white", font=("Arial", 11, "bold"), width=18)
         btn_analyze_dataset.pack(side=tk.LEFT, padx=15)
@@ -212,6 +234,15 @@ class SignalExtractorApp:
         print('age', age_in_years)
 
         return int(age_in_years) if age_in_years.isdigit() else None
+
+    @staticmethod
+    def _extract_cid_from_evolution(line):
+        if line is None:
+            return None
+
+        cid = line.split(':')[-1].strip()
+
+        return cid if cid else None
 
     @staticmethod
     def _is_reference_signal_file(file_path):
@@ -493,11 +524,14 @@ class SignalExtractorApp:
             "Sexo biológico",
             "Fototipo",
         ]
+        cid_column = "CID"
         signal_columns = {
             "ECG": "ECG",
             "PPG": "PPG",
             "Sinal respiratório": "Sinal respiratório",
         }
+        patient_id_column = "Id do paciente"
+        age_column = "Idade"
         report_lines = [
             "ANÁLISE DA PLANILHA LOCAL",
             f"Arquivo: {self.dataset_raw_file}",
@@ -505,10 +539,10 @@ class SignalExtractorApp:
             "",
         ]
 
-        figure = Figure(figsize=(16, 12), dpi=100)
+        figure = Figure(figsize=(16, 14), dpi=100)
         figure.patch.set_facecolor("#F5F7FA")
         figure.suptitle("Panorama dos dados da planilha", fontsize=16, fontweight="bold", color="#263238")
-        axes = figure.subplots(3, 4).ravel()
+        axes = figure.subplots(4, 4).ravel()
         for axis in axes:
             axis.set_facecolor("#F5F7FA")
         distance_column = analysis_columns[0]
@@ -606,8 +640,104 @@ class SignalExtractorApp:
                     report_lines.append(f"  {value}: {count} ({percentage:.2f}%)")
             report_lines.append("")
 
+        age_axis = axes[8]
+        report_lines.append("IDADE DOS PACIENTES")
+        if age_column not in self.df.columns or patient_id_column not in self.df.columns:
+            age_axis.set_title("Média de idade")
+            age_axis.text(0.5, 0.5, "Coluna não encontrada", ha="center", va="center")
+            report_lines.append("  Coluna 'Idade' ou 'Id do paciente' não encontrada.")
+        else:
+            age_data = self.df[[patient_id_column, age_column]].copy()
+            age_data = age_data[age_data[patient_id_column].apply(self._is_filled)]
+            age_data["_patient_id"] = (
+                age_data[patient_id_column]
+                .astype(str)
+                .str.strip()
+                .str.split(".", n=1)
+                .str[0]
+            )
+            age_data[age_column] = pd.to_numeric(
+                age_data[age_column].astype(str).str.replace(",", ".", regex=False),
+                errors="coerce",
+            )
+            unique_ages = age_data.groupby("_patient_id")[age_column].first().dropna()
+            if unique_ages.empty:
+                age_axis.text(0.5, 0.5, "Sem dados", ha="center", va="center")
+                report_lines.append("  Nenhuma idade válida disponível.")
+            else:
+                average_age = unique_ages.mean()
+                max_age = unique_ages.max()
+                min_age = unique_ages.min()
+                age_values = [min_age, average_age, max_age]
+                age_labels = ["Mínima", "Média", "Máxima"]
+                age_axis.bar(
+                    range(len(age_values)),
+                    age_values,
+                    color=["#59A14F", "#A18E4F", "#4F62A1"],
+                    width=0.6,
+                )
+                age_axis.set_xticks(range(len(age_labels)), age_labels)
+                age_axis.set_ylabel("anos")
+                age_axis.set_ylim(0, max(max_age * 1.25, 1))
+                for position, value in enumerate(age_values):
+                    age_axis.text(position, value, f"{value:.2f}", ha="center", va="bottom")
+                age_axis.grid(axis="y", alpha=0.3)
+                report_lines.append(f"  Pacientes únicos com idade válida: {len(unique_ages)}")
+                report_lines.append(f"  Média: {average_age:.2f} anos")
+                report_lines.append(f"  Máxima: {max_age:.2f} anos")
+                report_lines.append(f"  Mínima: {min_age:.2f} anos")
+            age_axis.set_title("Média de idade")
+        report_lines.append("")
+
+        cid_axis = axes[9]
+        report_lines.append("GRUPO DE ADMISSÃO (CID)")
+        if cid_column not in self.df.columns:
+            cid_axis.set_title("Grupo de admissão (CID)")
+            cid_axis.text(0.5, 0.5, "Coluna não encontrada", ha="center", va="center")
+            report_lines.append("  Coluna não encontrada.")
+        else:
+            cid_data = self.df[[patient_id_column, cid_column]].copy()
+            cid_data = cid_data[cid_data[patient_id_column].apply(self._is_filled)]
+            cid_data["_patient_id"] = (
+                cid_data[patient_id_column]
+                .astype(str)
+                .str.strip()
+                .str.split(".", n=1)
+                .str[0]
+            )
+            classified_cids = (
+                cid_data[cid_column]
+                .fillna("")
+                .astype(str)
+                .str.split("-", n=1)
+                .str[0]
+                .map(classify_cid)
+            )
+            classified_cids.index = cid_data["_patient_id"]
+            classified_cids = classified_cids.groupby(level=0).first()
+            distribution, valid_count, missing_count = self._analysis_distribution(classified_cids)
+            if distribution:
+                labels = [item[0] for item in distribution]
+                percentages = [item[2] for item in distribution]
+                cid_axis.pie(
+                    percentages,
+                    labels=labels,
+                    autopct="%1.1f%%",
+                    startangle=90,
+                    counterclock=False,
+                    wedgeprops={"edgecolor": "white", "linewidth": 1.5},
+                    textprops={"fontsize": 8},
+                )
+            else:
+                cid_axis.text(0.5, 0.5, "Sem dados", ha="center", va="center")
+            cid_axis.set_title("Grupo de admissão (CID)")
+            report_lines.append(f"  Pacientes únicos: {valid_count} | Ausentes: {missing_count}")
+            for value, count, percentage in distribution:
+                report_lines.append(f"  {value}: {count} ({percentage:.2f}%)")
+        report_lines.append("")
+
         report_lines.append("CAPTURA DOS SINAIS")
-        for signal_index, (label, column) in enumerate(signal_columns.items(), start=8):
+        for signal_index, (label, column) in enumerate(signal_columns.items(), start=10):
             if column not in self.df.columns:
                 report_lines.append(f"{label}: coluna não encontrada.")
                 axes[signal_index].set_title(label)
@@ -827,7 +957,6 @@ class SignalExtractorApp:
                 continue
 
             extracted_id = self._extract_patient_id_from_evolution_line(lines[1])
-            print('exracted_id', extracted_id, 'patient_id', self._normalize_patient_id(patient_id))
             if extracted_id is None:
                 continue
 
@@ -842,6 +971,8 @@ class SignalExtractorApp:
         self.df.at[idx, "evolucoes_path"] = found_file.name
 
         self.df.at[idx, "Idade"] = self._extract_patient_age_from_evolution(lines[1])
+        self.df.at[idx, "CID"] = self._extract_cid_from_evolution(lines[9])
+
         try:
             self.df.to_csv(self.dataset_raw_file, index=False)
             self.update_treeview()

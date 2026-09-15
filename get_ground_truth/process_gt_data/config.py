@@ -23,7 +23,7 @@ class AppSettings:
         uti_data_path = "/mnt/10.8.0.1/uti/Data"
         dataset_raw_file = Path.home() / "rppg" / "rPPG_data" / "ground_truth" / "dataset_raw.csv"
         patient_data_root = Path.home() / "ssd" / "dataset_raw"
-        evolucoes_path = "/mnt/10.8.0.1/UTI_Secure/Evolucoes"
+        evolucoes_path = "/mnt/10.8.0.1/uti_secure/Evolucoes"
 
     default_video_filename: str = "video_cropped.avi"
     signal_filename_templates: dict[str, str] = field(default_factory=lambda: {
