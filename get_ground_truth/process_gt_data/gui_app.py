@@ -771,6 +771,39 @@ class SignalExtractorApp:
                 report_lines.append(f"  Capturado (Verdadeiro): {captured} ({captured / total * 100:.2f}%)")
                 report_lines.append(f"  Não capturado (Falso): {not_captured} ({not_captured / total * 100:.2f}%)")
                 report_lines.append(f"  Ausentes ou inválidos: {missing}")
+
+        oxygen_axis = axes[13]
+        oxygen_column = "Oxigenoterapia"
+        report_lines.append("OXIGENOTERAPIA")
+        if oxygen_column not in self.df.columns:
+            oxygen_axis.set_title(oxygen_column)
+            oxygen_axis.text(0.5, 0.5, "Coluna não encontrada", ha="center", va="center")
+            report_lines.append("  Coluna não encontrada.")
+        else:
+            distribution, valid_count, missing_count = self._analysis_distribution(self.df[oxygen_column])
+            if distribution:
+                labels = [item[0] for item in distribution]
+                percentages = [item[2] for item in distribution]
+                oxygen_axis.pie(
+                    percentages,
+                    labels=labels,
+                    autopct="%1.1f%%",
+                    startangle=90,
+                    counterclock=False,
+                    wedgeprops={"edgecolor": "white", "linewidth": 1.5},
+                    textprops={"fontsize": 8},
+                )
+            else:
+                oxygen_axis.text(0.5, 0.5, "Sem dados", ha="center", va="center")
+            oxygen_axis.set_title(oxygen_column)
+            report_lines.append(f"  Válidos: {valid_count} | Ausentes: {missing_count}")
+            if not distribution:
+                report_lines.append("  Nenhum valor disponível.")
+            else:
+                for value, count, percentage in distribution:
+                    report_lines.append(f"  {value}: {count} ({percentage:.2f}%)")
+        report_lines.append("")
+
         figure.tight_layout(rect=(0, 0, 1, 0.97), h_pad=2.0, w_pad=1.5)
         self._open_analysis_window("Análise da Planilha", "\n".join(report_lines), figure)
 
