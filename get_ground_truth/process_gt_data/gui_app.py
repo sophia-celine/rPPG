@@ -92,29 +92,23 @@ class SignalExtractorApp:
         btn_frame = tk.Frame(self.root, pady=15)
         btn_frame.grid(row=2, column=0, sticky="ew")
 
-        btn_cut_video = tk.Button(btn_frame, text="1. Cortar Vídeo", command=self.cut_video_for_selected, bg="#2196F3", fg="white", font=("Arial", 11, "bold"), width=15)
-        btn_cut_video.pack(side=tk.LEFT, padx=15)
-
-        btn_process_signals = tk.Button(btn_frame, text="2. Processar Sinais", command=self.process_signals_for_selected, bg="#4CAF50", fg="white", font=("Arial", 11, "bold"), width=18)
-        btn_process_signals.pack(side=tk.LEFT, padx=15)
-
-        btn_visualize_signals = tk.Button(btn_frame, text="3. Visualizar Sinais", command=self.visualize_saved_signals_for_selected, bg="#FF9800", fg="white", font=("Arial", 11, "bold"), width=18)
-        btn_visualize_signals.pack(side=tk.LEFT, padx=15)
-
-        btn_sync_remote = tk.Button(btn_frame, text="4. Sincronizar Planilha", command=self.sync_local_dataset_with_remote, bg="#9C27B0", fg="white", font=("Arial", 11, "bold"), width=20)
+        btn_sync_remote = tk.Button(btn_frame, text="Sincronizar Planilha", command=self.sync_local_dataset_with_remote, bg="#9C27B0", fg="white", font=("Arial", 11, "bold"), width=20)
         btn_sync_remote.pack(side=tk.LEFT, padx=15)
 
-        # btn_load_reference = tk.Button(btn_frame, text="5. Carregar Sinais de Referência", command=self.load_reference_signals_for_selected, bg="#607D8B", fg="white", font=("Arial", 11, "bold"), width=28)
-        # btn_load_reference.pack(side=tk.LEFT, padx=15)
+        btn_cut_video = tk.Button(btn_frame, text="Cortar Vídeo", command=self.cut_video_for_selected, bg="#2196F3", fg="white", font=("Arial", 11, "bold"), width=15)
+        btn_cut_video.pack(side=tk.LEFT, padx=15)
 
-        btn_analyze_dataset = tk.Button(btn_frame, text="6. Analisar Planilha", command=self.show_dataset_analysis, bg="#795548", fg="white", font=("Arial", 11, "bold"), width=18)
-        btn_analyze_dataset.pack(side=tk.LEFT, padx=15)
+        btn_process_signals = tk.Button(btn_frame, text="Processar Sinais", command=self.process_signals_for_selected, bg="#4CAF50", fg="white", font=("Arial", 11, "bold"), width=18)
+        btn_process_signals.pack(side=tk.LEFT, padx=15)
+
+        btn_visualize_signals = tk.Button(btn_frame, text="Visualizar Sinais", command=self.visualize_saved_signals_for_selected, bg="#FF9800", fg="white", font=("Arial", 11, "bold"), width=18)
+        btn_visualize_signals.pack(side=tk.LEFT, padx=15)
 
         btn_load_clinical = tk.Button(btn_frame, text="Carregar dados clínicos", command=self.load_clinical_data_for_selected, bg="#E91E63", fg="white", font=("Arial", 11, "bold"), width=22)
         btn_load_clinical.pack(side=tk.LEFT, padx=15)
 
-        btn_refresh = tk.Button(btn_frame, text="Recarregar Planilha", command=self.load_data, font=("Arial", 10))
-        btn_refresh.pack(side=tk.RIGHT, padx=20)
+        btn_analyze_dataset = tk.Button(btn_frame, text="Analisar Planilha", command=self.show_dataset_analysis, bg="#795548", fg="white", font=("Arial", 11, "bold"), width=18)
+        btn_analyze_dataset.pack(side=tk.LEFT, padx=15)
 
         self.load_data()
 
@@ -244,14 +238,11 @@ class SignalExtractorApp:
 
         return cid if cid else None
 
-    @staticmethod
-    def _is_reference_signal_file(file_path):
-        return "_gt_" in Path(str(file_path)).name or "_referencia_" in Path(str(file_path)).name
 
     def _delete_previous_processed_signals(self, previous_paths, current_paths):
         current_paths = {os.path.normcase(os.path.abspath(str(path))) for path in current_paths if self._is_filled(path)}
         for path in previous_paths:
-            if not self._is_filled(path) or self._is_reference_signal_file(path):
+            if not self._is_filled(path):
                 continue
             normalized_path = os.path.normcase(os.path.abspath(str(path)))
             if normalized_path in current_paths:
@@ -810,104 +801,6 @@ class SignalExtractorApp:
         text.configure(yscrollcommand=scrollbar.set)
         text.insert("1.0", content)
         text.configure(state=tk.DISABLED)
-
-    def load_reference_signals_for_selected(self):
-        selected_item = self.tree.selection()
-        if not selected_item:
-            messagebox.showwarning("Aviso", "Selecione um paciente na lista primeiro.")
-            return
-
-        idx = int(self.tree.item(selected_item[0], "values")[0])
-        paciente = self.df.loc[idx]
-        patient_id = paciente.get("Id do paciente", "")
-        if not self._is_filled(patient_id):
-            messagebox.showwarning("Aviso", "O paciente selecionado não possui ID preenchido.")
-            return
-
-        h5_file = self._get_absolute_path(paciente, "h5_file")
-        if not self._is_filled(h5_file) or not os.path.exists(h5_file):
-            h5_file = self._build_h5_path_from_row(paciente.to_dict())
-
-        if not h5_file or not os.path.exists(h5_file):
-            messagebox.showerror("Erro", f"Arquivo H5 do paciente não encontrado:\n{h5_file or 'caminho não calculado'}")
-            return
-
-        h5_files = [h5_file]
-        time_value = str(paciente.get("Hora", "")).strip()
-        try:
-            time_parts = [part.strip() for part in time_value.split(":")]
-            if len(time_parts) >= 2:
-                hour = int(time_parts[0])
-                minute = int(time_parts[1])
-                minutes_to_next_hour = 60 - minute
-                if 0 <= minute <= 59 and 0 < minutes_to_next_hour <= 3:
-                    next_row = paciente.to_dict()
-                    next_row["Hora"] = f"{hour + 1}:00"
-                    next_h5_file = self._build_h5_path_from_row(next_row)
-                    if next_h5_file and os.path.exists(next_h5_file):
-                        h5_files.append(next_h5_file)
-        except Exception:
-            pass
-
-        signal_info = {
-            "sinal_ECG": (Config.ecg_id, "ecg"),
-            "sinal_PPG": (Config.spo2_id, "ppg"),
-            "sinal_resp": (Config.resp_id, "respiration"),
-        }
-        patient_folder = self._patient_folder_name(patient_id)
-        output_dir = self._patient_data_dir(patient_id)
-        output_dir.mkdir(parents=True, exist_ok=True)
-        safe_id = "".join(char if char.isalnum() else "_" for char in patient_folder)
-        saved_paths = {}
-        missing_signals = []
-        aggregated_signals = {column: [] for column in signal_info}
-
-        for current_h5_file in h5_files:
-            try:
-                datas, ids, _, _ = load_hdf5_packets(current_h5_file, b"\x02\x0B\x00\x00", 36)
-            except Exception as exc:
-                if current_h5_file == h5_file:
-                    messagebox.showerror("Erro", f"Não foi possível ler o H5:\n{exc}")
-                    return
-                continue
-
-            for column, (signal_id, _) in signal_info.items():
-                signal_indices = np.where(ids == signal_id)[0]
-                if len(signal_indices) == 0:
-                    continue
-                aggregated_signals[column].append(np.concatenate([datas[i] for i in signal_indices]))
-
-        for column, (signal_id, filename_prefix) in signal_info.items():
-            if not aggregated_signals[column]:
-                missing_signals.append(filename_prefix)
-                continue
-
-            signal = np.concatenate(aggregated_signals[column])
-            output_file = output_dir / APP_SETTINGS.reference_filename_template.format(
-                signal=filename_prefix,
-                patient_id=safe_id,
-            )
-            np.savetxt(output_file, signal, fmt="%.7e")
-            self.df.at[idx, column] = output_file.name
-            saved_paths[column] = str(output_file)
-
-        self.df.at[idx, "h5_file"] = h5_file.split('/')[-1]
-        if not saved_paths:
-            messagebox.showwarning("Aviso", "Nenhum sinal de referência foi encontrado no H5.")
-            return
-
-        try:
-            self.df.to_csv(self.dataset_raw_file, index=False)
-            self.update_treeview()
-            self._select_row_by_idx(idx)
-        except Exception as exc:
-            messagebox.showerror("Erro ao Salvar", f"Não foi possível atualizar o CSV:\n{exc}")
-            return
-
-        message = f"Sinais de referência salvos em:\n{output_dir}"
-        if missing_signals:
-            message += f"\n\nNão encontrados: {', '.join(missing_signals)}"
-        messagebox.showinfo("Sucesso", message)
 
     def load_clinical_data_for_selected(self):
         selected_item = self.tree.selection()
