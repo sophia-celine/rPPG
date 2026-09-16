@@ -139,7 +139,6 @@ def main():
         if result.face_landmarks:
 
             for face_landmarks in result.face_landmarks:
-
                 h, w, _ = frame.shape
 
                 # Desenhar cada landmark

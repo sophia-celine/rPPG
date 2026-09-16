@@ -132,11 +132,11 @@ def main():
 
         num_faces=1,
 
-        min_face_detection_confidence=0.5,
+        min_face_detection_confidence=0.1,
 
-        min_face_presence_confidence=0.5,
+        min_face_presence_confidence=0.1,
 
-        min_tracking_confidence=0.5
+        min_tracking_confidence=0.1
     )
 
 
@@ -227,7 +227,9 @@ def main():
         # ====================================================
         # Loop do vídeo
         # ====================================================
-
+        frames_with_face = 0
+        frames_without_face = 0
+        last_result = None
         while True:
 
             ret, frame = cap.read()
@@ -289,6 +291,8 @@ def main():
             # =================================================
 
             if face_result.face_landmarks:
+                frames_with_face += 1
+                last_result = face_result
 
                 for face_landmarks in face_result.face_landmarks:
 
@@ -307,7 +311,26 @@ def main():
                             (0, 255, 0),
                             -1
                         )
+            elif last_result is not None:
+                frames_without_face += 1
+                face_result = last_result
+                for face_landmarks in face_result.face_landmarks:
+                
+                    for landmark in face_landmarks:
 
+                        x, y = landmark_to_pixel(
+                            landmark,
+                            width,
+                            height
+                        )
+
+                        cv2.circle(
+                            frame,
+                            (x, y),
+                            1,
+                            (0, 255, 0),
+                            -1
+                        )
 
             # =================================================
             # DESENHAR LANDMARKS DO CORPO
@@ -400,6 +423,8 @@ def main():
     cap.release()
 
     cv2.destroyAllWindows()
+    print('frames with face:', frames_with_face)
+    print('frames without face:', frames_without_face)
 
 
 # ============================================================

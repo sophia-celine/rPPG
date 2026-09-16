@@ -1,0 +1,766 @@
+experiment,comparison_type,model,frame_a,frame_b,result,distance,threshold,confidence,error
+1,same_patient_original_original,ArcFace,204,839,SAME_PERSON,0.209489,0.68,93.9,
+1,same_patient_original_original,ArcFace,204,912,SAME_PERSON,0.248179,0.68,90.2,
+1,same_patient_original_original,ArcFace,204,1143,SAME_PERSON,0.11,0.68,100.0,
+1,same_patient_original_original,ArcFace,204,1828,SAME_PERSON,0.101303,0.68,100.0,
+1,same_patient_original_original,ArcFace,204,2006,SAME_PERSON,0.128151,0.68,100.0,
+1,same_patient_original_original,ArcFace,204,2253,SAME_PERSON,0.11475,0.68,100.0,
+1,same_patient_original_original,ArcFace,204,5238,SAME_PERSON,0.469807,0.68,64.36,
+1,same_patient_original_original,ArcFace,204,6033,SAME_PERSON,0.431783,0.68,69.0,
+1,same_patient_original_original,ArcFace,204,6074,SAME_PERSON,0.423838,0.68,69.98,
+1,same_patient_original_original,ArcFace,839,912,SAME_PERSON,0.050112,0.68,100.0,
+1,same_patient_original_original,ArcFace,839,1143,SAME_PERSON,0.273711,0.68,87.58,
+1,same_patient_original_original,ArcFace,839,1828,SAME_PERSON,0.192121,0.68,95.43,
+1,same_patient_original_original,ArcFace,839,2006,SAME_PERSON,0.201977,0.68,94.57,
+1,same_patient_original_original,ArcFace,839,2253,SAME_PERSON,0.219654,0.68,92.96,
+1,same_patient_original_original,ArcFace,839,5238,SAME_PERSON,0.489289,0.68,62.03,
+1,same_patient_original_original,ArcFace,839,6033,SAME_PERSON,0.420216,0.68,70.43,
+1,same_patient_original_original,ArcFace,839,6074,SAME_PERSON,0.423195,0.68,70.06,
+1,same_patient_original_original,ArcFace,912,1143,SAME_PERSON,0.307881,0.68,83.84,
+1,same_patient_original_original,ArcFace,912,1828,SAME_PERSON,0.205503,0.68,94.26,
+1,same_patient_original_original,ArcFace,912,2006,SAME_PERSON,0.219769,0.68,92.95,
+1,same_patient_original_original,ArcFace,912,2253,SAME_PERSON,0.235684,0.68,91.44,
+1,same_patient_original_original,ArcFace,912,5238,SAME_PERSON,0.475983,0.68,63.62,
+1,same_patient_original_original,ArcFace,912,6033,SAME_PERSON,0.395464,0.68,73.47,
+1,same_patient_original_original,ArcFace,912,6074,SAME_PERSON,0.401178,0.68,72.77,
+1,same_patient_original_original,ArcFace,1143,1828,SAME_PERSON,0.170133,0.68,97.27,
+1,same_patient_original_original,ArcFace,1143,2006,SAME_PERSON,0.168343,0.68,97.41,
+1,same_patient_original_original,ArcFace,1143,2253,SAME_PERSON,0.158964,0.68,98.15,
+1,same_patient_original_original,ArcFace,1143,5238,SAME_PERSON,0.411499,0.68,71.5,
+1,same_patient_original_original,ArcFace,1143,6033,SAME_PERSON,0.40411,0.68,72.41,
+1,same_patient_original_original,ArcFace,1143,6074,SAME_PERSON,0.400109,0.68,72.9,
+1,same_patient_original_original,ArcFace,1828,2006,SAME_PERSON,0.032759,0.68,100.0,
+1,same_patient_original_original,ArcFace,1828,2253,SAME_PERSON,0.037879,0.68,100.0,
+1,same_patient_original_original,ArcFace,1828,5238,SAME_PERSON,0.547518,0.68,55.36,
+1,same_patient_original_original,ArcFace,1828,6033,SAME_PERSON,0.493868,0.68,61.48,
+1,same_patient_original_original,ArcFace,1828,6074,SAME_PERSON,0.485084,0.68,62.53,
+1,same_patient_original_original,ArcFace,2006,2253,SAME_PERSON,0.032427,0.68,100.0,
+1,same_patient_original_original,ArcFace,2006,5238,SAME_PERSON,0.542645,0.68,55.89,
+1,same_patient_original_original,ArcFace,2006,6033,SAME_PERSON,0.494826,0.68,61.37,
+1,same_patient_original_original,ArcFace,2006,6074,SAME_PERSON,0.483558,0.68,62.71,
+1,same_patient_original_original,ArcFace,2253,5238,SAME_PERSON,0.525397,0.68,57.83,
+1,same_patient_original_original,ArcFace,2253,6033,SAME_PERSON,0.469814,0.68,64.36,
+1,same_patient_original_original,ArcFace,2253,6074,SAME_PERSON,0.464181,0.68,65.04,
+1,same_patient_original_original,ArcFace,5238,6033,SAME_PERSON,0.111724,0.68,100.0,
+1,same_patient_original_original,ArcFace,5238,6074,SAME_PERSON,0.104418,0.68,100.0,
+1,same_patient_original_original,ArcFace,6033,6074,SAME_PERSON,0.009754,0.68,100.0,
+2,same_frame_original_anonymized,ArcFace,204,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,ArcFace,839,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,ArcFace,912,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,ArcFace,1143,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,ArcFace,1828,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,ArcFace,2006,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,ArcFace,2253,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,ArcFace,5238,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,ArcFace,6033,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,ArcFace,6074,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,204,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,204,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,204,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,204,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,204,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,204,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,204,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,204,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,204,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,204,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,839,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,839,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,839,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,839,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,839,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,839,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,839,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,839,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,839,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,839,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,912,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,912,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,912,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,912,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,912,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,912,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,912,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,912,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,912,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,912,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,1143,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,1143,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,1143,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,1143,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,1143,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,1143,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,1143,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,1143,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,1143,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,1143,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,1828,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,1828,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,1828,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,1828,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,1828,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,1828,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,1828,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,1828,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,1828,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,1828,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,2006,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,2006,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,2006,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,2006,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,2006,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,2006,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,2006,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,2006,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,2006,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,2006,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,2253,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,2253,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,2253,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,2253,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,2253,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,2253,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,2253,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,2253,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,2253,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,2253,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,5238,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,5238,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,5238,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,5238,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,5238,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,5238,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,5238,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,5238,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,5238,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,5238,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,6033,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,6033,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,6033,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,6033,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,6033,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,6033,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,6033,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,6033,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,6033,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,6033,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,6074,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,6074,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,6074,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,6074,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,6074,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,6074,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,6074,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,6074,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,6074,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,ArcFace,6074,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+4,different_patient_original_original,ArcFace,204,244,NOT_SAME_PERSON,0.748115,0.68,14.19,
+4,different_patient_original_original,ArcFace,204,260,NOT_SAME_PERSON,0.743376,0.68,14.53,
+4,different_patient_original_original,ArcFace,204,712,NOT_SAME_PERSON,0.721113,0.68,16.22,
+4,different_patient_original_original,ArcFace,204,767,NOT_SAME_PERSON,0.732475,0.68,15.34,
+4,different_patient_original_original,ArcFace,204,1791,NOT_SAME_PERSON,0.750896,0.68,13.99,
+4,different_patient_original_original,ArcFace,204,3456,NOT_SAME_PERSON,0.734657,0.68,15.18,
+4,different_patient_original_original,ArcFace,204,4467,NOT_SAME_PERSON,0.745189,0.68,14.4,
+4,different_patient_original_original,ArcFace,204,4837,SAME_PERSON,0.675593,0.68,51.0,
+4,different_patient_original_original,ArcFace,204,5543,NOT_SAME_PERSON,0.732386,0.68,15.35,
+4,different_patient_original_original,ArcFace,204,6067,NOT_SAME_PERSON,0.719553,0.68,16.35,
+4,different_patient_original_original,ArcFace,839,244,NOT_SAME_PERSON,0.719122,0.68,16.38,
+4,different_patient_original_original,ArcFace,839,260,NOT_SAME_PERSON,0.721773,0.68,16.17,
+4,different_patient_original_original,ArcFace,839,712,NOT_SAME_PERSON,0.70864,0.68,17.23,
+4,different_patient_original_original,ArcFace,839,767,SAME_PERSON,0.676169,0.68,51.0,
+4,different_patient_original_original,ArcFace,839,1791,NOT_SAME_PERSON,0.728187,0.68,15.67,
+4,different_patient_original_original,ArcFace,839,3456,NOT_SAME_PERSON,0.690722,0.68,18.77,
+4,different_patient_original_original,ArcFace,839,4467,SAME_PERSON,0.676013,0.68,51.0,
+4,different_patient_original_original,ArcFace,839,4837,NOT_SAME_PERSON,0.693577,0.68,18.52,
+4,different_patient_original_original,ArcFace,839,5543,NOT_SAME_PERSON,0.744209,0.68,14.47,
+4,different_patient_original_original,ArcFace,839,6067,SAME_PERSON,0.676664,0.68,51.0,
+4,different_patient_original_original,ArcFace,912,244,NOT_SAME_PERSON,0.680176,0.68,19.71,
+4,different_patient_original_original,ArcFace,912,260,NOT_SAME_PERSON,0.680047,0.68,19.72,
+4,different_patient_original_original,ArcFace,912,712,SAME_PERSON,0.664773,0.68,51.0,
+4,different_patient_original_original,ArcFace,912,767,SAME_PERSON,0.624123,0.68,51.0,
+4,different_patient_original_original,ArcFace,912,1791,NOT_SAME_PERSON,0.685083,0.68,19.27,
+4,different_patient_original_original,ArcFace,912,3456,SAME_PERSON,0.645743,0.68,51.0,
+4,different_patient_original_original,ArcFace,912,4467,SAME_PERSON,0.656959,0.68,51.0,
+4,different_patient_original_original,ArcFace,912,4837,SAME_PERSON,0.638839,0.68,51.0,
+4,different_patient_original_original,ArcFace,912,5543,NOT_SAME_PERSON,0.68618,0.68,19.17,
+4,different_patient_original_original,ArcFace,912,6067,SAME_PERSON,0.628736,0.68,51.0,
+4,different_patient_original_original,ArcFace,1143,244,SAME_PERSON,0.671805,0.68,51.0,
+4,different_patient_original_original,ArcFace,1143,260,SAME_PERSON,0.658263,0.68,51.0,
+4,different_patient_original_original,ArcFace,1143,712,SAME_PERSON,0.671167,0.68,51.0,
+4,different_patient_original_original,ArcFace,1143,767,SAME_PERSON,0.665893,0.68,51.0,
+4,different_patient_original_original,ArcFace,1143,1791,NOT_SAME_PERSON,0.685268,0.68,19.25,
+4,different_patient_original_original,ArcFace,1143,3456,SAME_PERSON,0.662728,0.68,51.0,
+4,different_patient_original_original,ArcFace,1143,4467,NOT_SAME_PERSON,0.737767,0.68,14.94,
+4,different_patient_original_original,ArcFace,1143,4837,NOT_SAME_PERSON,0.684243,0.68,19.34,
+4,different_patient_original_original,ArcFace,1143,5543,NOT_SAME_PERSON,0.702159,0.68,17.78,
+4,different_patient_original_original,ArcFace,1143,6067,SAME_PERSON,0.651714,0.68,51.0,
+4,different_patient_original_original,ArcFace,1828,244,NOT_SAME_PERSON,0.740628,0.68,14.73,
+4,different_patient_original_original,ArcFace,1828,260,NOT_SAME_PERSON,0.743767,0.68,14.5,
+4,different_patient_original_original,ArcFace,1828,712,NOT_SAME_PERSON,0.711559,0.68,16.99,
+4,different_patient_original_original,ArcFace,1828,767,NOT_SAME_PERSON,0.703333,0.68,17.68,
+4,different_patient_original_original,ArcFace,1828,1791,NOT_SAME_PERSON,0.736667,0.68,15.02,
+4,different_patient_original_original,ArcFace,1828,3456,NOT_SAME_PERSON,0.728923,0.68,15.61,
+4,different_patient_original_original,ArcFace,1828,4467,NOT_SAME_PERSON,0.738915,0.68,14.86,
+4,different_patient_original_original,ArcFace,1828,4837,SAME_PERSON,0.67421,0.68,51.0,
+4,different_patient_original_original,ArcFace,1828,5543,NOT_SAME_PERSON,0.705078,0.68,17.53,
+4,different_patient_original_original,ArcFace,1828,6067,NOT_SAME_PERSON,0.696854,0.68,18.23,
+4,different_patient_original_original,ArcFace,2006,244,NOT_SAME_PERSON,0.693742,0.68,18.5,
+4,different_patient_original_original,ArcFace,2006,260,NOT_SAME_PERSON,0.70267,0.68,17.73,
+4,different_patient_original_original,ArcFace,2006,712,NOT_SAME_PERSON,0.689849,0.68,18.84,
+4,different_patient_original_original,ArcFace,2006,767,SAME_PERSON,0.658086,0.68,51.0,
+4,different_patient_original_original,ArcFace,2006,1791,NOT_SAME_PERSON,0.696592,0.68,18.25,
+4,different_patient_original_original,ArcFace,2006,3456,NOT_SAME_PERSON,0.680222,0.68,19.71,
+4,different_patient_original_original,ArcFace,2006,4467,NOT_SAME_PERSON,0.717008,0.68,16.55,
+4,different_patient_original_original,ArcFace,2006,4837,SAME_PERSON,0.660813,0.68,51.0,
+4,different_patient_original_original,ArcFace,2006,5543,NOT_SAME_PERSON,0.690098,0.68,18.82,
+4,different_patient_original_original,ArcFace,2006,6067,SAME_PERSON,0.657928,0.68,51.0,
+4,different_patient_original_original,ArcFace,2253,244,NOT_SAME_PERSON,0.724016,0.68,15.99,
+4,different_patient_original_original,ArcFace,2253,260,NOT_SAME_PERSON,0.72777,0.68,15.7,
+4,different_patient_original_original,ArcFace,2253,712,NOT_SAME_PERSON,0.714102,0.68,16.79,
+4,different_patient_original_original,ArcFace,2253,767,NOT_SAME_PERSON,0.694794,0.68,18.41,
+4,different_patient_original_original,ArcFace,2253,1791,NOT_SAME_PERSON,0.719747,0.68,16.33,
+4,different_patient_original_original,ArcFace,2253,3456,NOT_SAME_PERSON,0.711557,0.68,16.99,
+4,different_patient_original_original,ArcFace,2253,4467,NOT_SAME_PERSON,0.745575,0.68,14.37,
+4,different_patient_original_original,ArcFace,2253,4837,SAME_PERSON,0.674124,0.68,51.0,
+4,different_patient_original_original,ArcFace,2253,5543,NOT_SAME_PERSON,0.709009,0.68,17.2,
+4,different_patient_original_original,ArcFace,2253,6067,NOT_SAME_PERSON,0.692496,0.68,18.61,
+4,different_patient_original_original,ArcFace,5238,244,SAME_PERSON,0.48802,0.68,62.18,
+4,different_patient_original_original,ArcFace,5238,260,SAME_PERSON,0.472166,0.68,64.08,
+4,different_patient_original_original,ArcFace,5238,712,SAME_PERSON,0.560599,0.68,53.94,
+4,different_patient_original_original,ArcFace,5238,767,SAME_PERSON,0.530689,0.68,57.23,
+4,different_patient_original_original,ArcFace,5238,1791,SAME_PERSON,0.462336,0.68,65.27,
+4,different_patient_original_original,ArcFace,5238,3456,SAME_PERSON,0.441336,0.68,67.83,
+4,different_patient_original_original,ArcFace,5238,4467,NOT_SAME_PERSON,0.790717,0.68,11.37,
+4,different_patient_original_original,ArcFace,5238,4837,SAME_PERSON,0.670911,0.68,51.0,
+4,different_patient_original_original,ArcFace,5238,5543,SAME_PERSON,0.562747,0.68,53.71,
+4,different_patient_original_original,ArcFace,5238,6067,SAME_PERSON,0.510695,0.68,59.51,
+4,different_patient_original_original,ArcFace,6033,244,SAME_PERSON,0.46839,0.68,64.53,
+4,different_patient_original_original,ArcFace,6033,260,SAME_PERSON,0.453309,0.68,66.37,
+4,different_patient_original_original,ArcFace,6033,712,SAME_PERSON,0.525294,0.68,57.84,
+4,different_patient_original_original,ArcFace,6033,767,SAME_PERSON,0.494823,0.68,61.37,
+4,different_patient_original_original,ArcFace,6033,1791,SAME_PERSON,0.45173,0.68,66.56,
+4,different_patient_original_original,ArcFace,6033,3456,SAME_PERSON,0.442354,0.68,67.71,
+4,different_patient_original_original,ArcFace,6033,4467,NOT_SAME_PERSON,0.702545,0.68,17.74,
+4,different_patient_original_original,ArcFace,6033,4837,SAME_PERSON,0.651048,0.68,51.0,
+4,different_patient_original_original,ArcFace,6033,5543,SAME_PERSON,0.538858,0.68,56.31,
+4,different_patient_original_original,ArcFace,6033,6067,SAME_PERSON,0.489309,0.68,62.03,
+4,different_patient_original_original,ArcFace,6074,244,SAME_PERSON,0.4781,0.68,63.36,
+4,different_patient_original_original,ArcFace,6074,260,SAME_PERSON,0.464498,0.68,65.01,
+4,different_patient_original_original,ArcFace,6074,712,SAME_PERSON,0.54453,0.68,55.68,
+4,different_patient_original_original,ArcFace,6074,767,SAME_PERSON,0.514084,0.68,59.12,
+4,different_patient_original_original,ArcFace,6074,1791,SAME_PERSON,0.461221,0.68,65.4,
+4,different_patient_original_original,ArcFace,6074,3456,SAME_PERSON,0.455814,0.68,66.06,
+4,different_patient_original_original,ArcFace,6074,4467,NOT_SAME_PERSON,0.712523,0.68,16.91,
+4,different_patient_original_original,ArcFace,6074,4837,SAME_PERSON,0.656227,0.68,51.0,
+4,different_patient_original_original,ArcFace,6074,5543,SAME_PERSON,0.550455,0.68,55.04,
+4,different_patient_original_original,ArcFace,6074,6067,SAME_PERSON,0.493966,0.68,61.47,
+1,same_patient_original_original,Facenet512,204,839,SAME_PERSON,0.195205,0.3,74.47,
+1,same_patient_original_original,Facenet512,204,912,SAME_PERSON,0.154963,0.3,84.15,
+1,same_patient_original_original,Facenet512,204,1143,SAME_PERSON,0.076715,0.3,100.0,
+1,same_patient_original_original,Facenet512,204,1828,SAME_PERSON,0.057959,0.3,100.0,
+1,same_patient_original_original,Facenet512,204,2006,SAME_PERSON,0.068693,0.3,100.0,
+1,same_patient_original_original,Facenet512,204,2253,SAME_PERSON,0.040586,0.3,100.0,
+1,same_patient_original_original,Facenet512,204,5238,SAME_PERSON,0.225617,0.3,67.13,
+1,same_patient_original_original,Facenet512,204,6033,SAME_PERSON,0.106782,0.3,95.5,
+1,same_patient_original_original,Facenet512,204,6074,SAME_PERSON,0.107127,0.3,95.42,
+1,same_patient_original_original,Facenet512,839,912,SAME_PERSON,0.036816,0.3,100.0,
+1,same_patient_original_original,Facenet512,839,1143,SAME_PERSON,0.208404,0.3,71.29,
+1,same_patient_original_original,Facenet512,839,1828,SAME_PERSON,0.145967,0.3,86.3,
+1,same_patient_original_original,Facenet512,839,2006,SAME_PERSON,0.123502,0.3,91.61,
+1,same_patient_original_original,Facenet512,839,2253,SAME_PERSON,0.162307,0.3,82.39,
+1,same_patient_original_original,Facenet512,839,5238,SAME_PERSON,0.238927,0.3,63.93,
+1,same_patient_original_original,Facenet512,839,6033,SAME_PERSON,0.162568,0.3,82.33,
+1,same_patient_original_original,Facenet512,839,6074,SAME_PERSON,0.176012,0.3,79.1,
+1,same_patient_original_original,Facenet512,912,1143,SAME_PERSON,0.156874,0.3,83.7,
+1,same_patient_original_original,Facenet512,912,1828,SAME_PERSON,0.095619,0.3,98.07,
+1,same_patient_original_original,Facenet512,912,2006,SAME_PERSON,0.073982,0.3,100.0,
+1,same_patient_original_original,Facenet512,912,2253,SAME_PERSON,0.105308,0.3,95.84,
+1,same_patient_original_original,Facenet512,912,5238,SAME_PERSON,0.184692,0.3,77.01,
+1,same_patient_original_original,Facenet512,912,6033,SAME_PERSON,0.11768,0.3,92.97,
+1,same_patient_original_original,Facenet512,912,6074,SAME_PERSON,0.132303,0.3,89.54,
+1,same_patient_original_original,Facenet512,1143,1828,SAME_PERSON,0.105299,0.3,95.85,
+1,same_patient_original_original,Facenet512,1143,2006,SAME_PERSON,0.081368,0.3,100.0,
+1,same_patient_original_original,Facenet512,1143,2253,SAME_PERSON,0.077152,0.3,100.0,
+1,same_patient_original_original,Facenet512,1143,5238,SAME_PERSON,0.152198,0.3,84.81,
+1,same_patient_original_original,Facenet512,1143,6033,SAME_PERSON,0.106892,0.3,95.48,
+1,same_patient_original_original,Facenet512,1143,6074,SAME_PERSON,0.107698,0.3,95.29,
+1,same_patient_original_original,Facenet512,1828,2006,SAME_PERSON,0.013685,0.3,100.0,
+1,same_patient_original_original,Facenet512,1828,2253,SAME_PERSON,0.014922,0.3,100.0,
+1,same_patient_original_original,Facenet512,1828,5238,SAME_PERSON,0.248178,0.3,61.71,
+1,same_patient_original_original,Facenet512,1828,6033,SAME_PERSON,0.144943,0.3,86.54,
+1,same_patient_original_original,Facenet512,1828,6074,SAME_PERSON,0.1529,0.3,84.64,
+1,same_patient_original_original,Facenet512,2006,2253,SAME_PERSON,0.016147,0.3,100.0,
+1,same_patient_original_original,Facenet512,2006,5238,SAME_PERSON,0.196365,0.3,74.19,
+1,same_patient_original_original,Facenet512,2006,6033,SAME_PERSON,0.117894,0.3,92.92,
+1,same_patient_original_original,Facenet512,2006,6074,SAME_PERSON,0.125314,0.3,91.18,
+1,same_patient_original_original,Facenet512,2253,5238,SAME_PERSON,0.211097,0.3,70.63,
+1,same_patient_original_original,Facenet512,2253,6033,SAME_PERSON,0.112487,0.3,94.18,
+1,same_patient_original_original,Facenet512,2253,6074,SAME_PERSON,0.118993,0.3,92.66,
+1,same_patient_original_original,Facenet512,5238,6033,SAME_PERSON,0.073146,0.3,100.0,
+1,same_patient_original_original,Facenet512,5238,6074,SAME_PERSON,0.071729,0.3,100.0,
+1,same_patient_original_original,Facenet512,6033,6074,SAME_PERSON,0.00309,0.3,100.0,
+2,same_frame_original_anonymized,Facenet512,204,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,Facenet512,839,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,Facenet512,912,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,Facenet512,1143,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,Facenet512,1828,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,Facenet512,2006,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,Facenet512,2253,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,Facenet512,5238,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,Facenet512,6033,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,Facenet512,6074,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,204,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,204,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,204,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,204,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,204,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,204,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,204,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,204,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,204,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,204,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,839,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,839,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,839,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,839,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,839,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,839,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,839,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,839,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,839,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,839,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,912,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,912,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,912,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,912,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,912,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,912,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,912,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,912,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,912,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,912,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,1143,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,1143,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,1143,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,1143,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,1143,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,1143,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,1143,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,1143,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,1143,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,1143,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,1828,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,1828,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,1828,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,1828,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,1828,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,1828,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,1828,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,1828,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,1828,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,1828,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,2006,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,2006,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,2006,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,2006,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,2006,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,2006,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,2006,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,2006,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,2006,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,2006,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,2253,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,2253,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,2253,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,2253,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,2253,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,2253,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,2253,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,2253,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,2253,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,2253,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,5238,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,5238,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,5238,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,5238,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,5238,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,5238,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,5238,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,5238,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,5238,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,5238,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,6033,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,6033,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,6033,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,6033,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,6033,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,6033,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,6033,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,6033,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,6033,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,6033,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,6074,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,6074,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,6074,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,6074,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,6074,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,6074,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,6074,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,6074,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,6074,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,Facenet512,6074,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+4,different_patient_original_original,Facenet512,204,244,NOT_SAME_PERSON,0.707208,0.3,9.87,
+4,different_patient_original_original,Facenet512,204,260,NOT_SAME_PERSON,0.72037,0.3,9.36,
+4,different_patient_original_original,Facenet512,204,712,NOT_SAME_PERSON,0.71858,0.3,9.43,
+4,different_patient_original_original,Facenet512,204,767,NOT_SAME_PERSON,0.649655,0.3,12.4,
+4,different_patient_original_original,Facenet512,204,1791,NOT_SAME_PERSON,0.693219,0.3,10.44,
+4,different_patient_original_original,Facenet512,204,3456,NOT_SAME_PERSON,0.69882,0.3,10.21,
+4,different_patient_original_original,Facenet512,204,4467,NOT_SAME_PERSON,0.74818,0.3,8.34,
+4,different_patient_original_original,Facenet512,204,4837,NOT_SAME_PERSON,0.737332,0.3,8.73,
+4,different_patient_original_original,Facenet512,204,5543,NOT_SAME_PERSON,0.707791,0.3,9.85,
+4,different_patient_original_original,Facenet512,204,6067,NOT_SAME_PERSON,0.675889,0.3,11.19,
+4,different_patient_original_original,Facenet512,839,244,NOT_SAME_PERSON,0.595622,0.3,15.22,
+4,different_patient_original_original,Facenet512,839,260,NOT_SAME_PERSON,0.62052,0.3,13.87,
+4,different_patient_original_original,Facenet512,839,712,NOT_SAME_PERSON,0.619213,0.3,13.93,
+4,different_patient_original_original,Facenet512,839,767,NOT_SAME_PERSON,0.509392,0.3,20.72,
+4,different_patient_original_original,Facenet512,839,1791,NOT_SAME_PERSON,0.524029,0.3,19.7,
+4,different_patient_original_original,Facenet512,839,3456,NOT_SAME_PERSON,0.592455,0.3,15.4,
+4,different_patient_original_original,Facenet512,839,4467,NOT_SAME_PERSON,0.698538,0.3,10.22,
+4,different_patient_original_original,Facenet512,839,4837,NOT_SAME_PERSON,0.677489,0.3,11.12,
+4,different_patient_original_original,Facenet512,839,5543,NOT_SAME_PERSON,0.584669,0.3,15.85,
+4,different_patient_original_original,Facenet512,839,6067,NOT_SAME_PERSON,0.508619,0.3,20.78,
+4,different_patient_original_original,Facenet512,912,244,NOT_SAME_PERSON,0.568734,0.3,16.8,
+4,different_patient_original_original,Facenet512,912,260,NOT_SAME_PERSON,0.591582,0.3,15.45,
+4,different_patient_original_original,Facenet512,912,712,NOT_SAME_PERSON,0.603657,0.3,14.77,
+4,different_patient_original_original,Facenet512,912,767,NOT_SAME_PERSON,0.481578,0.3,22.77,
+4,different_patient_original_original,Facenet512,912,1791,NOT_SAME_PERSON,0.50564,0.3,20.99,
+4,different_patient_original_original,Facenet512,912,3456,NOT_SAME_PERSON,0.563167,0.3,17.15,
+4,different_patient_original_original,Facenet512,912,4467,NOT_SAME_PERSON,0.631903,0.3,13.28,
+4,different_patient_original_original,Facenet512,912,4837,NOT_SAME_PERSON,0.640188,0.3,12.86,
+4,different_patient_original_original,Facenet512,912,5543,NOT_SAME_PERSON,0.558289,0.3,17.45,
+4,different_patient_original_original,Facenet512,912,6067,NOT_SAME_PERSON,0.49606,0.3,21.69,
+4,different_patient_original_original,Facenet512,1143,244,NOT_SAME_PERSON,0.650339,0.3,12.37,
+4,different_patient_original_original,Facenet512,1143,260,NOT_SAME_PERSON,0.652798,0.3,12.25,
+4,different_patient_original_original,Facenet512,1143,712,NOT_SAME_PERSON,0.661711,0.3,11.83,
+4,different_patient_original_original,Facenet512,1143,767,NOT_SAME_PERSON,0.611289,0.3,14.36,
+4,different_patient_original_original,Facenet512,1143,1791,NOT_SAME_PERSON,0.623544,0.3,13.71,
+4,different_patient_original_original,Facenet512,1143,3456,NOT_SAME_PERSON,0.643142,0.3,12.72,
+4,different_patient_original_original,Facenet512,1143,4467,NOT_SAME_PERSON,0.640195,0.3,12.86,
+4,different_patient_original_original,Facenet512,1143,4837,NOT_SAME_PERSON,0.685707,0.3,10.76,
+4,different_patient_original_original,Facenet512,1143,5543,NOT_SAME_PERSON,0.654684,0.3,12.16,
+4,different_patient_original_original,Facenet512,1143,6067,NOT_SAME_PERSON,0.63695,0.3,13.02,
+4,different_patient_original_original,Facenet512,1828,244,NOT_SAME_PERSON,0.697113,0.3,10.28,
+4,different_patient_original_original,Facenet512,1828,260,NOT_SAME_PERSON,0.713324,0.3,9.63,
+4,different_patient_original_original,Facenet512,1828,712,NOT_SAME_PERSON,0.718845,0.3,9.42,
+4,different_patient_original_original,Facenet512,1828,767,NOT_SAME_PERSON,0.621498,0.3,13.81,
+4,different_patient_original_original,Facenet512,1828,1791,NOT_SAME_PERSON,0.660265,0.3,11.9,
+4,different_patient_original_original,Facenet512,1828,3456,NOT_SAME_PERSON,0.686107,0.3,10.74,
+4,different_patient_original_original,Facenet512,1828,4467,NOT_SAME_PERSON,0.72104,0.3,9.33,
+4,different_patient_original_original,Facenet512,1828,4837,NOT_SAME_PERSON,0.733736,0.3,8.86,
+4,different_patient_original_original,Facenet512,1828,5543,NOT_SAME_PERSON,0.702246,0.3,10.07,
+4,different_patient_original_original,Facenet512,1828,6067,NOT_SAME_PERSON,0.654582,0.3,12.16,
+4,different_patient_original_original,Facenet512,2006,244,NOT_SAME_PERSON,0.631122,0.3,13.32,
+4,different_patient_original_original,Facenet512,2006,260,NOT_SAME_PERSON,0.648125,0.3,12.47,
+4,different_patient_original_original,Facenet512,2006,712,NOT_SAME_PERSON,0.653656,0.3,12.21,
+4,different_patient_original_original,Facenet512,2006,767,NOT_SAME_PERSON,0.565123,0.3,17.03,
+4,different_patient_original_original,Facenet512,2006,1791,NOT_SAME_PERSON,0.584722,0.3,15.85,
+4,different_patient_original_original,Facenet512,2006,3456,NOT_SAME_PERSON,0.621613,0.3,13.81,
+4,different_patient_original_original,Facenet512,2006,4467,NOT_SAME_PERSON,0.667625,0.3,11.56,
+4,different_patient_original_original,Facenet512,2006,4837,NOT_SAME_PERSON,0.687347,0.3,10.69,
+4,different_patient_original_original,Facenet512,2006,5543,NOT_SAME_PERSON,0.642603,0.3,12.74,
+4,different_patient_original_original,Facenet512,2006,6067,NOT_SAME_PERSON,0.591722,0.3,15.45,
+4,different_patient_original_original,Facenet512,2253,244,NOT_SAME_PERSON,0.66761,0.3,11.56,
+4,different_patient_original_original,Facenet512,2253,260,NOT_SAME_PERSON,0.683477,0.3,10.86,
+4,different_patient_original_original,Facenet512,2253,712,NOT_SAME_PERSON,0.694134,0.3,10.41,
+4,different_patient_original_original,Facenet512,2253,767,NOT_SAME_PERSON,0.606744,0.3,14.6,
+4,different_patient_original_original,Facenet512,2253,1791,NOT_SAME_PERSON,0.632998,0.3,13.22,
+4,different_patient_original_original,Facenet512,2253,3456,NOT_SAME_PERSON,0.659229,0.3,11.95,
+4,different_patient_original_original,Facenet512,2253,4467,NOT_SAME_PERSON,0.693418,0.3,10.44,
+4,different_patient_original_original,Facenet512,2253,4837,NOT_SAME_PERSON,0.711126,0.3,9.72,
+4,different_patient_original_original,Facenet512,2253,5543,NOT_SAME_PERSON,0.681587,0.3,10.94,
+4,different_patient_original_original,Facenet512,2253,6067,NOT_SAME_PERSON,0.633707,0.3,13.19,
+4,different_patient_original_original,Facenet512,5238,244,NOT_SAME_PERSON,0.538928,0.3,18.7,
+4,different_patient_original_original,Facenet512,5238,260,NOT_SAME_PERSON,0.554441,0.3,17.69,
+4,different_patient_original_original,Facenet512,5238,712,NOT_SAME_PERSON,0.596455,0.3,15.18,
+4,different_patient_original_original,Facenet512,5238,767,NOT_SAME_PERSON,0.520069,0.3,19.97,
+4,different_patient_original_original,Facenet512,5238,1791,NOT_SAME_PERSON,0.455364,0.3,24.82,
+4,different_patient_original_original,Facenet512,5238,3456,NOT_SAME_PERSON,0.519461,0.3,20.02,
+4,different_patient_original_original,Facenet512,5238,4467,NOT_SAME_PERSON,0.51893,0.3,20.05,
+4,different_patient_original_original,Facenet512,5238,4837,NOT_SAME_PERSON,0.546978,0.3,18.17,
+4,different_patient_original_original,Facenet512,5238,5543,NOT_SAME_PERSON,0.521284,0.3,19.89,
+4,different_patient_original_original,Facenet512,5238,6067,NOT_SAME_PERSON,0.526832,0.3,19.51,
+4,different_patient_original_original,Facenet512,6033,244,NOT_SAME_PERSON,0.617602,0.3,14.02,
+4,different_patient_original_original,Facenet512,6033,260,NOT_SAME_PERSON,0.636419,0.3,13.05,
+4,different_patient_original_original,Facenet512,6033,712,NOT_SAME_PERSON,0.653685,0.3,12.21,
+4,different_patient_original_original,Facenet512,6033,767,NOT_SAME_PERSON,0.588928,0.3,15.61,
+4,different_patient_original_original,Facenet512,6033,1791,NOT_SAME_PERSON,0.557329,0.3,17.51,
+4,different_patient_original_original,Facenet512,6033,3456,NOT_SAME_PERSON,0.604015,0.3,14.75,
+4,different_patient_original_original,Facenet512,6033,4467,NOT_SAME_PERSON,0.628999,0.3,13.43,
+4,different_patient_original_original,Facenet512,6033,4837,NOT_SAME_PERSON,0.640535,0.3,12.84,
+4,different_patient_original_original,Facenet512,6033,5543,NOT_SAME_PERSON,0.601339,0.3,14.9,
+4,different_patient_original_original,Facenet512,6033,6067,NOT_SAME_PERSON,0.589659,0.3,15.56,
+4,different_patient_original_original,Facenet512,6074,244,NOT_SAME_PERSON,0.622194,0.3,13.78,
+4,different_patient_original_original,Facenet512,6074,260,NOT_SAME_PERSON,0.639782,0.3,12.88,
+4,different_patient_original_original,Facenet512,6074,712,NOT_SAME_PERSON,0.657007,0.3,12.05,
+4,different_patient_original_original,Facenet512,6074,767,NOT_SAME_PERSON,0.595814,0.3,15.21,
+4,different_patient_original_original,Facenet512,6074,1791,NOT_SAME_PERSON,0.572889,0.3,16.55,
+4,different_patient_original_original,Facenet512,6074,3456,NOT_SAME_PERSON,0.611798,0.3,14.33,
+4,different_patient_original_original,Facenet512,6074,4467,NOT_SAME_PERSON,0.632555,0.3,13.24,
+4,different_patient_original_original,Facenet512,6074,4837,NOT_SAME_PERSON,0.641913,0.3,12.78,
+4,different_patient_original_original,Facenet512,6074,5543,NOT_SAME_PERSON,0.610647,0.3,14.39,
+4,different_patient_original_original,Facenet512,6074,6067,NOT_SAME_PERSON,0.605828,0.3,14.65,
+1,same_patient_original_original,SFace,204,839,NOT_SAME_PERSON,0.59635,0.593,23.01,
+1,same_patient_original_original,SFace,204,912,SAME_PERSON,0.452755,0.593,64.36,
+1,same_patient_original_original,SFace,204,1143,SAME_PERSON,0.118765,0.593,100.0,
+1,same_patient_original_original,SFace,204,1828,SAME_PERSON,0.165983,0.593,97.45,
+1,same_patient_original_original,SFace,204,2006,SAME_PERSON,0.276195,0.593,86.27,
+1,same_patient_original_original,SFace,204,2253,SAME_PERSON,0.177342,0.593,96.45,
+1,same_patient_original_original,SFace,204,5238,NOT_SAME_PERSON,0.602176,0.593,22.39,
+1,same_patient_original_original,SFace,204,6033,SAME_PERSON,0.591448,0.593,51.0,
+1,same_patient_original_original,SFace,204,6074,SAME_PERSON,0.563944,0.593,51.76,
+1,same_patient_original_original,SFace,839,912,SAME_PERSON,0.147314,0.593,99.02,
+1,same_patient_original_original,SFace,839,1143,NOT_SAME_PERSON,0.631011,0.593,19.53,
+1,same_patient_original_original,SFace,839,1828,NOT_SAME_PERSON,0.607597,0.593,21.83,
+1,same_patient_original_original,SFace,839,2006,SAME_PERSON,0.554186,0.593,52.76,
+1,same_patient_original_original,SFace,839,2253,NOT_SAME_PERSON,0.626991,0.593,19.91,
+1,same_patient_original_original,SFace,839,5238,SAME_PERSON,0.545485,0.593,53.67,
+1,same_patient_original_original,SFace,839,6033,SAME_PERSON,0.507601,0.593,57.83,
+1,same_patient_original_original,SFace,839,6074,SAME_PERSON,0.487239,0.593,60.19,
+1,same_patient_original_original,SFace,912,1143,SAME_PERSON,0.478983,0.593,61.17,
+1,same_patient_original_original,SFace,912,1828,SAME_PERSON,0.483004,0.593,60.69,
+1,same_patient_original_original,SFace,912,2006,SAME_PERSON,0.555706,0.593,52.6,
+1,same_patient_original_original,SFace,912,2253,SAME_PERSON,0.489354,0.593,59.94,
+1,same_patient_original_original,SFace,912,5238,SAME_PERSON,0.54783,0.593,53.42,
+1,same_patient_original_original,SFace,912,6033,SAME_PERSON,0.400977,0.593,70.87,
+1,same_patient_original_original,SFace,912,6074,SAME_PERSON,0.385831,0.593,72.8,
+1,same_patient_original_original,SFace,1143,1828,SAME_PERSON,0.226334,0.593,91.71,
+1,same_patient_original_original,SFace,1143,2006,SAME_PERSON,0.334034,0.593,79.33,
+1,same_patient_original_original,SFace,1143,2253,SAME_PERSON,0.196234,0.593,94.7,
+1,same_patient_original_original,SFace,1143,5238,SAME_PERSON,0.536677,0.593,54.6,
+1,same_patient_original_original,SFace,1143,6033,SAME_PERSON,0.539459,0.593,54.31,
+1,same_patient_original_original,SFace,1143,6074,SAME_PERSON,0.512003,0.593,57.33,
+1,same_patient_original_original,SFace,1828,2006,SAME_PERSON,0.125841,0.593,100.0,
+1,same_patient_original_original,SFace,1828,2253,SAME_PERSON,0.064307,0.593,100.0,
+1,same_patient_original_original,SFace,1828,5238,NOT_SAME_PERSON,0.653972,0.593,17.43,
+1,same_patient_original_original,SFace,1828,6033,SAME_PERSON,0.522101,0.593,56.2,
+1,same_patient_original_original,SFace,1828,6074,SAME_PERSON,0.513154,0.593,57.2,
+1,same_patient_original_original,SFace,2006,2253,SAME_PERSON,0.133935,0.593,100.0,
+1,same_patient_original_original,SFace,2006,5238,NOT_SAME_PERSON,0.6187,0.593,20.72,
+1,same_patient_original_original,SFace,2006,6033,NOT_SAME_PERSON,0.622004,0.593,20.39,
+1,same_patient_original_original,SFace,2006,6074,NOT_SAME_PERSON,0.600626,0.593,22.56,
+1,same_patient_original_original,SFace,2253,5238,NOT_SAME_PERSON,0.613485,0.593,21.24,
+1,same_patient_original_original,SFace,2253,6033,SAME_PERSON,0.534188,0.593,54.87,
+1,same_patient_original_original,SFace,2253,6074,SAME_PERSON,0.521518,0.593,56.26,
+1,same_patient_original_original,SFace,5238,6033,SAME_PERSON,0.421357,0.593,68.29,
+1,same_patient_original_original,SFace,5238,6074,SAME_PERSON,0.380856,0.593,73.43,
+1,same_patient_original_original,SFace,6033,6074,SAME_PERSON,0.015132,0.593,100.0,
+2,same_frame_original_anonymized,SFace,204,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,SFace,839,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,SFace,912,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,SFace,1143,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,SFace,1828,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,SFace,2006,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,SFace,2253,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,SFace,5238,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,SFace,6033,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+2,same_frame_original_anonymized,SFace,6074,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,204,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,204,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,204,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,204,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,204,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,204,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,204,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,204,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,204,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,204,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,839,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,839,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,839,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,839,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,839,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,839,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,839,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,839,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,839,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,839,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,912,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,912,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,912,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,912,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,912,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,912,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,912,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,912,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,912,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,912,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,1143,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,1143,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,1143,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,1143,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,1143,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,1143,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,1143,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,1143,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,1143,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,1143,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,1828,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,1828,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,1828,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,1828,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,1828,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,1828,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,1828,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,1828,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,1828,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,1828,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,2006,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,2006,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,2006,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,2006,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,2006,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,2006,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,2006,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,2006,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,2006,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,2006,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,2253,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,2253,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,2253,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,2253,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,2253,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,2253,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,2253,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,2253,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,2253,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,2253,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,5238,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,5238,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,5238,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,5238,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,5238,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,5238,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,5238,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,5238,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,5238,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,5238,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,6033,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,6033,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,6033,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,6033,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,6033,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,6033,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,6033,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,6033,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,6033,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,6033,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,6074,204,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,6074,839,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,6074,912,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,6074,1143,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,6074,1828,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,6074,2006,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,6074,2253,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,6074,5238,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,6074,6033,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+3,all_original_vs_all_anonymized,SFace,6074,6074,FACE_NOT_DETECTED_OR_ERROR,,,,Exception while processing img2_path
+4,different_patient_original_original,SFace,204,244,NOT_SAME_PERSON,1.014065,0.593,1.51,
+4,different_patient_original_original,SFace,204,260,NOT_SAME_PERSON,1.019059,0.593,1.43,
+4,different_patient_original_original,SFace,204,712,NOT_SAME_PERSON,1.031151,0.593,1.25,
+4,different_patient_original_original,SFace,204,767,NOT_SAME_PERSON,1.021913,0.593,1.39,
+4,different_patient_original_original,SFace,204,1791,NOT_SAME_PERSON,1.046171,0.593,1.04,
+4,different_patient_original_original,SFace,204,3456,NOT_SAME_PERSON,1.076596,0.593,0.67,
+4,different_patient_original_original,SFace,204,4467,NOT_SAME_PERSON,1.028629,0.593,1.29,
+4,different_patient_original_original,SFace,204,4837,NOT_SAME_PERSON,1.09695,0.593,0.45,
+4,different_patient_original_original,SFace,204,5543,NOT_SAME_PERSON,1.025981,0.593,1.33,
+4,different_patient_original_original,SFace,204,6067,NOT_SAME_PERSON,1.097696,0.593,0.44,
+4,different_patient_original_original,SFace,839,244,NOT_SAME_PERSON,0.936541,0.593,3.04,
+4,different_patient_original_original,SFace,839,260,NOT_SAME_PERSON,0.930796,0.593,3.18,
+4,different_patient_original_original,SFace,839,712,NOT_SAME_PERSON,0.869961,0.593,4.94,
+4,different_patient_original_original,SFace,839,767,NOT_SAME_PERSON,0.945807,0.593,2.82,
+4,different_patient_original_original,SFace,839,1791,NOT_SAME_PERSON,0.95211,0.593,2.68,
+4,different_patient_original_original,SFace,839,3456,NOT_SAME_PERSON,0.958117,0.593,2.55,
+4,different_patient_original_original,SFace,839,4467,NOT_SAME_PERSON,0.812403,0.593,7.19,
+4,different_patient_original_original,SFace,839,4837,NOT_SAME_PERSON,0.891277,0.593,4.26,
+4,different_patient_original_original,SFace,839,5543,NOT_SAME_PERSON,0.903724,0.593,3.9,
+4,different_patient_original_original,SFace,839,6067,NOT_SAME_PERSON,0.943668,0.593,2.87,
+4,different_patient_original_original,SFace,912,244,NOT_SAME_PERSON,0.964727,0.593,2.41,
+4,different_patient_original_original,SFace,912,260,NOT_SAME_PERSON,0.958381,0.593,2.54,
+4,different_patient_original_original,SFace,912,712,NOT_SAME_PERSON,0.912669,0.593,3.65,
+4,different_patient_original_original,SFace,912,767,NOT_SAME_PERSON,0.967371,0.593,2.35,
+4,different_patient_original_original,SFace,912,1791,NOT_SAME_PERSON,1.004534,0.593,1.67,
+4,different_patient_original_original,SFace,912,3456,NOT_SAME_PERSON,0.986622,0.593,1.98,
+4,different_patient_original_original,SFace,912,4467,NOT_SAME_PERSON,0.869945,0.593,4.94,
+4,different_patient_original_original,SFace,912,4837,NOT_SAME_PERSON,0.942049,0.593,2.91,
+4,different_patient_original_original,SFace,912,5543,NOT_SAME_PERSON,0.924114,0.593,3.35,
+4,different_patient_original_original,SFace,912,6067,NOT_SAME_PERSON,0.978828,0.593,2.13,
+4,different_patient_original_original,SFace,1143,244,NOT_SAME_PERSON,0.953722,0.593,2.64,
+4,different_patient_original_original,SFace,1143,260,NOT_SAME_PERSON,0.956279,0.593,2.59,
+4,different_patient_original_original,SFace,1143,712,NOT_SAME_PERSON,1.000396,0.593,1.74,
+4,different_patient_original_original,SFace,1143,767,NOT_SAME_PERSON,0.983252,0.593,2.04,
+4,different_patient_original_original,SFace,1143,1791,NOT_SAME_PERSON,0.973459,0.593,2.23,
+4,different_patient_original_original,SFace,1143,3456,NOT_SAME_PERSON,1.035798,0.593,1.18,
+4,different_patient_original_original,SFace,1143,4467,NOT_SAME_PERSON,1.045682,0.593,1.05,
+4,different_patient_original_original,SFace,1143,4837,NOT_SAME_PERSON,1.100177,0.593,0.41,
+4,different_patient_original_original,SFace,1143,5543,NOT_SAME_PERSON,0.988709,0.593,1.94,
+4,different_patient_original_original,SFace,1143,6067,NOT_SAME_PERSON,1.048866,0.593,1.0,
+4,different_patient_original_original,SFace,1828,244,NOT_SAME_PERSON,0.894603,0.593,4.16,
+4,different_patient_original_original,SFace,1828,260,NOT_SAME_PERSON,0.898591,0.593,4.04,
+4,different_patient_original_original,SFace,1828,712,NOT_SAME_PERSON,0.915799,0.593,3.56,
+4,different_patient_original_original,SFace,1828,767,NOT_SAME_PERSON,0.895275,0.593,4.14,
+4,different_patient_original_original,SFace,1828,1791,NOT_SAME_PERSON,0.947447,0.593,2.78,
+4,different_patient_original_original,SFace,1828,3456,NOT_SAME_PERSON,0.940829,0.593,2.94,
+4,different_patient_original_original,SFace,1828,4467,NOT_SAME_PERSON,0.914996,0.593,3.59,
+4,different_patient_original_original,SFace,1828,4837,NOT_SAME_PERSON,0.969518,0.593,2.31,
+4,different_patient_original_original,SFace,1828,5543,NOT_SAME_PERSON,0.915955,0.593,3.56,
+4,different_patient_original_original,SFace,1828,6067,NOT_SAME_PERSON,0.96315,0.593,2.44,
+4,different_patient_original_original,SFace,2006,244,NOT_SAME_PERSON,0.911272,0.593,3.69,
+4,different_patient_original_original,SFace,2006,260,NOT_SAME_PERSON,0.91955,0.593,3.46,
+4,different_patient_original_original,SFace,2006,712,NOT_SAME_PERSON,0.918463,0.593,3.49,
+4,different_patient_original_original,SFace,2006,767,NOT_SAME_PERSON,0.907836,0.593,3.78,
+4,different_patient_original_original,SFace,2006,1791,NOT_SAME_PERSON,0.944427,0.593,2.85,
+4,different_patient_original_original,SFace,2006,3456,NOT_SAME_PERSON,0.962495,0.593,2.46,
+4,different_patient_original_original,SFace,2006,4467,NOT_SAME_PERSON,0.920401,0.593,3.44,
+4,different_patient_original_original,SFace,2006,4837,NOT_SAME_PERSON,0.933481,0.593,3.11,
+4,different_patient_original_original,SFace,2006,5543,NOT_SAME_PERSON,0.919579,0.593,3.46,
+4,different_patient_original_original,SFace,2006,6067,NOT_SAME_PERSON,0.969162,0.593,2.32,
+4,different_patient_original_original,SFace,2253,244,NOT_SAME_PERSON,0.897765,0.593,4.07,
+4,different_patient_original_original,SFace,2253,260,NOT_SAME_PERSON,0.903411,0.593,3.91,
+4,different_patient_original_original,SFace,2253,712,NOT_SAME_PERSON,0.929844,0.593,3.2,
+4,different_patient_original_original,SFace,2253,767,NOT_SAME_PERSON,0.910199,0.593,3.72,
+4,different_patient_original_original,SFace,2253,1791,NOT_SAME_PERSON,0.937237,0.593,3.02,
+4,different_patient_original_original,SFace,2253,3456,NOT_SAME_PERSON,0.946078,0.593,2.81,
+4,different_patient_original_original,SFace,2253,4467,NOT_SAME_PERSON,0.93316,0.593,3.12,
+4,different_patient_original_original,SFace,2253,4837,NOT_SAME_PERSON,0.948117,0.593,2.77,
+4,different_patient_original_original,SFace,2253,5543,NOT_SAME_PERSON,0.925052,0.593,3.32,
+4,different_patient_original_original,SFace,2253,6067,NOT_SAME_PERSON,0.961265,0.593,2.48,
+4,different_patient_original_original,SFace,5238,244,NOT_SAME_PERSON,1.026748,0.593,1.31,
+4,different_patient_original_original,SFace,5238,260,NOT_SAME_PERSON,1.026964,0.593,1.31,
+4,different_patient_original_original,SFace,5238,712,NOT_SAME_PERSON,0.954423,0.593,2.63,
+4,different_patient_original_original,SFace,5238,767,NOT_SAME_PERSON,0.999828,0.593,1.75,
+4,different_patient_original_original,SFace,5238,1791,NOT_SAME_PERSON,1.037641,0.593,1.16,
+4,different_patient_original_original,SFace,5238,3456,NOT_SAME_PERSON,1.059954,0.593,0.86,
+4,different_patient_original_original,SFace,5238,4467,NOT_SAME_PERSON,0.978304,0.593,2.14,
+4,different_patient_original_original,SFace,5238,4837,NOT_SAME_PERSON,0.990503,0.593,1.91,
+4,different_patient_original_original,SFace,5238,5543,NOT_SAME_PERSON,0.925294,0.593,3.32,
+4,different_patient_original_original,SFace,5238,6067,NOT_SAME_PERSON,1.078518,0.593,0.64,
+4,different_patient_original_original,SFace,6033,244,NOT_SAME_PERSON,1.030896,0.593,1.25,
+4,different_patient_original_original,SFace,6033,260,NOT_SAME_PERSON,1.024785,0.593,1.34,
+4,different_patient_original_original,SFace,6033,712,NOT_SAME_PERSON,0.902096,0.593,3.94,
+4,different_patient_original_original,SFace,6033,767,NOT_SAME_PERSON,0.916994,0.593,3.53,
+4,different_patient_original_original,SFace,6033,1791,NOT_SAME_PERSON,1.034194,0.593,1.21,
+4,different_patient_original_original,SFace,6033,3456,NOT_SAME_PERSON,1.009538,0.593,1.58,
+4,different_patient_original_original,SFace,6033,4467,NOT_SAME_PERSON,0.866817,0.593,5.05,
+4,different_patient_original_original,SFace,6033,4837,NOT_SAME_PERSON,0.870327,0.593,4.93,
+4,different_patient_original_original,SFace,6033,5543,NOT_SAME_PERSON,0.899192,0.593,4.03,
+4,different_patient_original_original,SFace,6033,6067,NOT_SAME_PERSON,0.985776,0.593,2.0,
+4,different_patient_original_original,SFace,6074,244,NOT_SAME_PERSON,1.022498,0.593,1.38,
+4,different_patient_original_original,SFace,6074,260,NOT_SAME_PERSON,1.01786,0.593,1.45,
+4,different_patient_original_original,SFace,6074,712,NOT_SAME_PERSON,0.894892,0.593,4.15,
+4,different_patient_original_original,SFace,6074,767,NOT_SAME_PERSON,0.912303,0.593,3.66,
+4,different_patient_original_original,SFace,6074,1791,NOT_SAME_PERSON,1.012763,0.593,1.53,
+4,different_patient_original_original,SFace,6074,3456,NOT_SAME_PERSON,0.997206,0.593,1.79,
+4,different_patient_original_original,SFace,6074,4467,NOT_SAME_PERSON,0.853351,0.593,5.53,
+4,different_patient_original_original,SFace,6074,4837,NOT_SAME_PERSON,0.876663,0.593,4.72,
+4,different_patient_original_original,SFace,6074,5543,NOT_SAME_PERSON,0.888127,0.593,4.36,
+4,different_patient_original_original,SFace,6074,6067,NOT_SAME_PERSON,0.973696,0.593,2.23,

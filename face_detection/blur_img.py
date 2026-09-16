@@ -160,7 +160,6 @@ def main():
             left_eye_brow_hull = cv2.convexHull(points[LEFT_EYE_IDXS + LEFT_EYEBROW_IDXS + outer_right_eye])
             cv2.fillConvexPoly(features_mask, left_eye_brow_hull, 255)
 
-           
             right_eye_brow_hull = cv2.convexHull(points[RIGHT_EYE_IDXS + RIGHT_EYEBROW_IDXS + outer_left_eye])
             cv2.fillConvexPoly(features_mask, right_eye_brow_hull, 255)
 
@@ -169,8 +168,23 @@ def main():
             nose_triangle = points[[168, 98, 327]]
             cv2.fillConvexPoly(features_mask, nose_triangle, 255)
 
+            # Região inferior da boca: preserva um trapézio formado pelos cantos
+            # da boca e pelos cantos inferiores do frame para não aplicar blur ali.
+            mouth_left = points[291]
+            mouth_right = points[61]
+            trapezoid = np.array([
+                [mouth_left[0], mouth_left[1]],
+                [mouth_right[0], mouth_right[1]],
+                [width - 1, height - 1],
+                [0, height - 1],
+            ], dtype=np.int32)
+
+            keep_lower_face_mask = np.zeros((height, width), dtype=np.uint8)
+            cv2.fillPoly(keep_lower_face_mask, [trapezoid], 255)
+
             # 6. Combina as máscaras
             final_mask = cv2.bitwise_or(features_mask, outside_blur_ring)
+            final_mask = cv2.bitwise_and(final_mask, cv2.bitwise_not(keep_lower_face_mask))
 
             # 7. Suavização das bordas
             mask_blurred = cv2.GaussianBlur(final_mask, (15, 15), 0)

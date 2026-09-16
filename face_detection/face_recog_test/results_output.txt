@@ -1,0 +1,137 @@
+Patient A frame indices:
+[204, 839, 912, 1143, 1828, 2006, 2253, 5238, 6033, 6074]
+
+Patient B frame indices:
+[244, 260, 712, 767, 1791, 3456, 4467, 4837, 5543, 6067]
+
+Experiment 1: same patient - original vs original
+
+Experiment 2: original vs anonymized - same frame
+
+Experiment 3: all original vs all anonymized
+
+Experiment 4: different patient - original vs original
+
+====================================================================================================
+SUMMARY
+====================================================================================================
+
+Experiment 1 | ArcFace
+  Total comparisons:       45
+  Valid comparisons:       45
+  Face/error failures:     0
+  SAME_PERSON:             45
+  NOT_SAME_PERSON:         0
+  Same person (% valid):   100.00%
+  Different (% valid):     0.00%
+  Mean distance:           0.2955
+  Median distance:         0.2737
+  Min distance:            0.0098
+  Max distance:            0.5475
+
+Experiment 1 | Facenet512
+  Total comparisons:       45
+  Valid comparisons:       45
+  Face/error failures:     0
+  SAME_PERSON:             45
+  NOT_SAME_PERSON:         0
+  Same person (% valid):   100.00%
+  Different (% valid):     0.00%
+  Mean distance:           0.1201
+  Median distance:         0.1177
+  Min distance:            0.0031
+  Max distance:            0.2482
+
+Experiment 1 | SFace
+  Total comparisons:       45
+  Valid comparisons:       45
+  Face/error failures:     0
+  SAME_PERSON:             35
+  NOT_SAME_PERSON:         10
+  Same person (% valid):   77.78%
+  Different (% valid):     22.22%
+  Mean distance:           0.4373
+  Median distance:         0.5120
+  Min distance:            0.0151
+  Max distance:            0.6540
+
+Experiment 2 | ArcFace
+  Total comparisons:       10
+  Valid comparisons:       0
+  Face/error failures:     10
+  SAME_PERSON:             0
+  NOT_SAME_PERSON:         0
+
+Experiment 2 | Facenet512
+  Total comparisons:       10
+  Valid comparisons:       0
+  Face/error failures:     10
+  SAME_PERSON:             0
+  NOT_SAME_PERSON:         0
+
+Experiment 2 | SFace
+  Total comparisons:       10
+  Valid comparisons:       0
+  Face/error failures:     10
+  SAME_PERSON:             0
+  NOT_SAME_PERSON:         0
+
+Experiment 3 | ArcFace
+  Total comparisons:       100
+  Valid comparisons:       0
+  Face/error failures:     100
+  SAME_PERSON:             0
+  NOT_SAME_PERSON:         0
+
+Experiment 3 | Facenet512
+  Total comparisons:       100
+  Valid comparisons:       0
+  Face/error failures:     100
+  SAME_PERSON:             0
+  NOT_SAME_PERSON:         0
+
+Experiment 3 | SFace
+  Total comparisons:       100
+  Valid comparisons:       0
+  Face/error failures:     100
+  SAME_PERSON:             0
+  NOT_SAME_PERSON:         0
+
+Experiment 4 | ArcFace
+  Total comparisons:       100
+  Valid comparisons:       100
+  Face/error failures:     0
+  SAME_PERSON:             48
+  NOT_SAME_PERSON:         52
+  Same person (% valid):   48.00%
+  Different (% valid):     52.00%
+  Mean distance:           0.6490
+  Median distance:         0.6802
+  Min distance:            0.4413
+  Max distance:            0.7907
+
+Experiment 4 | Facenet512
+  Total comparisons:       100
+  Valid comparisons:       100
+  Face/error failures:     0
+  SAME_PERSON:             0
+  NOT_SAME_PERSON:         100
+  Same person (% valid):   0.00%
+  Different (% valid):     100.00%
+  Mean distance:           0.6256
+  Median distance:         0.6328
+  Min distance:            0.4554
+  Max distance:            0.7482
+
+Experiment 4 | SFace
+  Total comparisons:       100
+  Valid comparisons:       100
+  Face/error failures:     0
+  SAME_PERSON:             0
+  NOT_SAME_PERSON:         100
+  Same person (% valid):   0.00%
+  Different (% valid):     100.00%
+  Mean distance:           0.9612
+  Median distance:         0.9541
+  Min distance:            0.8124
+  Max distance:            1.1002
