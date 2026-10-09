@@ -184,8 +184,10 @@ class SignalExtractorApp:
     @staticmethod
     def _normalize_patient_id(value):
         normalized = str(value).strip().lower()
-        if normalized.endswith(".0") and normalized[:-2].isdigit():
-            return normalized[:-2]
+        if len(normalized.split('.')) > 1 and normalized[:-2].isdigit():
+            normalized = normalized[:-2]
+        if len(normalized) < 7:
+            normalized = (7-len(normalized)) * "0" + normalized
         return normalized
 
     @staticmethod
