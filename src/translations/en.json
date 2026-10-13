@@ -4,5 +4,12 @@
   "samples": "Samples",
   "amplitude": "Amplitude",
   "normalized_amplitude": "Normalized Amplitude",
-  "respiration_signal": "Respiration signal"
+  "respiration_signal": "Respiration signal",
+  "time": "Time",
+  "frequency": "Frequency",
+  "heart_rate": "Heart Rate",
+  "respiration_rate": "Respiration Rate",
+  "correlation": "Correlation",
+  "spectrogram": "Spectrogram",
+  "psd": "Power Spectral Density"
 }

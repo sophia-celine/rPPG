@@ -4,5 +4,12 @@
   "samples": "Amostras",
   "amplitude": "Amplitude",
   "normalized_amplitude": "Amplitude normalizada",
-  "respiration_signal": "Sinal respiratório"
+  "respiration_signal": "Sinal respiratório",
+  "time": "Tempo",
+  "frequency": "Frequência",
+  "heart_rate": "Frequência cardíaca",
+  "respiration_rate": "Frequência respiratória",
+  "correlation": "Correlação",
+  "spectrogram": "Espectrograma",
+  "psd": "Densidade espectral de potência"
 }

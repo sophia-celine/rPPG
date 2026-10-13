@@ -607,10 +607,14 @@ class rPPGAnalysis:
         plt.show()
 
 
-    def plot_spectral_analysis(self, title=True, fontsize='large', labelsize='large', lowcut=0.2, highcut=3.3):
+    def plot_spectral_analysis(self, title=True, fontsize='large', labelsize='large', lowcut=0.2, highcut=3.3, methods='all'):
 
-        cols = 2
-        rows = int(np.ceil(len(self.rppg_signals) / cols))
+        if methods == 'all' or len(methods) > 3:
+            if methods == 'all': methods = list(self.rppg_signals.keys())
+            cols = 2
+        else:
+            cols = 1
+        rows = int(np.ceil(len(methods) / cols))
     
         # --- FIGURA 1: Espectrogramas ---
         fig_spec, axes_spec = plt.subplots(rows, cols, figsize=(15, 4 * rows), squeeze=False)
@@ -620,7 +624,8 @@ class rPPGAnalysis:
         fig_psd, axes_psd = plt.subplots(rows, cols, figsize=(15, 4 * rows), squeeze=False)
         axes_psd = axes_psd.flatten()
 
-        for method_index, method_name in enumerate(self.rppg_signals):
+        for i in range(len(methods)):
+            method_name = methods[i]
             rppg_signal = self.rppg_signals[method_name]
             if method_name not in self.filtered_methods:
                 rppg_signal = self.bandpass_filter(rppg_signal, lowcut=lowcut, highcut=highcut, fs=self.video_fps, order=3)    
@@ -633,7 +638,7 @@ class rPPGAnalysis:
             f, t, Sxx = signal.spectrogram(rppg_signal, fs=self.video_fps, nperseg=min(len(rppg_signal), 256), 
                                             noverlap=128, nfft=nfft_val)
             
-            ax_s = axes_spec[method_index]
+            ax_s = axes_spec[i]
             im = ax_s.pcolormesh(t, f, 10 * np.log10(Sxx + 1e-12), shading='gouraud', cmap='jet')
             if title: ax_s.set_title(f"{method_name}", fontsize=fontsize)
             ax_s.set_xlabel(self._t("time") + " (s)", fontsize=fontsize)
@@ -647,7 +652,7 @@ class rPPGAnalysis:
             # 2. Cálculo do Espectro de Potência (Welch ou Periodograma)
             freqs, psd = signal.periodogram(rppg_signal, fs=self.video_fps, nfft=nfft_val, detrend='constant')
             
-            ax_p = axes_psd[method_index]
+            ax_p = axes_psd[i]
             ax_p.plot(freqs, psd, color='tab:green', linewidth=2)
             
             # Encontrar e marcar o pico principal (Frequência Cardíaca estimada)
@@ -675,11 +680,15 @@ class rPPGAnalysis:
         
         plt.show()
         
-    def plot_rppg_ppg_correlation(self, title=True, fontsize='large', labelsize='large'):
+    def plot_rppg_ppg_correlation(self, title=True, fontsize='large', labelsize='large', methods='all'):
         
         if self.correlation_results:
-            cols = 2
-            rows = int(np.ceil(len(self.correlation_results) / cols))
+            if methods == 'all' or len(methods) > 3:
+                cols = 2
+                if methods == 'all': methods = list(self.rppg_signals.keys())
+            else:
+                cols = 1
+            rows = int(np.ceil(len(methods) / cols))
             fig, axes = plt.subplots(
                 rows, cols, figsize=(15, 4 * rows), squeeze=False,
                 sharex=True, sharey=True,
@@ -687,13 +696,14 @@ class rPPGAnalysis:
             axes = axes.flatten()
             fs_common = max(self.video_fps, self.gt_ppg_sample_rate)
 
-            for method_index, method in enumerate(self.correlation_results):
+            for i in range(len(methods)):
+                method = methods[i]
                 result = self.correlation_results[method]
                 synced_rppg = result['synced_rppg']
                 synced_ppg = result['synced_ppg']
                 pearson_coef = result['pearson_coef']
                 best_lag = result['best_lag']/fs_common
-                ax = axes[method_index]
+                ax = axes[i]
                 time_seconds = np.arange(len(synced_rppg)) / fs_common
 
                 ax.plot(time_seconds, synced_rppg, label='rPPG', alpha=0.7)
