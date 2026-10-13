@@ -93,7 +93,7 @@ class rPPGAnalysis:
     @staticmethod
     def estimate_hr_heartpy(segment, fs):
         try:
-            wd, m = hp.process(segment, sample_rate=fs)
+            wd, m = hp.process(segment, sample_rate=fs, bpmmin=30, bpmmax=200)
             return m['bpm']
         except Exception:
             return np.nan
