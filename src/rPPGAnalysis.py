@@ -45,6 +45,12 @@ class rPPGAnalysis:
         self.hr_window_size = hr_window_size
         self.respiration_window_size = respiration_window_size
 
+        self.filtered_methods = {
+            'CHROM', 
+            # 'POS',
+            # 'ICA'
+        }
+
         # deferred/computed values (initialized to None)
         self.frame_count = None
         self.video_fps = None
@@ -62,8 +68,8 @@ class rPPGAnalysis:
             self.run()
 
     @staticmethod
-    def _next_power_of_2(x):
-        return 1 if x == 0 else 2 ** (x - 1).bit_length()
+    def _1bpm_resolution(x, fs):
+        return max(int(x), int(np.ceil(60 * fs)))
 
     @staticmethod
     def normalize_signal(s):
@@ -225,7 +231,7 @@ class rPPGAnalysis:
 
         # Calculate FFT
         pred_ppg_signal = np.expand_dims(pred_ppg_signal, 0)
-        N = self._next_power_of_2(pred_ppg_signal.shape[1])
+        N = self._1bpm_resolution(pred_ppg_signal.shape[1], self.video_fps)
         f_ppg, pxx_ppg = scipy.signal.periodogram(pred_ppg_signal, fs=self.video_fps, nfft=N, detrend=False)
 
         # Calculate the indices corresponding to the frequency ranges
@@ -270,17 +276,12 @@ class rPPGAnalysis:
     def _estimate_hr_rppg(self):
 
         hr_rppg = {}
-        filtered_methods = {
-            'CHROM', 
-            # 'POS',
-            # 'ICA'
-        }
 
         for i in self.rppg_signals:
             rppg_signal = self.rppg_signals[i]
             # rppg_signal = self._detrend(rppg_signal, 100)
             print('----------------- ESTIMATING HR FOR METHOD:', i, '-----------------')
-            if i not in filtered_methods:
+            if i not in self.filtered_methods:
                 rppg_signal = self.bandpass_filter(rppg_signal, lowcut=0.2, highcut=3.3, fs=self.video_fps, order=3)
             window_len_rppg = int(self.hr_window_size * self.video_fps)
             n_windows_rppg = len(rppg_signal) // window_len_rppg
@@ -368,7 +369,7 @@ class rPPGAnalysis:
         """Calculate heart rate based on PPG using Fast Fourier transform (FFT)."""
         seg_td = np.asarray(segment).flatten()
         seg_exp = np.expand_dims(seg_td, 0)
-        N = self._next_power_of_2(seg_td.shape[0])     # @TODO colocar zero-padding para resolução de 1 bpm
+        N = self._1bpm_resolution(seg_td.shape[0], self.video_fps)
         f_ppg, pxx_ppg = scipy.signal.periodogram(seg_exp, fs=self.video_fps, nfft=N, detrend='constant')
         pxx_ppg = np.squeeze(pxx_ppg)
         plot_window = False
@@ -402,7 +403,7 @@ class rPPGAnalysis:
         high_pass = rr_max / 60
 
         sig_exp = np.expand_dims(sig, 0)
-        N = self._next_power_of_2(sig_exp.shape[1])
+        N = self._1bpm_resolution(sig_exp.shape[1], fs)
         f_ppg, pxx_ppg = scipy.signal.periodogram(sig_exp, fs=fs, nfft=N, detrend='constant')
 
         fmask_ppg = np.argwhere((f_ppg >= low_pass) & (f_ppg <= high_pass))
@@ -558,7 +559,7 @@ class rPPGAnalysis:
         
         return correlation_results
 
-    def plot_gt(self, title=True, fontsize='medium', labelsize='medium'):
+    def plot_gt(self, title=True, fontsize='large', labelsize='large'):
 
         if self.gt_ecg_path:
             ecg = hp.get_data(self.gt_ecg_path)
@@ -606,6 +607,112 @@ class rPPGAnalysis:
         plt.show()
 
 
+    def plot_spectral_analysis(self, title=True, fontsize='large', labelsize='large', lowcut=0.2, highcut=3.3):
+
+        cols = 2
+        rows = int(np.ceil(len(self.rppg_signals) / cols))
+    
+        # --- FIGURA 1: Espectrogramas ---
+        fig_spec, axes_spec = plt.subplots(rows, cols, figsize=(15, 4 * rows), squeeze=False)
+        axes_spec = axes_spec.flatten()
+    
+        # --- FIGURA 2: Espectro de Potência (PSD) ---
+        fig_psd, axes_psd = plt.subplots(rows, cols, figsize=(15, 4 * rows), squeeze=False)
+        axes_psd = axes_psd.flatten()
+
+        for method_index, method_name in enumerate(self.rppg_signals):
+            rppg_signal = self.rppg_signals[method_name]
+            if method_name not in self.filtered_methods:
+                rppg_signal = self.bandpass_filter(rppg_signal, lowcut=lowcut, highcut=highcut, fs=self.video_fps, order=3)    
+    
+            # Definir NFFT para alta resolução (Zero-padding)
+            nfft_val = self._1bpm_resolution(len(rppg_signal), self.video_fps)
+
+            # 1. Cálculo do Espectrograma
+            # Usamos nfft para suavizar a imagem do espectrograma
+            f, t, Sxx = signal.spectrogram(rppg_signal, fs=self.video_fps, nperseg=min(len(rppg_signal), 256), 
+                                            noverlap=128, nfft=nfft_val)
+            
+            ax_s = axes_spec[method_index]
+            im = ax_s.pcolormesh(t, f, 10 * np.log10(Sxx + 1e-12), shading='gouraud', cmap='jet')
+            if title: ax_s.set_title(f"{method_name}", fontsize=fontsize)
+            ax_s.set_xlabel(self._t("time") + " (s)", fontsize=fontsize)
+            ax_s.set_ylabel(self._t("frequency") + " (Hz)", fontsize=fontsize)
+            ax_s.tick_params(axis='both', labelsize=labelsize)
+            ax_s.set_ylim(lowcut, highcut)
+            cbar = fig_spec.colorbar(im, ax=ax_s)
+            cbar.set_label('dB', fontsize=fontsize)
+            cbar.ax.tick_params(labelsize=labelsize)
+
+            # 2. Cálculo do Espectro de Potência (Welch ou Periodograma)
+            freqs, psd = signal.periodogram(rppg_signal, fs=self.video_fps, nfft=nfft_val, detrend='constant')
+            
+            ax_p = axes_psd[method_index]
+            ax_p.plot(freqs, psd, color='tab:green', linewidth=2)
+            
+            # Encontrar e marcar o pico principal (Frequência Cardíaca estimada)
+            mask = (freqs >= lowcut) & (freqs <= highcut)
+            if np.any(mask):
+                peak_idx = np.argmax(psd[mask])
+                peak_f = freqs[mask][peak_idx]
+                ax_p.axvline(peak_f, color='red', linestyle='--', alpha=0.6)
+                ax_p.text(peak_f + 0.1, np.max(psd)*0.8, f"{peak_f*60:.1f} BPM", color='red')
+
+            ax_p.set_title(f"{method_name}", fontsize=fontsize)
+            ax_p.set_xlabel(self._t("frequency") + " (Hz)", fontsize=fontsize)
+            ax_p.set_ylabel(self._t("psd"), fontsize=fontsize)
+            ax_p.tick_params(axis='both', labelsize=labelsize)
+            ax_p.set_xlim(0, highcut + 1)
+            ax_p.grid(True, alpha=0.3)
+    
+        # Remover eixos extras
+        for j in range(len(self.rppg_signals), len(axes_spec)):
+            fig_spec.delaxes(axes_spec[j])
+            fig_psd.delaxes(axes_psd[j])
+    
+        fig_spec.tight_layout()
+        fig_psd.tight_layout()
+        
+        plt.show()
+        
+    def plot_rppg_ppg_correlation(self, title=True, fontsize='large', labelsize='large'):
+        
+        if self.correlation_results:
+            cols = 2
+            rows = int(np.ceil(len(self.correlation_results) / cols))
+            fig, axes = plt.subplots(
+                rows, cols, figsize=(15, 4 * rows), squeeze=False,
+                sharex=True, sharey=True,
+            )
+            axes = axes.flatten()
+            fs_common = max(self.video_fps, self.gt_ppg_sample_rate)
+
+            for method_index, method in enumerate(self.correlation_results):
+                result = self.correlation_results[method]
+                synced_rppg = result['synced_rppg']
+                synced_ppg = result['synced_ppg']
+                pearson_coef = result['pearson_coef']
+                best_lag = result['best_lag']/fs_common
+                ax = axes[method_index]
+                time_seconds = np.arange(len(synced_rppg)) / fs_common
+
+                ax.plot(time_seconds, synced_rppg, label='rPPG', alpha=0.7)
+                ax.plot(time_seconds, synced_ppg, label='PPG', alpha=0.7)
+                if title: ax.set_title(f"{method} - Pearson: {pearson_coef:.3f}, Lag: {best_lag} s", fontsize=fontsize)
+                ax.set_xlabel(self._t("time") + " (s)", fontsize=fontsize)
+                ax.set_ylabel(self._t("normalized_amplitude"), fontsize=fontsize)
+                ax.legend()
+                ax.grid(True, alpha=0.3)
+                ax.tick_params(axis='both', labelsize=labelsize)
+
+            for unused_axis in axes[len(self.correlation_results):]:
+                fig.delaxes(unused_axis)
+
+            fig.tight_layout()
+            plt.show()
+        else:
+            print("No correlation results available. Please run the analysis first.")
+
     def run(self):
         """Execute the heavy loading and processing steps.
 
@@ -619,8 +726,8 @@ class rPPGAnalysis:
         self.rppg_signals = self._load_rppg_signals()
         self.ecg_hr_values = self._estimate_hr_ecg()
         self.rppg_hr_values = self._estimate_hr_rppg()
-        # self.hr_results = self.compare_hr_rppg_ecg()
+        self.hr_results = self.compare_hr_rppg_ecg()
         self.correlation_results = self.compare_rppg_ppg()
-        # self.gt_rr_values, self.ref_rr_signal = self._load_respiratory_signal()
-        # self.rppg_rr_values = self._estimate_rr_rppg()
-        # self.rr_results = self.compare_rr_rppg_respiration()
+        self.gt_rr_values, self.ref_rr_signal = self._load_respiratory_signal()
+        self.rppg_rr_values = self._estimate_rr_rppg()
+        self.rr_results = self.compare_rr_rppg_respiration()
