@@ -167,6 +167,15 @@ class rPPGAnalysis:
             rppg_signals[method_name] = signal
 
         return rppg_signals
+
+    def _filter_rppg_signals(self, lowcut=0.2, highcut=3.3, order=3):
+        filtered_signals = {}
+        for i in self.rppg_signals:
+            rppg_signal = self.rppg_signals[i]
+            if i not in self.filtered_methods:
+                rppg_signal = self.bandpass_filter(rppg_signal, lowcut=lowcut, highcut=highcut, fs=self.video_fps, order=order)
+            filtered_signals[i] = rppg_signal
+        return filtered_signals
     
     def _load_respiratory_signal(self):
         """Lê o arquivo de referência e calcula RR por janelas."""
@@ -276,21 +285,18 @@ class rPPGAnalysis:
     def _estimate_hr_rppg(self):
 
         hr_rppg = {}
+        filtered_signals = self._filter_rppg_signals(lowcut=0.2, highcut=3.3, order=3)
 
-        for i in self.rppg_signals:
-            rppg_signal = self.rppg_signals[i]
+        for i in filtered_signals:
+            rppg_signal = filtered_signals[i]
             # rppg_signal = self._detrend(rppg_signal, 100)
             print('----------------- ESTIMATING HR FOR METHOD:', i, '-----------------')
-            if i not in self.filtered_methods:
-                rppg_signal = self.bandpass_filter(rppg_signal, lowcut=0.2, highcut=3.3, fs=self.video_fps, order=3)
             window_len_rppg = int(self.hr_window_size * self.video_fps)
             n_windows_rppg = len(rppg_signal) // window_len_rppg
 
             rppg_hr_values = []
             for j in range(n_windows_rppg):
                 segment = rppg_signal[j * window_len_rppg : (j + 1) * window_len_rppg]
-                # segment = self._detrend(segment, 100)
-                # segment = self.bandpass_filter(segment, lowcut=0.3, highcut=3.3, fs=self.video_fps, order=1)
                 hr = self._calculate_fft_hr(segment)
                 rppg_hr_values.append(hr)
 
@@ -546,10 +552,11 @@ class rPPGAnalysis:
 
         gt_ppg_signal = self._load_signal_from_txt(self.gt_ppg_path)
 
-        correlation_results = {}    
+        correlation_results = {}
+        filtered_signals = self._filter_rppg_signals(lowcut=0.2, highcut=3.3, order=3)    
         
         for method in self.rppg_hr_values:
-            pearson_coef, best_lag, synced_rppg, synced_ppg = self._sync_and_correlate(self.rppg_signals[method], gt_ppg_signal)
+            pearson_coef, best_lag, synced_rppg, synced_ppg = self._sync_and_correlate(filtered_signals[method], gt_ppg_signal)
             correlation_results[method] = ({
                 'pearson_coef': pearson_coef,
                 'best_lag': best_lag,
@@ -623,12 +630,11 @@ class rPPGAnalysis:
         # --- FIGURA 2: Espectro de Potência (PSD) ---
         fig_psd, axes_psd = plt.subplots(rows, cols, figsize=(15, 4 * rows), squeeze=False)
         axes_psd = axes_psd.flatten()
+        filtered_signals = self._filter_rppg_signals(lowcut=lowcut, highcut=highcut, order=3)
 
         for i in range(len(methods)):
             method_name = methods[i]
-            rppg_signal = self.rppg_signals[method_name]
-            if method_name not in self.filtered_methods:
-                rppg_signal = self.bandpass_filter(rppg_signal, lowcut=lowcut, highcut=highcut, fs=self.video_fps, order=3)    
+            rppg_signal = filtered_signals[method_name]
     
             # Definir NFFT para alta resolução (Zero-padding)
             nfft_val = self._1bpm_resolution(len(rppg_signal), self.video_fps)
@@ -722,6 +728,39 @@ class rPPGAnalysis:
             plt.show()
         else:
             print("No correlation results available. Please run the analysis first.")
+
+    def plot_bvp(self, title=True, fontsize='large', labelsize='large', methods='all', same_scale=True):
+        if methods == 'all' or len(methods) > 3:
+            cols = 2
+            if methods == 'all': methods = list(self.rppg_signals.keys())
+        else:
+            cols = 1
+        rows = int(np.ceil(len(methods) / cols))
+        fig, axes = plt.subplots(
+            rows, cols, figsize=(15, 4 * rows), squeeze=False,
+            sharex=same_scale, sharey=same_scale,
+        )
+        axes = axes.flatten()
+        filtered_signals = self._filter_rppg_signals(lowcut=0.2, highcut=3.3, order=3)
+
+        for i in range(len(methods)):
+            method_name = methods[i]
+            rppg_signal = filtered_signals[method_name]
+            ax = axes[i]
+            time_seconds = np.arange(len(rppg_signal)) / self.video_fps
+            ax.plot(time_seconds, rppg_signal, label=f'{method_name} rPPG', alpha=0.7)
+            if title: ax.set_title(f"{method_name}", fontsize=fontsize)
+            ax.set_xlabel(self._t("time") + " (s)", fontsize=fontsize)
+            ax.set_ylabel(self._t("amplitude"), fontsize=fontsize)
+            ax.legend()
+            ax.grid(True, alpha=0.3)
+            ax.tick_params(axis='both', labelsize=labelsize)
+
+        for unused_axis in axes[len(methods):]:
+            fig.delaxes(unused_axis)
+
+        fig.tight_layout()
+        plt.show()
 
     def run(self):
         """Execute the heavy loading and processing steps.
