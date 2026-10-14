@@ -40,15 +40,15 @@ class rPPGAnalysis:
         self.resp_modulation_resample = 4
         self.language = language
         self.translations = self._load_translations(language)
+        self.hr_lowcut = 0.2
+        self.hr_highcut = 3.3
 
         # lightweight config
         self.hr_window_size = hr_window_size
         self.respiration_window_size = respiration_window_size
 
         self.filtered_methods = {
-            'CHROM', 
-            # 'POS',
-            # 'ICA'
+            'CHROM'
         }
 
         # deferred/computed values (initialized to None)
@@ -168,7 +168,7 @@ class rPPGAnalysis:
 
         return rppg_signals
 
-    def _filter_rppg_signals(self, lowcut=0.2, highcut=3.3, order=3):
+    def _filter_rppg_signals(self, lowcut=0.3, highcut=3.3, order=3):
         filtered_signals = {}
         for i in self.rppg_signals:
             rppg_signal = self.rppg_signals[i]
@@ -213,7 +213,7 @@ class rPPGAnalysis:
     def _get_bvp_features(self, segment, fs):
         """Detecta picos e vales no sinal rPPG para extração de modulações."""
         # Filtro para realçar o sinal de pulso
-        clean_sig = self.bandpass_filter(segment, 0.7, 3.5, fs)
+        clean_sig = self.bandpass_filter(segment, 0.1, 4, fs)
         
         # Distância mínima entre picos baseada em fisiologia (~130 RPM)
         min_dist = int(fs * 0.45)
@@ -229,7 +229,7 @@ class rPPGAnalysis:
                 
         return peaks, troughs, pairs
     
-    def _calculate_SNR(self, pred_ppg_signal, hr_label, low_pass=0.6, high_pass=3.3):
+    def _calculate_SNR(self, pred_ppg_signal, hr_label):
         """Calculate SNR as the ratio of the area under the curve of the frequency spectrum 
             around the first and second harmonics of the ground truth HR frequency.
         """
@@ -237,6 +237,8 @@ class rPPGAnalysis:
         first_harmonic_freq = hr_label / 60
         second_harmonic_freq = 2 * first_harmonic_freq
         deviation = 6 / 60  # 6 beats/min converted to Hz
+        low_pass = self.hr_lowcut
+        high_pass = self.hr_highcut
 
         # Calculate FFT
         pred_ppg_signal = np.expand_dims(pred_ppg_signal, 0)
@@ -285,7 +287,7 @@ class rPPGAnalysis:
     def _estimate_hr_rppg(self):
 
         hr_rppg = {}
-        filtered_signals = self._filter_rppg_signals(lowcut=0.2, highcut=3.3, order=3)
+        filtered_signals = self._filter_rppg_signals(lowcut=self.hr_lowcut, highcut=self.hr_highcut)
 
         for i in filtered_signals:
             rppg_signal = filtered_signals[i]
@@ -317,6 +319,10 @@ class rPPGAnalysis:
                 
         except Exception as e:
             print(f"Erro ao carregar arquivos: {e}")
+            return None, None, None, None
+
+        if np.all(np.asarray(raw_ppg) == 0):
+            print("Null PPG signal.")
             return None, None, None, None
 
         # 2. Reamostragem baseada no tempo real (considerando frequências diferentes)
@@ -371,14 +377,16 @@ class rPPGAnalysis:
 
         return coef_pearson, best_lag, synced_rppg, synced_ppg
 
-    def _calculate_fft_hr(self, segment, low_pass=0.6, high_pass=3.3):
+    def _calculate_fft_hr(self, segment):
         """Calculate heart rate based on PPG using Fast Fourier transform (FFT)."""
+        low_pass = self.hr_lowcut
+        high_pass = self.hr_highcut
         seg_td = np.asarray(segment).flatten()
         seg_exp = np.expand_dims(seg_td, 0)
         N = self._1bpm_resolution(seg_td.shape[0], self.video_fps)
         f_ppg, pxx_ppg = scipy.signal.periodogram(seg_exp, fs=self.video_fps, nfft=N, detrend='constant')
         pxx_ppg = np.squeeze(pxx_ppg)
-        plot_window = False
+        plot_window = True
         if plot_window:
             # Create a figure with two stacked plots: time-domain signal and spectrum
             fig, (ax_sig, ax_spec) = plt.subplots(2, 1, figsize=(8, 6), sharex=False)
@@ -553,10 +561,12 @@ class rPPGAnalysis:
         gt_ppg_signal = self._load_signal_from_txt(self.gt_ppg_path)
 
         correlation_results = {}
-        filtered_signals = self._filter_rppg_signals(lowcut=0.2, highcut=3.3, order=3)    
+        filtered_signals = self._filter_rppg_signals(lowcut=self.hr_lowcut, highcut=self.hr_highcut)    
         
         for method in self.rppg_hr_values:
             pearson_coef, best_lag, synced_rppg, synced_ppg = self._sync_and_correlate(filtered_signals[method], gt_ppg_signal)
+            if pearson_coef is None:
+                continue
             correlation_results[method] = ({
                 'pearson_coef': pearson_coef,
                 'best_lag': best_lag,
@@ -614,7 +624,7 @@ class rPPGAnalysis:
         plt.show()
 
 
-    def plot_spectral_analysis(self, title=True, fontsize='large', labelsize='large', lowcut=0.2, highcut=3.3, methods='all'):
+    def plot_spectral_analysis(self, title=True, fontsize='large', labelsize='large', methods='all'):
 
         if methods == 'all' or len(methods) > 3:
             if methods == 'all': methods = list(self.rppg_signals.keys())
@@ -630,7 +640,7 @@ class rPPGAnalysis:
         # --- FIGURA 2: Espectro de Potência (PSD) ---
         fig_psd, axes_psd = plt.subplots(rows, cols, figsize=(15, 4 * rows), squeeze=False)
         axes_psd = axes_psd.flatten()
-        filtered_signals = self._filter_rppg_signals(lowcut=lowcut, highcut=highcut, order=3)
+        filtered_signals = self._filter_rppg_signals(lowcut=self.hr_lowcut, highcut=self.hr_highcut)
 
         for i in range(len(methods)):
             method_name = methods[i]
@@ -650,7 +660,7 @@ class rPPGAnalysis:
             ax_s.set_xlabel(self._t("time") + " (s)", fontsize=fontsize)
             ax_s.set_ylabel(self._t("frequency") + " (Hz)", fontsize=fontsize)
             ax_s.tick_params(axis='both', labelsize=labelsize)
-            ax_s.set_ylim(lowcut, highcut)
+            ax_s.set_ylim(self.hr_lowcut, self.hr_highcut)
             cbar = fig_spec.colorbar(im, ax=ax_s)
             cbar.set_label('dB', fontsize=fontsize)
             cbar.ax.tick_params(labelsize=labelsize)
@@ -662,7 +672,7 @@ class rPPGAnalysis:
             ax_p.plot(freqs, psd, color='tab:green', linewidth=2)
             
             # Encontrar e marcar o pico principal (Frequência Cardíaca estimada)
-            mask = (freqs >= lowcut) & (freqs <= highcut)
+            mask = (freqs >= self.hr_lowcut) & (freqs <= self.hr_highcut)
             if np.any(mask):
                 peak_idx = np.argmax(psd[mask])
                 peak_f = freqs[mask][peak_idx]
@@ -673,7 +683,7 @@ class rPPGAnalysis:
             ax_p.set_xlabel(self._t("frequency") + " (Hz)", fontsize=fontsize)
             ax_p.set_ylabel(self._t("psd"), fontsize=fontsize)
             ax_p.tick_params(axis='both', labelsize=labelsize)
-            ax_p.set_xlim(0, highcut + 1)
+            ax_p.set_xlim(0, self.hr_highcut + 1)
             ax_p.grid(True, alpha=0.3)
     
         # Remover eixos extras
@@ -741,7 +751,7 @@ class rPPGAnalysis:
             sharex=same_scale, sharey=same_scale,
         )
         axes = axes.flatten()
-        filtered_signals = self._filter_rppg_signals(lowcut=0.2, highcut=3.3, order=3)
+        filtered_signals = self._filter_rppg_signals(lowcut=self.hr_lowcut, highcut=self.hr_highcut)
 
         for i in range(len(methods)):
             method_name = methods[i]
