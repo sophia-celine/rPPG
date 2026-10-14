@@ -4,3 +4,4 @@ data/
 *mp4
 get_ground_truth/__pycache__/
 get_ground_truth/process_gt_data/__pycache__/
+example/test_foco_ganho/
