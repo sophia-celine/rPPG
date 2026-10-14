@@ -323,7 +323,7 @@ class SignalExtractorApp:
             return ""
 
         if os.path.isabs(filename):
-            return filename
+            filename = filename.split("/")[-1]
 
         if column_name == "h5_file":
             date = str(row.get("Dia", "")).strip()
@@ -349,7 +349,6 @@ class SignalExtractorApp:
         built_h5_file = self._build_h5_path_from_row(row.to_dict())
         if not built_h5_file:
             return ""
-
         self.df.at[row_index, "h5_file"] = Path(built_h5_file).name
         self.df.to_csv(self.dataset_raw_file, index=False)
         return built_h5_file
@@ -1247,14 +1246,13 @@ class SignalExtractorApp:
 
         idx = int(self.tree.item(selected_item[0], "values")[0])
         paciente = self.df.loc[idx]
-
         h5_file = self._resolve_h5_path(paciente, idx)
         date_str = str(paciente.get("Dia", "")).strip()
         init_time = str(paciente.get("init_time", "")).strip()
         end_time = str(paciente.get("end_time", "")).strip()
 
         if not h5_file or str(h5_file) == "nan" or not os.path.exists(str(h5_file)):
-            messagebox.showwarning("Aviso", "Arquivo H5 do paciente não encontrado para visualizar os sinais.")
+            messagebox.showwarning("Aviso", f"Arquivo H5 {h5_file} do paciente não encontrado para visualizar os sinais.")
             return
 
         if not self._is_filled(date_str) or not self._is_filled(init_time) or not self._is_filled(end_time):
