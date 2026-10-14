@@ -7,8 +7,8 @@ from rPPGAnalysis import rPPGAnalysis
 # PPG_DATA_PATH = '/home/soph/ssd/dataset_raw/2356759_2/ppg_20-08-2026_3_16-34-55_16-37-00.txt'
 # RESPIRATION_DATA_PATH = '/home/soph/ssd/dataset_raw/2356759_2/respiration_20-08-2026_3_16-34-55_16-37-00.txt'
 # RPPG_FOLDER_PATH = '/home/soph/rppg/rPPG-Toolbox/BVPresults'
-HR_WINDOW_SIZE = 15
-RESPIRATION_WINDOW_SIZE = 30
+HR_WINDOW_SIZE = 120
+RESPIRATION_WINDOW_SIZE = 60
 
 def find_patient_info(root_path: Path) -> tuple[str, str, str, str, str]:
     root_path = Path(root_path).expanduser().resolve()
@@ -62,8 +62,12 @@ def find_patient_info(root_path: Path) -> tuple[str, str, str, str, str]:
         )),
     )
 
-VIDEO_PATH, ECG_DATA_PATH, PPG_DATA_PATH, RESPIRATION_DATA_PATH, RPPG_FOLDER_PATH = find_patient_info('/home/soph/ssd/dataset_raw/test/10227_1')
+# EXEMPLO MAIS DIFÍCIL
+# VIDEO_PATH, ECG_DATA_PATH, PPG_DATA_PATH, RESPIRATION_DATA_PATH, RPPG_FOLDER_PATH = find_patient_info(r"A:\dataset_raw\test\10227_1")
+# BRADICARDIA 
+# VIDEO_PATH, ECG_DATA_PATH, PPG_DATA_PATH, RESPIRATION_DATA_PATH, RPPG_FOLDER_PATH = find_patient_info(r"A:\dataset_raw\2356759_2")
 
+VIDEO_PATH, ECG_DATA_PATH, PPG_DATA_PATH, RESPIRATION_DATA_PATH, RPPG_FOLDER_PATH = find_patient_info(r"A:\dataset_raw\test\378675_0")
 
 if __name__ == '__main__':
 
@@ -78,12 +82,13 @@ if __name__ == '__main__':
     patient2_analysis.run()
     # patient2_analysis.plot_gt()
     # print('rppg_signals\n', patient2_analysis.rppg_signals)
-    # print('ecg_hr_values\n', patient2_analysis.ecg_hr_values)
+    print('ecg_hr_values\n', patient2_analysis.ecg_hr_values)
     # # print('fps\n', patient2_analysis.video_fps)
-    # print('rppg_hr_values\n', patient2_analysis.rppg_hr_values)
+    print('rppg_hr_values\n', patient2_analysis.rppg_hr_values)
     print('hr_results\n', patient2_analysis.hr_results)
-    # print('Correlation_results\n', patient2_analysis.correlation_results)
+    print('Correlation_results\n', patient2_analysis.correlation_results)
     print('Respiratory rate estimation\n', patient2_analysis.rr_results)
-    # patient2_analysis.plot_spectral_analysis(methods=['POS', 'CHROM'])
-    patient2_analysis.plot_rppg_ppg_correlation()
-    # patient2_analysis.plot_bvp()
+    patient2_analysis.plot_spectral_analysis()
+    patient2_analysis.plot_rppg_ppg_correlation(methods=['POS'])
+    patient2_analysis.plot_bvp(methods=['POS'], same_scale=False)
+    print(patient2_analysis.rppg_rr_values['ICA']['fusion'])
