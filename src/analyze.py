@@ -7,7 +7,7 @@ from rPPGAnalysis import rPPGAnalysis
 # PPG_DATA_PATH = '/home/soph/ssd/dataset_raw/2356759_2/ppg_20-08-2026_3_16-34-55_16-37-00.txt'
 # RESPIRATION_DATA_PATH = '/home/soph/ssd/dataset_raw/2356759_2/respiration_20-08-2026_3_16-34-55_16-37-00.txt'
 # RPPG_FOLDER_PATH = '/home/soph/rppg/rPPG-Toolbox/BVPresults'
-HR_WINDOW_SIZE = 120
+HR_WINDOW_SIZE = 60
 RESPIRATION_WINDOW_SIZE = 60
 
 def find_patient_info(root_path: Path) -> tuple[str, str, str, str, str]:
@@ -67,7 +67,7 @@ def find_patient_info(root_path: Path) -> tuple[str, str, str, str, str]:
 # BRADICARDIA 
 # VIDEO_PATH, ECG_DATA_PATH, PPG_DATA_PATH, RESPIRATION_DATA_PATH, RPPG_FOLDER_PATH = find_patient_info(r"A:\dataset_raw\2356759_2")
 
-VIDEO_PATH, ECG_DATA_PATH, PPG_DATA_PATH, RESPIRATION_DATA_PATH, RPPG_FOLDER_PATH = find_patient_info(r"A:\dataset_raw\test\378675_0")
+VIDEO_PATH, ECG_DATA_PATH, PPG_DATA_PATH, RESPIRATION_DATA_PATH, RPPG_FOLDER_PATH = find_patient_info(r"A:\dataset_raw\test\2022121_0")
 
 if __name__ == '__main__':
 
@@ -90,5 +90,5 @@ if __name__ == '__main__':
     print('Respiratory rate estimation\n', patient2_analysis.rr_results)
     patient2_analysis.plot_spectral_analysis()
     patient2_analysis.plot_rppg_ppg_correlation(methods=['POS'])
-    patient2_analysis.plot_bvp(methods=['POS'], same_scale=False)
-    print(patient2_analysis.rppg_rr_values['ICA']['fusion'])
+    # patient2_analysis.plot_bvp(same_scale=False)
+    patient2_analysis.plot_all(method='POS')

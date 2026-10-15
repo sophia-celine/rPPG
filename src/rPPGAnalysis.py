@@ -40,7 +40,7 @@ class rPPGAnalysis:
         self.resp_modulation_resample = 4
         self.language = language
         self.translations = self._load_translations(language)
-        self.hr_lowcut = 0.2
+        self.hr_lowcut = 0.3
         self.hr_highcut = 3.3
 
         # lightweight config
@@ -386,7 +386,7 @@ class rPPGAnalysis:
         N = self._1bpm_resolution(seg_td.shape[0], self.video_fps)
         f_ppg, pxx_ppg = scipy.signal.periodogram(seg_exp, fs=self.video_fps, nfft=N, detrend='constant')
         pxx_ppg = np.squeeze(pxx_ppg)
-        plot_window = True
+        plot_window = False
         if plot_window:
             # Create a figure with two stacked plots: time-domain signal and spectrum
             fig, (ax_sig, ax_spec) = plt.subplots(2, 1, figsize=(8, 6), sharex=False)
@@ -771,6 +771,45 @@ class rPPGAnalysis:
 
         fig.tight_layout()
         plt.show()
+
+    def plot_all(self, method: str, title=True, fontsize='large', labelsize='large', methods='all', same_scale=True):
+        plots = []
+        if self.gt_ecg_path:
+            ecg = hp.get_data(self.gt_ecg_path)
+            plots.append((ecg, self._t("raw_ecg"), self._t("amplitude"), self.ecg_sample_rate, None))
+
+        if self.gt_ppg_path:
+            ppg = self._load_signal_from_txt(self.gt_ppg_path)
+            ppg = self.normalize_signal(ppg)
+            plots.append((ppg, self._t("raw_ppg"), self._t("normalized_amplitude"), self.gt_ppg_sample_rate, None))
+
+        if method in self.correlation_results:
+            rppg_signal = self.correlation_results[method]['synced_rppg']
+            # window_size = 5
+            # if len(rppg_signal) > 0:
+            #     weights = np.ones(window_size) / window_size
+            #     padded_signal = np.pad(rppg_signal, (window_size // 2,), mode='edge')
+            #     rppg_signal = np.convolve(padded_signal, weights, mode='valid')
+            ppg_signal = self.correlation_results[method]['synced_ppg']
+            plots.append((ppg_signal, self._t("raw_ppg"), self._t("normalized_amplitude"), self.gt_ppg_sample_rate, None))
+            plots.append((rppg_signal, method, self._t("normalized_amplitude"), self.gt_ppg_sample_rate, f'{method} rPPG'))
+
+        if plots:
+            fig, axes = plt.subplots(len(plots), 1, figsize=(15, 4 * len(plots)), squeeze=False, sharex=True)
+            for ax, (signal, plot_title, ylabel, sample_rate, label) in zip(axes.flatten(), plots):
+                time_seconds = np.arange(len(signal)) / sample_rate
+                ax.plot(time_seconds, signal, label=label, alpha=0.7)
+                if title:
+                    ax.set_title(plot_title, fontsize=fontsize)
+                ax.set_xlabel(self._t("time") + " (s)", fontsize=fontsize)
+                ax.set_ylabel(ylabel, fontsize=fontsize)
+                if label:
+                    ax.legend()
+                ax.grid(True, alpha=0.3)
+                ax.tick_params(axis='both', labelsize=labelsize)
+
+            fig.tight_layout()
+            plt.show()
 
     def run(self):
         """Execute the heavy loading and processing steps.
