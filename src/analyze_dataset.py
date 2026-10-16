@@ -3,11 +3,12 @@ from pathlib import Path
 from rPPGAnalysis import rPPGAnalysis
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from copy import deepcopy
+from openpyxl import Workbook
 
-HR_WINDOW_SIZE = 60
-RESPIRATION_WINDOW_SIZE = 60
-RESULTS_CSV = r"C:\Users\Sophia\Documents\rPPG_data\results\results.csv"
-
+HR_WINDOW_SIZE = 30
+RESPIRATION_WINDOW_SIZE = 30
+# RESULTS_CSV = r"C:\Users\Sophia\Documents\rPPG_data\results\results_Y5F.csv"
+RESULTS_CSV = "/home/soph/rppg/rPPG_data/results/results_Y5F_20s.csv"
 
 def save_results(results: dict, output_path: str | Path = RESULTS_CSV) -> None:
     """Save per-patient metrics grouped by metric, then by method."""
@@ -49,6 +50,14 @@ def save_results(results: dict, output_path: str | Path = RESULTS_CSV) -> None:
         writer = csv.writer(csv_file)
         writer.writerow(["metric", *patient_names])
         writer.writerows(metric_rows)
+
+    workbook = Workbook()
+    worksheet = workbook.active
+    worksheet.title = "Resultados"
+    worksheet.append(["metric", *patient_names])
+    for row in metric_rows:
+        worksheet.append(row)
+    workbook.save(output_path.with_suffix(".xlsx"))
 
 
 def find_patient_info(root_path: Path) -> tuple[str, str, str, str, str]:
@@ -111,7 +120,24 @@ def list_patients(root_path: Path) -> list[str]:
     patient_dirs = [path for path in root_path.iterdir() if path.is_dir()]
     return sorted(str(path) for path in patient_dirs)
 
-patients_paths = list_patients(r"A:\dataset_raw\test")
+
+def list_patients_from_batches(root_path: Path) -> list[str]:
+    root_path = Path(root_path).expanduser().resolve()
+    if not root_path.is_dir():
+        raise NotADirectoryError(f"Root path is not a directory: {root_path}")
+
+    patient_dirs = [
+        patient_dir
+        for batch_dir in root_path.iterdir()
+        if batch_dir.is_dir() and batch_dir.name.casefold().startswith("batch")
+        for patient_dir in batch_dir.iterdir()
+        if patient_dir.is_dir()
+    ]
+    return sorted(str(path) for path in patient_dirs)
+
+
+# patients_paths = list_patients(r"A:\dataset_raw\test")
+patients_paths = list_patients_from_batches("/home/soph/ssd/dataset_raw")
 
 patients_info = {}
 
@@ -148,6 +174,7 @@ pearson_coef_all = deepcopy(methods)
 
 for patient in patients_info:
     patient_info = patients_info[patient]
+    print(f"Analyzing patient: {patient}")
     patient_analysis = rPPGAnalysis(
         video_path=patient_info["video_path"],
         ecg_data_path=patient_info["ecg_data_path"],
@@ -158,23 +185,27 @@ for patient in patients_info:
         respiration_window_size=RESPIRATION_WINDOW_SIZE,
         auto_run=True
     )
-    results[patient] = {
-        "ecg_hr_values": patient_analysis.ecg_hr_values,
-        "rppg_hr_values": patient_analysis.rppg_hr_values,
-        "hr_results": patient_analysis.hr_results,
-        "snr": patient_analysis.hr_results,
-        "rr_gt_values": patient_analysis.gt_rr_values,
-        "rr_rppg_values": patient_analysis.rppg_rr_values,
-        "rr_results": patient_analysis.rr_results,
-        "correlation_results": patient_analysis.correlation_results
-    }
-    for method in methods:
-        hr_ecg_all[method].extend(patient_analysis.ecg_hr_values)
-        hr_rppg_all[method].extend(patient_analysis.rppg_hr_values[method])
-        snr_all[method].append(patient_analysis.hr_results[method]['snr'])
-        rr_gt_all[method].extend(patient_analysis.gt_rr_values)
-        rr_rppg_all[method].extend(patient_analysis.rppg_rr_values[method]['fusion'])
-        pearson_coef_all[method].append(patient_analysis.correlation_results[method]['pearson_coef'])
+    if patient_analysis.frame_count / patient_analysis.video_fps > HR_WINDOW_SIZE:
+        print('duration', patient_analysis.frame_count / patient_analysis.video_fps)
+        results[patient] = {
+            "ecg_hr_values": patient_analysis.ecg_hr_values,
+            "rppg_hr_values": patient_analysis.rppg_hr_values,
+            "hr_results": patient_analysis.hr_results,
+            "snr": patient_analysis.hr_results,
+            "rr_gt_values": patient_analysis.gt_rr_values,
+            "rr_rppg_values": patient_analysis.rppg_rr_values,
+            "rr_results": patient_analysis.rr_results,
+            "correlation_results": patient_analysis.correlation_results
+        }
+        for method in methods:
+            hr_ecg_all[method].extend(patient_analysis.ecg_hr_values)
+            hr_rppg_all[method].extend(patient_analysis.rppg_hr_values[method])
+            snr_all[method].append(patient_analysis.hr_results[method]['snr'])
+            if patient_analysis.gt_rr_values.all():
+                rr_gt_all[method].extend(patient_analysis.gt_rr_values)
+            rr_rppg_all[method].extend(patient_analysis.rppg_rr_values[method]['fusion'])
+            if method in patient_analysis.correlation_results:
+                pearson_coef_all[method].append(patient_analysis.correlation_results[method]['pearson_coef'])
 
 save_results(results)
 
@@ -187,8 +218,9 @@ print('pearson coef all\n', pearson_coef_all)
 
 mae_hr_all = {method: mean_absolute_error(hr_ecg_all[method], hr_rppg_all[method]) for method in methods}
 print('MAE all\n', mae_hr_all)
-mae_rr_all = {method: mean_absolute_error(rr_gt_all[method], rr_rppg_all[method]) for method in methods}
-print('MAE rr all\n', mae_rr_all)
+# print(rr_gt_all, 'gt rr all')
+# mae_rr_all = {method: mean_absolute_error(rr_gt_all[method], rr_rppg_all[method]) for method in methods}
+# print('MAE rr all\n', mae_rr_all)
 mean_snr_all = {method: sum(snr_all[method]) / len(snr_all[method]) for method in methods}
 print('Mean SNR all\n', mean_snr_all)
 greatest_mae, patient_with_greatest_mae, method_with_greatest_mae = max(

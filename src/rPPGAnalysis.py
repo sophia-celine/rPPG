@@ -40,7 +40,7 @@ class rPPGAnalysis:
         self.resp_modulation_resample = 4
         self.language = language
         self.translations = self._load_translations(language)
-        self.hr_lowcut = 0.3
+        self.hr_lowcut = 0.6
         self.hr_highcut = 3.3
 
         # lightweight config
@@ -819,6 +819,10 @@ class rPPGAnalysis:
         # populate video metadata
         self.frame_count = self._get_frame_count()
         self.video_fps = self._get_video_fps()
+
+        if self.frame_count / self.video_fps < self.hr_window_size:
+            print(f"Warning: Video duration ({self.frame_count / self.video_fps:.2f}s) is shorter than HR window size ({self.hr_window_size}s).")
+            return
 
         # load signals and compute HR values
         self.rppg_signals = self._load_rppg_signals()
