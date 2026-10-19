@@ -13,6 +13,7 @@ import heartpy as hp
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 import matplotlib.ticker as ticker
 from scipy.sparse import spdiags
+import neurokit2 as nk
 
 class rPPGAnalysis:
     def __init__(self, video_path: Path,
@@ -40,7 +41,7 @@ class rPPGAnalysis:
         self.resp_modulation_resample = 4
         self.language = language
         self.translations = self._load_translations(language)
-        self.hr_lowcut = 0.6
+        self.hr_lowcut = 0.5
         self.hr_highcut = 3.3
 
         # lightweight config
@@ -102,6 +103,16 @@ class rPPGAnalysis:
             wd, m = hp.process(segment, sample_rate=fs, bpmmin=30, bpmmax=200)
             return m['bpm']
         except Exception:
+            return np.nan
+
+    @staticmethod
+    def estimate_hr_neurokit2(segment, fs):
+        try:
+            signals, info = nk.ecg_process(segment, sampling_rate=fs)
+            nk.ecg_plot(signals, info)
+            plt.show()
+            return float(np.nanmean(signals["ECG_Rate"]))
+        except Exception:   
             return np.nan
 
     @staticmethod
@@ -270,16 +281,18 @@ class rPPGAnalysis:
 
     def _estimate_hr_ecg(self):
 
-        ecg = hp.get_data(self.gt_ecg_path)
-        ecg = self.filter_ecg(ecg, sample_rate=self.ecg_sample_rate)
+        print(f"Calculating Ground Truth HR for {n_windows_ecg} windows...")
+        # ecg = hp.get_data(self.gt_ecg_path)
+        # ecg = self.filter_ecg(ecg, sample_rate=self.ecg_sample_rate)
+        ecg = np.loadtxt(self.gt_ecg_path, dtype=np.float64, ndmin=1)
         window_len_ecg = int(self.hr_window_size * self.ecg_sample_rate)
         n_windows_ecg = len(ecg) // window_len_ecg
-
-        print(f"Calculating Ground Truth HR for {n_windows_ecg} windows...")
+        
         ecg_hr_values = []
         for i in range(n_windows_ecg):
             segment = ecg[i * window_len_ecg : (i + 1) * window_len_ecg]
-            hr = self.estimate_hr_heartpy(segment, self.ecg_sample_rate)
+            # hr = self.estimate_hr_heartpy(segment, self.ecg_sample_rate)
+            hr = self.estimate_hr_neurokit2(segment, self.ecg_sample_rate)
             ecg_hr_values.append(hr)
         
         return np.array(ecg_hr_values)
