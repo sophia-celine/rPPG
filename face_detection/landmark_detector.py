@@ -19,16 +19,9 @@ FACE_MODEL_URL = (
     "face_landmarker.task"
 )
 
-POSE_MODEL_URL = (
-    "https://storage.googleapis.com/mediapipe-models/"
-    "pose_landmarker/pose_landmarker_lite/float16/1/"
-    "pose_landmarker_lite.task"
-)
-
 MODEL_DIR = Path("mediapipe_models")
 
 FACE_MODEL_PATH = MODEL_DIR / "face_landmarker.task"
-POSE_MODEL_PATH = MODEL_DIR / "pose_landmarker_lite.task"
 
 
 # ============================================================
@@ -132,11 +125,11 @@ def main():
 
         num_faces=1,
 
-        min_face_detection_confidence=0.1,
+        min_face_detection_confidence=0.5,
 
-        min_face_presence_confidence=0.1,
+        min_face_presence_confidence=0.5,
 
-        min_tracking_confidence=0.1
+        min_tracking_confidence=0.5
     )
 
 
@@ -331,74 +324,6 @@ def main():
                             (0, 255, 0),
                             -1
                         )
-
-            # =================================================
-            # DESENHAR LANDMARKS DO CORPO
-            # =================================================
-
-            # if pose_result.pose_landmarks:
-
-            #     for pose_landmarks in pose_result.pose_landmarks:
-
-            #         # -----------------------------------------
-            #         # Pontos
-            #         # -----------------------------------------
-
-            #         for landmark in pose_landmarks:
-
-            #             x, y = landmark_to_pixel(
-            #                 landmark,
-            #                 width,
-            #                 height
-            #             )
-
-            #             cv2.circle(
-            #                 frame,
-            #                 (x, y),
-            #                 4,
-            #                 (0, 0, 255),
-            #                 -1
-            #             )
-
-
-                    # -----------------------------------------
-                    # Conexões entre os pontos
-                    # -----------------------------------------
-
-                    # for connection in mp.tasks.vision.PoseLandmarksConnections.POSE_LANDMARKS:
-
-                    #     start_index = connection.start
-                    #     end_index = connection.end
-
-                    #     start_landmark = pose_landmarks[
-                    #         start_index
-                    #     ]
-
-                    #     end_landmark = pose_landmarks[
-                    #         end_index
-                    #     ]
-
-                    #     x1, y1 = landmark_to_pixel(
-                    #         start_landmark,
-                    #         width,
-                    #         height
-                    #     )
-
-                    #     x2, y2 = landmark_to_pixel(
-                    #         end_landmark,
-                    #         width,
-                    #         height
-                    #     )
-
-                    #     cv2.line(
-                    #         frame,
-                    #         (x1, y1),
-                    #         (x2, y2),
-                    #         (255, 0, 0),
-                    #         2
-                    #     )
-
-
 
             # =================================================
             # MOSTRAR
