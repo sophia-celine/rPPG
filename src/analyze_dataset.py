@@ -7,7 +7,7 @@ from openpyxl import Workbook
 
 HR_WINDOW_SIZE = 60
 RESPIRATION_WINDOW_SIZE = 60
-RESULTS_CSV = r"C:\Users\Sophia\Documents\rPPG_data\results\results_Y5F_nk2.csv"
+RESULTS_CSV = r"C:\Users\Sophia\Documents\rPPG_data\results\results_mp_batch3.csv"
 # RESULTS_CSV = "/home/soph/rppg/rPPG_data/results/results_Y5F_20s.csv"
 
 def save_results(results: dict, output_path: str | Path = RESULTS_CSV) -> None:
@@ -60,7 +60,9 @@ def save_results(results: dict, output_path: str | Path = RESULTS_CSV) -> None:
     workbook.save(output_path.with_suffix(".xlsx"))
 
 
-def find_patient_info(root_path: Path) -> tuple[str, str, str, str, str]:
+def find_patient_info(
+    root_path: str | Path,
+) -> tuple[str, str, str | None, str | None, str]:
     root_path = Path(root_path).expanduser().resolve()
     if not root_path.is_dir():
         raise NotADirectoryError(f"Root path is not a directory: {root_path}")
@@ -77,6 +79,15 @@ def find_patient_info(root_path: Path) -> tuple[str, str, str, str, str]:
             raise ValueError(f"Multiple {description} found under {root_path}: {matches}")
         return candidates[0]
 
+    def find_optional_unique(
+        description: str,
+        candidates: list[Path],
+    ) -> str | None:
+        if len(candidates) > 1:
+            matches = ", ".join(str(path) for path in candidates)
+            raise ValueError(f"Multiple {description} found under {root_path}: {matches}")
+        return str(candidates[0]) if candidates else None
+
     return (
         str(find_unique(
             "AVI video",
@@ -90,25 +101,25 @@ def find_patient_info(root_path: Path) -> tuple[str, str, str, str, str]:
                 and path.suffix.casefold() == ".csv"
             ],
         )),
-        str(find_unique(
+        find_optional_unique(
             "PPG TXT file",
             [
                 path for path in files
                 if path.name.casefold().startswith("ppg")
                 and path.suffix.casefold() == ".txt"
             ],
-        )),
-        str(find_unique(
+        ),
+        find_optional_unique(
             "respiration TXT file",
             [
                 path for path in files
                 if path.name.casefold().startswith("resp")
                 and path.suffix.casefold() == ".txt"
             ],
-        )),
+        ),
         str(find_unique(
             "BVP directory",
-            [path for path in directories if path.name.casefold().startswith("bvp")],
+            [path for path in directories if path.name.casefold() == "bvp_results"],
         )),
     )
 
@@ -136,9 +147,9 @@ def list_patients_from_batches(root_path: Path) -> list[str]:
     return sorted(str(path) for path in patient_dirs)
 
 
-# patients_paths = list_patients(r"A:\dataset_raw\batch7")
+patients_paths = list_patients(r"A:\dataset_raw\batch3")
 # patients_paths = list_patients_from_batches(r"A:\dataset_raw")
-patients_paths = list_patients_from_batches("/home/soph/ssd/dataset_raw")
+# patients_paths = list_patients_from_batches("/home/soph/ssd/dataset_raw")
 # patients_paths = list_patients("/home/soph/ssd/dataset_raw/batch7")
 
 patients_info = {}
@@ -207,7 +218,7 @@ for patient in patients_info:
             hr_ecg_all[method].extend(patient_analysis.ecg_hr_values)
             hr_rppg_all[method].extend(patient_analysis.rppg_hr_values[method])
             snr_all[method].append(patient_analysis.hr_results[method]['snr'])
-            if patient_analysis.gt_rr_values.all():
+            if patient_analysis.gt_rr_values is not None:
                 rr_gt_all[method].extend(patient_analysis.gt_rr_values)
             rr_rppg_all[method].extend(patient_analysis.rppg_rr_values[method]['fusion'])
             if method in patient_analysis.correlation_results:

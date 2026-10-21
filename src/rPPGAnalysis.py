@@ -18,8 +18,8 @@ import neurokit2 as nk
 class rPPGAnalysis:
     def __init__(self, video_path: Path,
                  ecg_data_path: Path,
-                 ppg_data_path: Path,
-                 respiration_data_path: Path,
+                 ppg_data_path: str | Path | None,
+                 respiration_data_path: str | Path | None,
                  rPPG_folder_path: Path,
                  hr_window_size: int,
                  respiration_window_size: int,
@@ -213,6 +213,9 @@ class rPPGAnalysis:
     
     def _load_respiratory_signal(self):
         """Lê o arquivo de referência e calcula RR por janelas."""
+        if not self.gt_respiration_path:
+            return None, None
+
         try:
             sig = np.loadtxt(self.gt_respiration_path)
             t = np.linspace(0, len(sig)/self.gt_respiration_sample_rate, len(sig))
@@ -573,25 +576,34 @@ class rPPGAnalysis:
         rr_results = {}
         
         for method in self.rppg_rr_values:
-            rr_rppg_values = self.rppg_rr_values[method]['fusion']
-            min_length = min(len(self.gt_rr_values), len(rr_rppg_values))
-            gt_rr_aligned = self.gt_rr_values[:min_length]
-            rppg_rr_aligned = rr_rppg_values[:min_length]
+            if self.gt_rr_values is None:
+                rr_results[method] = ({
+                    'mae': None,
+                    'rmse': None,
+                    'mape': None
+                })
+            else:
+                rr_rppg_values = self.rppg_rr_values[method]['fusion']
+                min_length = min(len(self.gt_rr_values), len(rr_rppg_values))
+                gt_rr_aligned = self.gt_rr_values[:min_length]
+                rppg_rr_aligned = rr_rppg_values[:min_length]
 
-            mae = mean_absolute_error(gt_rr_aligned, rppg_rr_aligned)
-            rmse = np.sqrt(mean_squared_error(gt_rr_aligned, rppg_rr_aligned))
-            mape = self.calculate_mape(gt_rr_aligned, rppg_rr_aligned)
+                mae = mean_absolute_error(gt_rr_aligned, rppg_rr_aligned)
+                rmse = np.sqrt(mean_squared_error(gt_rr_aligned, rppg_rr_aligned))
+                mape = self.calculate_mape(gt_rr_aligned, rppg_rr_aligned)
 
-            rr_results[method] = ({
-                'mae': mae,
-                'rmse': rmse,
-                'mape': mape
-            })
+                rr_results[method] = ({
+                    'mae': mae,
+                    'rmse': rmse,
+                    'mape': mape
+                })
         
         return rr_results
 
     def compare_rppg_ppg(self):
-        
+        if not self.gt_ppg_path:
+            return {}
+
         print('Running linear correlation analysis...')
 
         gt_ppg_signal = self._load_signal_from_txt(self.gt_ppg_path)

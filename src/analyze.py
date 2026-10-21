@@ -65,10 +65,10 @@ def find_patient_info(root_path: Path) -> tuple[str, str, str, str, str]:
 # EXEMPLO MAIS DIFÍCIL
 # VIDEO_PATH, ECG_DATA_PATH, PPG_DATA_PATH, RESPIRATION_DATA_PATH, RPPG_FOLDER_PATH = find_patient_info(r"A:\dataset_raw\test\10227_1")
 # BRADICARDIA 
-# VIDEO_PATH, ECG_DATA_PATH, PPG_DATA_PATH, RESPIRATION_DATA_PATH, RPPG_FOLDER_PATH = find_patient_info(r"A:\dataset_raw\2356759_2")
-VIDEO_PATH, ECG_DATA_PATH, PPG_DATA_PATH, RESPIRATION_DATA_PATH, RPPG_FOLDER_PATH = find_patient_info("/home/soph/ssd/dataset_raw/batch4/2356759_2")
+# VIDEO_PATH, ECG_DATA_PATH, PPG_DATA_PATH, RESPIRATION_DATA_PATH, RPPG_FOLDER_PATH = find_patient_info(r"A:\dataset_raw\batch4\2356759_2")
+# VIDEO_PATH, ECG_DATA_PATH, PPG_DATA_PATH, RESPIRATION_DATA_PATH, RPPG_FOLDER_PATH = find_patient_info("/home/soph/ssd/dataset_raw/batch4/2356759_2")
 
-# VIDEO_PATH, ECG_DATA_PATH, PPG_DATA_PATH, RESPIRATION_DATA_PATH, RPPG_FOLDER_PATH = find_patient_info(r"A:\dataset_raw\test\2022121_0")
+VIDEO_PATH, ECG_DATA_PATH, PPG_DATA_PATH, RESPIRATION_DATA_PATH, RPPG_FOLDER_PATH = find_patient_info(r"A:\dataset_raw\batch1\10227_1")
 
 if __name__ == '__main__':
 
@@ -89,7 +89,7 @@ if __name__ == '__main__':
     print('hr_results\n', patient2_analysis.hr_results)
     # print('Correlation_results\n', patient2_analysis.correlation_results)
     # print('Respiratory rate estimation\n', patient2_analysis.rr_results)
-    # patient2_analysis.plot_spectral_analysis()
-    # patient2_analysis.plot_rppg_ppg_correlation()
+    patient2_analysis.plot_spectral_analysis()
+    patient2_analysis.plot_rppg_ppg_correlation()
     # patient2_analysis.plot_bvp(same_scale=False)
     # patient2_analysis.plot_all(method='POS')
