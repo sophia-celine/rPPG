@@ -7,7 +7,7 @@ from rPPGAnalysis import rPPGAnalysis
 # PPG_DATA_PATH = '/home/soph/ssd/dataset_raw/2356759_2/ppg_20-08-2026_3_16-34-55_16-37-00.txt'
 # RESPIRATION_DATA_PATH = '/home/soph/ssd/dataset_raw/2356759_2/respiration_20-08-2026_3_16-34-55_16-37-00.txt'
 # RPPG_FOLDER_PATH = '/home/soph/rppg/rPPG-Toolbox/BVPresults'
-HR_WINDOW_SIZE = 30
+HR_WINDOW_SIZE = 60
 RESPIRATION_WINDOW_SIZE = 60
 
 def find_patient_info(root_path: Path) -> tuple[str, str, str, str, str]:
@@ -87,9 +87,9 @@ if __name__ == '__main__':
     # # print('fps\n', patient2_analysis.video_fps)
     print('rppg_hr_values\n', patient2_analysis.rppg_hr_values)
     print('hr_results\n', patient2_analysis.hr_results)
-    print('Correlation_results\n', patient2_analysis.correlation_results)
-    print('Respiratory rate estimation\n', patient2_analysis.rr_results)
-    patient2_analysis.plot_spectral_analysis()
-    patient2_analysis.plot_rppg_ppg_correlation()
+    # print('Correlation_results\n', patient2_analysis.correlation_results)
+    # print('Respiratory rate estimation\n', patient2_analysis.rr_results)
+    # patient2_analysis.plot_spectral_analysis()
+    # patient2_analysis.plot_rppg_ppg_correlation()
     # patient2_analysis.plot_bvp(same_scale=False)
-    patient2_analysis.plot_all(method='POS')
+    # patient2_analysis.plot_all(method='POS')

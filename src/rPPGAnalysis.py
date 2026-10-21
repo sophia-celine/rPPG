@@ -101,6 +101,8 @@ class rPPGAnalysis:
     def estimate_hr_heartpy(segment, fs):
         try:
             wd, m = hp.process(segment, sample_rate=fs, bpmmin=30, bpmmax=200)
+            hp.plotter(wd, m)
+            plt.show()
             return m['bpm']
         except Exception:
             return np.nan
@@ -108,9 +110,30 @@ class rPPGAnalysis:
     @staticmethod
     def estimate_hr_neurokit2(segment, fs):
         try:
-            signals, info = nk.ecg_process(segment, sampling_rate=fs)
-            nk.ecg_plot(signals, info)
-            plt.show()
+            ecg_cleaned = nk.ecg_clean(segment, sampling_rate=fs)
+            signals, info = nk.ecg_peaks(
+                ecg_cleaned,
+                sampling_rate=fs,
+                correct_artifacts=True,
+                method='promac',
+                # method='engzeemod2012', -- fc mt bom, picos mt bons mas errou alguns picos
+                # method='manikandan2012', -- fc mt bom, pico com um pouco de thresh
+                # method='khamis2016', -- fc mt bom, pico com mt thresh
+                # method='promac', -- fc mt bom, pico bom
+            )
+            signals["ECG_Clean"] = ecg_cleaned
+            signals["ECG_Raw"] = segment
+            signals["ECG_Quality"] = nk.ecg_quality(
+                ecg_cleaned,
+                sampling_rate=fs,
+            )
+            signals["ECG_Rate"] = nk.signal_rate(
+                info["ECG_R_Peaks"],
+                sampling_rate=fs,
+                desired_length=len(segment),
+            )
+            # nk.ecg_plot(signals, info)
+            # plt.show()
             return float(np.nanmean(signals["ECG_Rate"]))
         except Exception:   
             return np.nan
@@ -281,12 +304,12 @@ class rPPGAnalysis:
 
     def _estimate_hr_ecg(self):
 
-        print(f"Calculating Ground Truth HR for {n_windows_ecg} windows...")
         # ecg = hp.get_data(self.gt_ecg_path)
         # ecg = self.filter_ecg(ecg, sample_rate=self.ecg_sample_rate)
         ecg = np.loadtxt(self.gt_ecg_path, dtype=np.float64, ndmin=1)
         window_len_ecg = int(self.hr_window_size * self.ecg_sample_rate)
         n_windows_ecg = len(ecg) // window_len_ecg
+        print(f"Calculating Ground Truth HR for {n_windows_ecg} windows...")
         
         ecg_hr_values = []
         for i in range(n_windows_ecg):
