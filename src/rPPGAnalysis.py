@@ -675,7 +675,7 @@ class rPPGAnalysis:
     def plot_spectral_analysis(self, title=True, fontsize='large', labelsize='large', methods='all'):
 
         if methods == 'all' or len(methods) > 3:
-            if methods == 'all': methods = list(self.rppg_signals.keys())
+            if methods == 'all' and self.rppg_signals is not None: methods = list(self.rppg_signals.keys())
             cols = 2
         else:
             cols = 1
