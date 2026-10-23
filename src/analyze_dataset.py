@@ -7,8 +7,8 @@ from openpyxl import Workbook
 
 HR_WINDOW_SIZE = 60
 RESPIRATION_WINDOW_SIZE = 60
-RESULTS_CSV = r"C:\Users\Sophia\Documents\rPPG_data\results\results_mp.csv"
-# RESULTS_CSV = "/home/soph/rppg/rPPG_data/results/results_Y5F_20s.csv"
+# RESULTS_CSV = r"C:\Users\Sophia\Documents\rPPG_data\results\results_mp.csv"
+RESULTS_CSV = "/home/soph/rppg/rPPG_data/results/results_mp.csv"
 
 def save_results(results: dict, output_path: str | Path = RESULTS_CSV) -> None:
     """Save per-patient metrics grouped by metric, then by method."""
@@ -148,8 +148,8 @@ def list_patients_from_batches(root_path: Path) -> list[str]:
 
 
 # patients_paths = list_patients(r"A:\dataset_raw\batch3")
-patients_paths = list_patients_from_batches(r"A:\dataset_raw")
-# patients_paths = list_patients_from_batches("/home/soph/ssd/dataset_raw")
+# patients_paths = list_patients_from_batches(r"A:\dataset_raw")
+patients_paths = list_patients_from_batches("/home/soph/ssd/dataset_raw")
 # patients_paths = list_patients("/home/soph/ssd/dataset_raw/batch7")
 
 patients_info = {}
