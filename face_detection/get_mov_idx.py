@@ -489,7 +489,7 @@ def get_mov_index(video_path, show: bool = True):
                     )
 
                 cv2.imshow(
-                    "MediaPipe - Face Body Landmarks",
+                    f"{Path(video_path).parent.name}",
                     frame
                 )
 
@@ -522,6 +522,7 @@ def process_dataset(
     folder_path=None,
     dataset_csv_path='',
     dataset_cas_path=None,
+    show=False
 ):
     csv_file = Path(csv_path)
     dataset_folder = Path(folder_path) if folder_path is not None else None
@@ -632,7 +633,7 @@ def process_dataset(
             print(f"Paciente {patient_name} ignorado: nenhum arquivo AVI encontrado.")
             continue
         print(f'================= {patient_name} ==================')
-        result = get_mov_index(avi_files[0], show=False)
+        result = get_mov_index(avi_files[0], show=show)
         if result is not None:
             movement_index, detection_rate = result
             patient_indices[patient_name] = (movement_index, detection_rate)
@@ -723,4 +724,5 @@ if __name__ == "__main__":
         csv_path='/home/soph/rppg/rPPG_data/results/results_mp.csv',
         folder_path='/home/soph/ssd/dataset_raw',
         dataset_cas_path='/home/soph/rppg/rPPG_data/ground_truth/dataset_raw.csv',
+        show=True
     )
