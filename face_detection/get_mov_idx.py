@@ -133,11 +133,11 @@ def get_mov_index(video_path, show: bool = True):
 
         num_faces=1,
 
-        min_face_detection_confidence=0.5,
+        min_face_detection_confidence=0.3,
 
-        min_face_presence_confidence=0.5,
+        min_face_presence_confidence=0.3,
 
-        min_tracking_confidence=0.5
+        min_tracking_confidence=0.3
     )
 
 
@@ -521,24 +521,18 @@ def process_dataset(
     csv_path='',
     folder_path=None,
     dataset_csv_path='',
-    dataset_cas_path=None,
     show=False
 ):
     csv_file = Path(csv_path)
     dataset_folder = Path(folder_path) if folder_path is not None else None
-    if dataset_csv_path and dataset_cas_path:
-        raise ValueError(
-            "Informe apenas um dos parâmetros: dataset_csv_path ou dataset_cas_path."
-        )
-    dataset_source_path = dataset_cas_path or dataset_csv_path
-    dataset_csv_file = Path(dataset_source_path) if dataset_source_path else None
+    dataset_csv_file = Path(dataset_csv_path) if dataset_csv_path else None
 
     if not csv_file.is_file():
         raise FileNotFoundError(f"Planilha CSV não encontrada: {csv_file}")
 
     if dataset_csv_file is None or not dataset_csv_file.is_file():
         raise FileNotFoundError(
-            f"Planilha de dados do dataset não encontrada: {dataset_source_path}"
+            f"Planilha de dados do dataset não encontrada: {dataset_csv_path}"
         )
 
     if dataset_folder is None or not dataset_folder.is_dir():
@@ -565,23 +559,33 @@ def process_dataset(
             "A planilha do dataset não contém a coluna 'Iluminação (lux)'."
         ) from error
 
-    illumination_by_patient = {}
+    try:
+        phototype_column = dataset_headers.index("Fototipo")
+    except ValueError as error:
+        raise ValueError(
+            "A planilha do dataset não contém a coluna 'Fototipo'."
+        ) from error
+
+    patient_dataset_info = {}
     for row_number, dataset_row in enumerate(dataset_rows[1:], start=2):
         if not dataset_row or not dataset_row[0].strip():
             print('nao achou a linha')
             continue
 
         patient_name = dataset_row[0].strip().replace('.', '_')
-        if patient_name in illumination_by_patient:
+        if patient_name in patient_dataset_info:
             raise ValueError(
                 f"Paciente duplicado na planilha do dataset: {patient_name}"
             )
-        if illumination_column >= len(dataset_row):
+        if max(illumination_column, phototype_column) >= len(dataset_row):
             raise ValueError(
                 f"A linha {row_number} da planilha do dataset não possui "
-                "a coluna 'Iluminação (lux)'."
+                "as colunas 'Iluminação (lux)' e 'Fototipo'."
             )
-        illumination_by_patient[patient_name] = dataset_row[illumination_column]
+        patient_dataset_info[patient_name] = (
+            dataset_row[illumination_column],
+            dataset_row[phototype_column],
+        )
 
     batch_folders = sorted(
         folder
@@ -674,15 +678,18 @@ def process_dataset(
     detection_rate_row[0] = "detection_rate"
     illumination_row = [""] * len(headers)
     illumination_row[0] = "Iluminação (lux)"
+    phototype_row = [""] * len(headers)
+    phototype_row[0] = "Fototipo"
     for patient_name, (movement_index, detection_rate) in found_indices.items():
         movement_row[patient_columns[patient_name]] = movement_index
         detection_rate_row[patient_columns[patient_name]] = detection_rate
-        illumination_row[patient_columns[patient_name]] = (
-            illumination_by_patient.get(patient_name, "")
-        )
+        illumination, phototype = patient_dataset_info.get(patient_name, ("", ""))
+        illumination_row[patient_columns[patient_name]] = illumination
+        phototype_row[patient_columns[patient_name]] = phototype
     rows.append(movement_row)
     rows.append(detection_rate_row)
     rows.append(illumination_row)
+    rows.append(phototype_row)
 
     output_file = csv_file.with_name(f"{csv_file.stem}_mov{csv_file.suffix}")
     with output_file.open("w", newline="", encoding="utf-8") as output:
@@ -707,7 +714,14 @@ def process_dataset(
             writer.writerow([
                 "Iluminação (lux)",
                 *(
-                    illumination_by_patient.get(patient_name, "")
+                    patient_dataset_info.get(patient_name, ("", ""))[0]
+                    for patient_name in missing_indices
+                ),
+            ])
+            writer.writerow([
+                "Fototipo",
+                *(
+                    patient_dataset_info.get(patient_name, ("", ""))[1]
                     for patient_name in missing_indices
                 ),
             ])
@@ -720,9 +734,18 @@ def process_dataset(
 
 
 if __name__ == "__main__":
-    process_dataset(
-        csv_path='/home/soph/rppg/rPPG_data/results/results_mp.csv',
-        folder_path='/home/soph/ssd/dataset_raw',
-        dataset_cas_path='/home/soph/rppg/rPPG_data/ground_truth/dataset_raw.csv',
+    # process_dataset(
+    #     csv_path='/home/soph/rppg/rPPG_data/results/results_mp.csv',
+    #     folder_path='/home/soph/ssd/dataset_raw',
+    #     dataset_csv_path='/home/soph/rppg/rPPG_data/ground_truth/dataset_raw.csv',
+    #     show=True
+    # )
+        process_dataset(
+        csv_path='/home/soph/rppg/rPPG_data/results/results_mp_batch8.csv',
+        folder_path='/home/soph/ssd/dataset_raw/batch8',
+        dataset_csv_path='/home/soph/rppg/rPPG_data/ground_truth/dataset_raw.csv',
         show=True
     )
+    # accumulated_movement_index, detection_rate = get_mov_index('/home/soph/ssd/dataset_raw/batch7/2358581_1/L06-15-10-2026-16-22.avi', show=False)
+    # print("mov idx", accumulated_movement_index)
+    # print('det rate', detection_rate)
