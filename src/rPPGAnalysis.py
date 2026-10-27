@@ -116,10 +116,10 @@ class rPPGAnalysis:
                 sampling_rate=fs,
                 correct_artifacts=True,
                 method='promac',
-                # method='engzeemod2012', -- fc mt bom, picos mt bons mas errou alguns picos
-                # method='manikandan2012', -- fc mt bom, pico com um pouco de thresh
-                # method='khamis2016', -- fc mt bom, pico com mt thresh
-                # method='promac', -- fc mt bom, pico bom
+                # method='engzeemod2012', #-- fc mt bom, picos mt bons mas errou alguns picos
+                # method='manikandan2012', #-- fc mt bom, pico com um pouco de thresh
+                # method='khamis2016', #-- fc mt bom, pico com mt thresh
+                # method='promac', #-- fc mt bom, pico bom
             )
             signals["ECG_Clean"] = ecg_cleaned
             signals["ECG_Raw"] = segment
@@ -132,8 +132,8 @@ class rPPGAnalysis:
                 sampling_rate=fs,
                 desired_length=len(segment),
             )
-            # nk.ecg_plot(signals, info)
-            # plt.show()
+            nk.ecg_plot(signals, info)
+            plt.show()
             return float(np.nanmean(signals["ECG_Rate"]))
         except Exception:   
             return np.nan
