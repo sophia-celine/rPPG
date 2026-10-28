@@ -132,8 +132,8 @@ class rPPGAnalysis:
                 sampling_rate=fs,
                 desired_length=len(segment),
             )
-            nk.ecg_plot(signals, info)
-            plt.show()
+            # nk.ecg_plot(signals, info)
+            # plt.show()
             return float(np.nanmean(signals["ECG_Rate"]))
         except Exception:   
             return np.nan

@@ -146,13 +146,13 @@ if __name__ == "__main__":
 
     HR_WINDOW_SIZE = 60
     RESPIRATION_WINDOW_SIZE = 60
-    # RESULTS_CSV = r"C:\Users\Sophia\Documents\rPPG_data\results\results_mp.csv"
-    RESULTS_CSV = "/home/soph/rppg/rPPG_data/results/results_mp_batch8.csv"
+    RESULTS_CSV = r"C:\Users\Sophia\Documents\rPPG_data\results\results_mp_mov.csv"
+    # RESULTS_CSV = "/home/soph/rppg/rPPG_data/results/results_mp.csv"
 
     # patients_paths = list_patients(r"A:\dataset_raw\batch3")
-    # patients_paths = list_patients_from_batches(r"A:\dataset_raw")
+    patients_paths = list_patients_from_batches(r"A:\dataset_raw")
     # patients_paths = list_patients_from_batches("/home/soph/ssd/dataset_raw")
-    patients_paths = list_patients("/home/soph/ssd/dataset_raw/batch8")
+    # patients_paths = list_patients("/home/soph/ssd/dataset_raw/batch8")
 
     patients_info = {}
 
@@ -202,7 +202,7 @@ if __name__ == "__main__":
         )
         print("ECG HR values", patient_analysis.ecg_hr_values)
         print("hr results", patient_analysis.hr_results)
-        patient_analysis.plot_spectral_analysis()
+        # patient_analysis.plot_spectral_analysis()
         # patient_analysis.plot_gt()
         if patient_analysis.frame_count / patient_analysis.video_fps > HR_WINDOW_SIZE:
             print('duration', patient_analysis.frame_count / patient_analysis.video_fps)
