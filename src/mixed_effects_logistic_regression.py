@@ -15,8 +15,8 @@ import statsmodels.formula.api as smf
 # 1. CONFIGURAÇÕES
 # ============================================================
 
-ARQUIVO_CSV = Path(r"C:\Users\Sophia\Documents\rPPG_data\results\results_mp_mov_NoOutliers.csv")
-PASTA_SAIDA = Path(r"C:\Users\Sophia\Documents\rPPG_data\results\resultados_POS_binario")
+ARQUIVO_CSV = Path(r"C:\Users\Sophia\Documents\rPPG_data\results\results_mp_mov_obs.csv")
+PASTA_SAIDA = Path(r"C:\Users\Sophia\Documents\rPPG_data\results\resultados_comOutliers")
 PASTA_SAIDA.mkdir(parents=True, exist_ok=True)
 
 LIMIAR_MAE = 5.0
