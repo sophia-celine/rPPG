@@ -389,6 +389,7 @@ class SignalExtractorApp:
         local_specific_cols = [
             "init_time", "end_time", "sinal_ECG", "sinal_PPG", "sinal_resp",
             "sinal_P1", "sinal_PVC", "sinal_ART", "sinal_CO2", "sinal_FC", "sinal_SpO2",
+            "sinal_FR_impedancia", "sinal_FR_CO2",
             "video_path", "video_duration", "h5_file", "evolucoes_path"
         ]
         for col in local_specific_cols:
@@ -476,7 +477,7 @@ class SignalExtractorApp:
                 novas_colunas = [
                     "init_time", "end_time", "sinal_ECG", "sinal_PPG",
                     "sinal_resp", "sinal_P1", "sinal_PVC", "sinal_ART", "sinal_CO2",
-                    "sinal_FC", "sinal_SpO2",
+                    "sinal_FC", "sinal_SpO2", "sinal_FR_impedancia", "sinal_FR_CO2",
                     "video_path", "video_duration", "evolucoes_path",
                 ]
                 for col in novas_colunas:
@@ -492,6 +493,7 @@ class SignalExtractorApp:
             novas_colunas = [
                 "init_time", "end_time", "sinal_ECG", "sinal_PPG", "sinal_resp",
                 "sinal_P1", "sinal_PVC", "sinal_ART", "sinal_CO2", "sinal_FC", "sinal_SpO2",
+                "sinal_FR_impedancia", "sinal_FR_CO2",
                 "video_path", "video_duration", "evolucoes_path",
             ]
             for col in novas_colunas:
@@ -1528,6 +1530,20 @@ class SignalExtractorApp:
                 "id": Config.spo2_trend_id, "template": "spo2_trend", "column": "sinal_SpO2",
                 "scale": 1.0, "unit": "%",
             },
+            "Frequência respiratória (impedância, provável)": {
+                "id": Config.respiratory_rate_impedance_id,
+                "template": "respiratory_rate_impedance",
+                "column": "sinal_FR_impedancia",
+                "scale": 1.0,
+                "unit": "rpm",
+            },
+            "Frequência respiratória (CO₂, provável)": {
+                "id": Config.respiratory_rate_co2_id,
+                "template": "respiratory_rate_co2",
+                "column": "sinal_FR_CO2",
+                "scale": 1.0,
+                "unit": "rpm",
+            },
         }
         date_str = str(paciente.get("Dia", "")).strip()
         init_time = str(paciente.get("init_time", "")).strip()
@@ -1544,6 +1560,8 @@ class SignalExtractorApp:
                 numeric_signal_ids=(
                     Config.heart_rate_id,
                     Config.spo2_trend_id,
+                    Config.respiratory_rate_impedance_id,
+                    Config.respiratory_rate_co2_id,
                 ),
             )
         except (OSError, TypeError, ValueError) as exc:

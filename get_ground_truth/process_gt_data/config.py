@@ -36,6 +36,8 @@ class AppSettings:
         "co2": "co2_{date}_{bed}_{start}_{end}.txt",
         "heart_rate": "heart_rate_{date}_{bed}_{start}_{end}.txt",
         "spo2_trend": "spo2_trend_{date}_{bed}_{start}_{end}.txt",
+        "respiratory_rate_impedance": "respiratory_rate_impedance_{date}_{bed}_{start}_{end}.txt",
+        "respiratory_rate_co2": "respiratory_rate_co2_{date}_{bed}_{start}_{end}.txt",
     })
     reference_filename_template: str = "{signal}_{patient_id}.txt"
     video_filename_template: str = "{bed}-{date}-{hour}.avi"
@@ -67,6 +69,8 @@ class Config:
     co2_id: int = 4784136
     heart_rate_id: int = 0x0100
     spo2_trend_id: int = 0x0700
+    respiratory_rate_impedance_id: int = 0x0500
+    respiratory_rate_co2_id: int = 0x4900
     interactive_select_time: bool = True
     duration_seconds: float = 120.0
     selected_start_ts: float | None = None
