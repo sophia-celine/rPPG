@@ -16,6 +16,7 @@ from config import APP_SETTINGS, Config
 from signal_processing import (
     build_time_vectors,
     load_hdf5_packets,
+    load_hdf5_numeric_packets,
     run_extraction_for_patient,
     write_cut_video,
 )
@@ -35,7 +36,10 @@ def classify_cid(cid):
 
     elif cid.startswith("G"):
         return "Doença neurológica"
-
+    
+    elif cid.startswith("K"):
+        return "Doença gastrointestinal"
+    
     elif cid.startswith(("S", "T", "V")):
         return "Trauma"
 
@@ -101,6 +105,9 @@ class SignalExtractorApp:
 
         btn_visualize_signals = tk.Button(btn_frame, text="Visualizar Sinais", command=self.visualize_saved_signals_for_selected, bg="#FF9800", fg="white", font=("Arial", 11, "bold"), width=18)
         btn_visualize_signals.pack(side=tk.LEFT, padx=15)
+
+        btn_add_signals = tk.Button(btn_frame, text="Adicionar sinais", command=self.add_additional_signals_for_selected, bg="#607D8B", fg="white", font=("Arial", 11, "bold"), width=18)
+        btn_add_signals.pack(side=tk.LEFT, padx=15)
 
         btn_load_clinical = tk.Button(btn_frame, text="Carregar dados clínicos", command=self.load_clinical_data_for_selected, bg="#E91E63", fg="white", font=("Arial", 11, "bold"), width=22)
         btn_load_clinical.pack(side=tk.LEFT, padx=15)
@@ -381,6 +388,7 @@ class SignalExtractorApp:
 
         local_specific_cols = [
             "init_time", "end_time", "sinal_ECG", "sinal_PPG", "sinal_resp",
+            "sinal_P1", "sinal_PVC", "sinal_ART", "sinal_CO2", "sinal_FC", "sinal_SpO2",
             "video_path", "video_duration", "h5_file", "evolucoes_path"
         ]
         for col in local_specific_cols:
@@ -467,7 +475,9 @@ class SignalExtractorApp:
                 self.df = pd.DataFrame()
                 novas_colunas = [
                     "init_time", "end_time", "sinal_ECG", "sinal_PPG",
-                    "sinal_resp", "video_path", "video_duration", "evolucoes_path",
+                    "sinal_resp", "sinal_P1", "sinal_PVC", "sinal_ART", "sinal_CO2",
+                    "sinal_FC", "sinal_SpO2",
+                    "video_path", "video_duration", "evolucoes_path",
                 ]
                 for col in novas_colunas:
                     self.df[col] = pd.NA
@@ -479,7 +489,11 @@ class SignalExtractorApp:
                 return
             self.df = pd.read_csv(self.dataset_raw_file)
 
-            novas_colunas = ["init_time", "end_time", "sinal_ECG", "sinal_PPG", "sinal_resp", "video_path", "video_duration", "evolucoes_path"]
+            novas_colunas = [
+                "init_time", "end_time", "sinal_ECG", "sinal_PPG", "sinal_resp",
+                "sinal_P1", "sinal_PVC", "sinal_ART", "sinal_CO2", "sinal_FC", "sinal_SpO2",
+                "video_path", "video_duration", "evolucoes_path",
+            ]
             for col in novas_colunas:
                 if col not in self.df.columns:
                     self.df[col] = pd.NA
@@ -709,14 +723,40 @@ class SignalExtractorApp:
             )
             classified_cids = (
                 cid_data[cid_column]
-                .fillna("")
-                .astype(str)
+                .where(cid_data[cid_column].apply(self._is_filled))
+                .astype("string")
                 .str.split("-", n=1)
                 .str[0]
-                .map(classify_cid)
+                .map(classify_cid, na_action="ignore")
             )
             classified_cids.index = cid_data["_patient_id"]
             classified_cids = classified_cids.groupby(level=0).first()
+
+            admission_group_column = "Grupo de admissão"
+            if admission_group_column not in self.df.columns:
+                self.df[admission_group_column] = pd.NA
+            patient_ids = (
+                self.df[patient_id_column]
+                .astype(str)
+                .str.strip()
+                .str.split(".", n=1)
+                .str[0]
+            )
+            classified_for_rows = patient_ids.map(classified_cids)
+            rows_to_fill = (
+                ~self.df[admission_group_column].apply(self._is_filled)
+                & classified_for_rows.notna()
+            )
+            if rows_to_fill.any():
+                self.df.loc[rows_to_fill, admission_group_column] = classified_for_rows.loc[rows_to_fill]
+                try:
+                    self.df.to_csv(self.dataset_raw_file, index=False)
+                except Exception as e:
+                    messagebox.showerror(
+                        "Erro ao Salvar",
+                        f"Não foi possível salvar os grupos de admissão no CSV:\n{e}",
+                    )
+
             distribution, valid_count, missing_count = self._analysis_distribution(classified_cids)
             if distribution:
                 labels = [item[0] for item in distribution]
@@ -1171,72 +1211,171 @@ class SignalExtractorApp:
 
         return (dates_np >= start_dt) & (dates_np <= end_dt)
 
-    def _load_full_signal_by_id(self, paciente, h5_file, signal_id, date_str, local_init_time, local_end_time):
-        try:
-            h5_files = [h5_file]
-            time_value = str(paciente.get("Hora", "")).strip()
-            time_parts = [part.strip() for part in time_value.split(":")]
-            if len(time_parts) >= 2:
+    def _load_full_signals_by_id(
+        self,
+        paciente,
+        h5_file,
+        signal_ids,
+        date_str,
+        local_init_time,
+        local_end_time,
+        numeric_signal_ids=(),
+    ):
+        h5_files = [h5_file]
+        time_parts = str(paciente.get("Hora", "")).strip().split(":")
+        if len(time_parts) >= 2:
+            try:
                 hour = int(time_parts[0])
                 minute = int(time_parts[1])
-                minutes_to_next_hour = 60 - minute
-                if 0 <= minute <= 59 and 0 < minutes_to_next_hour <= 3:
-                    next_row = paciente.to_dict()
-                    next_row["Hora"] = f"{hour + 1}:00"
-                    next_h5_file = self._build_h5_path_from_row(next_row)
-                    if next_h5_file and os.path.exists(next_h5_file):
-                        h5_files.append(next_h5_file)
+            except ValueError:
+                hour = minute = -1
+            if 0 <= minute <= 59 and 0 < 60 - minute <= 3:
+                next_row = paciente.to_dict()
+                next_row["Hora"] = f"{hour + 1}:00"
+                next_h5_file = self._build_h5_path_from_row(next_row)
+                if next_h5_file and os.path.exists(next_h5_file):
+                    h5_files.append(next_h5_file)
 
-            combined_datas = []
-            combined_ids = []
-            combined_seqsts = []
+        datas = []
+        ids = []
+        seqsts = []
+        numeric_records = {signal_id: [] for signal_id in numeric_signal_ids}
+        for current_h5 in h5_files:
+            try:
+                current_datas, current_ids, _, current_seqsts = load_hdf5_packets(
+                    current_h5,
+                    b"\x02\x0B\x00\x00",
+                    36,
+                )
+            except (OSError, KeyError, TypeError, ValueError) as exc:
+                raise OSError(f"Não foi possível ler o arquivo H5 {current_h5}:\n{exc}") from exc
 
-            for current_h5 in h5_files:
+            datas.extend(current_datas)
+            ids.extend(current_ids.tolist())
+            seqsts.extend(current_seqsts.tolist())
+
+            if numeric_records:
                 try:
-                    datas, ids, _, seqsts = load_hdf5_packets(
+                    current_numeric_records = load_hdf5_numeric_packets(
                         current_h5,
-                        b"\x02\x0B\x00\x00",
-                        36,
+                        numeric_records,
                     )
-                except Exception as e:
-                    if current_h5 == h5_file:
-                        return {"error": f"Erro ao ler H5: {e}"}
+                except (OSError, KeyError, TypeError, ValueError) as exc:
+                    raise OSError(
+                        f"Não foi possível decodificar tendências numéricas de {current_h5}:\n{exc}"
+                    ) from exc
+
+                for numeric_id, (numeric_times, numeric_values) in current_numeric_records.items():
+                    numeric_records[numeric_id].extend(
+                        zip(numeric_times.tolist(), numeric_values.tolist())
+                    )
+
+        if not datas and not any(numeric_records.values()):
+            raise ValueError("Nenhum pacote de dados foi encontrado nos arquivos H5.")
+
+        ids = np.asarray(ids)
+        seqsts = np.asarray(seqsts)
+        loaded_signals = {}
+        invalid_signal_ids = []
+
+        for signal_id in signal_ids:
+            indices = np.flatnonzero(ids == signal_id)
+            if indices.size == 0:
+                continue
+
+            chunks = [np.asarray(datas[index]) for index in indices]
+            timestamps = np.asarray(seqsts[indices], dtype=float)
+            if (
+                any(
+                    chunk.ndim != 1
+                    or chunk.size == 0
+                    or not np.issubdtype(chunk.dtype, np.number)
+                    or not np.isfinite(chunk).all()
+                    for chunk in chunks
+                )
+                or timestamps.size != len(chunks)
+                or not np.isfinite(timestamps).all()
+            ):
+                invalid_signal_ids.append(signal_id)
+                continue
+
+            positive_diffs = np.diff(timestamps)
+            positive_diffs = positive_diffs[positive_diffs > 0]
+            if positive_diffs.size == 0:
+                invalid_signal_ids.append(signal_id)
+                continue
+
+            sample_interval = float(np.median(positive_diffs))
+            sampling_rate = len(chunks[0]) / sample_interval
+            if not np.isfinite(sampling_rate) or sampling_rate <= 0:
+                invalid_signal_ids.append(signal_id)
+                continue
+
+            try:
+                signal = np.concatenate(chunks)
+                time_vector = build_time_vectors(timestamps, chunks, sampling_rate)
+                if (
+                    signal.size == 0
+                    or signal.size != time_vector.size
+                    or not np.isfinite(time_vector).all()
+                ):
+                    invalid_signal_ids.append(signal_id)
                     continue
+                dates = np.array([datetime.fromtimestamp(value) for value in time_vector])
+            except (TypeError, ValueError, OverflowError):
+                invalid_signal_ids.append(signal_id)
+                continue
 
-                if not datas:
-                    continue
+            mask = self._build_saved_interval_mask(
+                dates,
+                date_str,
+                local_init_time,
+                local_end_time,
+            )
+            loaded_signals[signal_id] = (dates, signal, mask, time_vector)
 
-                combined_datas.extend(datas)
-                combined_ids.extend(ids.tolist())
-                combined_seqsts.extend(seqsts.tolist())
+        for signal_id, records in numeric_records.items():
+            if not records:
+                continue
 
-            if not combined_datas:
-                return {"error": "Nenhum pacote de dados encontrado no H5."}
+            records.sort(key=lambda record: record[0])
+            timestamps = np.asarray([record[0] for record in records], dtype=float)
+            signal = np.asarray(
+                [np.nan if record[1] == -32768 else record[1] for record in records],
+                dtype=float,
+            )
+            positive_diffs = np.diff(timestamps)
+            positive_diffs = positive_diffs[
+                np.isfinite(positive_diffs) & (positive_diffs > 0)
+            ]
+            if (
+                not np.isfinite(timestamps).all()
+                or positive_diffs.size == 0
+                or not np.isfinite(signal).any()
+            ):
+                invalid_signal_ids.append(signal_id)
+                continue
 
-            datas = combined_datas
-            ids = np.asarray(combined_ids)
-            seqsts = np.asarray(combined_seqsts)
-        except Exception:
-            return None, None, None, None
+            sampling_rate = 1.0 / float(np.median(positive_diffs))
+            if not np.isfinite(sampling_rate) or sampling_rate <= 0:
+                invalid_signal_ids.append(signal_id)
+                continue
 
-        signal_indices = np.where(ids == signal_id)[0]
-        if len(signal_indices) == 0:
-            return None, None, None, None
+            try:
+                dates = np.array([datetime.fromtimestamp(value) for value in timestamps])
+            except (TypeError, ValueError, OverflowError, OSError):
+                invalid_signal_ids.append(signal_id)
+                continue
 
-        sig = np.concatenate([datas[i] for i in signal_indices])
-        ts = seqsts[signal_indices]
-        fs = len(datas[signal_indices[0]]) / np.median(np.diff(ts))
-        time_vector = build_time_vectors(ts, [datas[i] for i in signal_indices], fs)
-        dates_np = np.array([datetime.fromtimestamp(ts_value) for ts_value in time_vector])
+            mask = self._build_saved_interval_mask(
+                dates,
+                date_str,
+                local_init_time,
+                local_end_time,
+            )
+            loaded_signals[signal_id] = (dates, signal, mask, timestamps)
 
-        mask = self._build_saved_interval_mask(
-            dates_np,
-            date_str,
-            local_init_time,
-            local_end_time,
-        )
-
-        return dates_np, sig, mask, time_vector
+        return loaded_signals, invalid_signal_ids
 
     def visualize_saved_signals_for_selected(self):
         selected_item = self.tree.selection()
@@ -1265,21 +1404,34 @@ class SignalExtractorApp:
             "Respiração": Config.resp_id,
         }
 
-        fig, axes = plt.subplots(len(signal_info), 1, figsize=(14, 4 * len(signal_info)), sharex=True)
-        if len(signal_info) == 1:
-            axes = [axes]
-
-        for ax, (name, signal_id) in zip(axes, signal_info.items()):
-            dates_np, sig, mask, _ = self._load_full_signal_by_id(
+        try:
+            loaded_signals, _ = self._load_full_signals_by_id(
                 paciente,
                 str(h5_file),
-                signal_id,
+                signal_info.values(),
                 date_str,
                 init_time,
                 end_time,
             )
-            if dates_np is None or sig is None:
-                continue
+        except (OSError, TypeError, ValueError) as exc:
+            messagebox.showerror("Erro ao ler sinais", str(exc))
+            return
+
+        if not loaded_signals:
+            messagebox.showwarning("Sinais indisponíveis", "Nenhum dos sinais ECG, PPG ou respiração foi encontrado como vetor válido.")
+            return
+
+        loaded_signal_info = [
+            (name, signal_id)
+            for name, signal_id in signal_info.items()
+            if signal_id in loaded_signals
+        ]
+        fig, axes = plt.subplots(len(loaded_signals), 1, figsize=(14, 4 * len(loaded_signals)), sharex=True)
+        if len(loaded_signals) == 1:
+            axes = [axes]
+
+        for ax, (name, signal_id) in zip(axes, loaded_signal_info):
+            dates_np, sig, mask, _ = loaded_signals[signal_id]
 
             ax.plot(dates_np, sig, color='tab:blue', linewidth=1.5, label='sinal completo')
             if np.any(mask):
@@ -1293,6 +1445,233 @@ class SignalExtractorApp:
         fig.autofmt_xdate()
         fig.tight_layout()
         plt.show()
+
+    def _choose_additional_signals_to_save(self, signal_names):
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Selecionar sinais para salvar")
+        dialog.transient(self.root)
+        dialog.resizable(False, False)
+
+        tk.Label(dialog, text="Selecione os sinais que deseja salvar como TXT:").pack(
+            padx=20,
+            pady=(15, 8),
+            anchor="w",
+        )
+        selections = {
+            name: tk.BooleanVar(master=dialog, value=False)
+            for name in signal_names
+        }
+        for name, selected in selections.items():
+            ttk.Checkbutton(dialog, text=name, variable=selected).pack(
+                padx=20,
+                anchor="w",
+            )
+
+        result = {"selected": None}
+
+        def finish_selection():
+            result["selected"] = [
+                name for name, selected in selections.items() if selected.get()
+            ]
+            dialog.destroy()
+
+        button_frame = tk.Frame(dialog)
+        button_frame.pack(pady=15)
+        ttk.Button(button_frame, text="Salvar selecionados", command=finish_selection).pack(
+            side=tk.LEFT,
+            padx=5,
+        )
+        ttk.Button(button_frame, text="Cancelar", command=dialog.destroy).pack(
+            side=tk.LEFT,
+            padx=5,
+        )
+        dialog.protocol("WM_DELETE_WINDOW", dialog.destroy)
+        dialog.grab_set()
+        self.root.wait_window(dialog)
+        return result["selected"]
+
+    def add_additional_signals_for_selected(self):
+        selected_item = self.tree.selection()
+        if not selected_item:
+            messagebox.showwarning("Aviso", "Selecione um paciente na lista primeiro.")
+            return
+
+        idx = int(self.tree.item(selected_item[0], "values")[0])
+        paciente = self.df.loc[idx]
+        h5_file = self._resolve_h5_path(paciente, idx)
+        if not h5_file or not os.path.exists(str(h5_file)):
+            messagebox.showerror("Erro", f"Arquivo H5 não encontrado:\n{h5_file}")
+            return
+
+        signal_info = {
+            "P1": {
+                "id": Config.p1_id, "template": "p1", "column": "sinal_P1",
+                "scale": 250.0 / 2048.0, "unit": "mmHg",
+            },
+            "PVC": {
+                "id": Config.pvc_id, "template": "pvc", "column": "sinal_PVC",
+                "scale": 1.0, "unit": "contagens",
+            },
+            "ART": {
+                "id": Config.art_id, "template": "art", "column": "sinal_ART",
+                "scale": 250.0 / 2048.0, "unit": "mmHg",
+            },
+            "CO2": {
+                "id": Config.co2_id, "template": "co2", "column": "sinal_CO2",
+                "scale": 0.1, "unit": "mmHg",
+            },
+            "Frequência cardíaca": {
+                "id": Config.heart_rate_id, "template": "heart_rate", "column": "sinal_FC",
+                "scale": 1.0, "unit": "bpm",
+            },
+            "Saturação de oxigênio": {
+                "id": Config.spo2_trend_id, "template": "spo2_trend", "column": "sinal_SpO2",
+                "scale": 1.0, "unit": "%",
+            },
+        }
+        date_str = str(paciente.get("Dia", "")).strip()
+        init_time = str(paciente.get("init_time", "")).strip()
+        end_time = str(paciente.get("end_time", "")).strip()
+
+        try:
+            loaded_signals, invalid_signal_ids = self._load_full_signals_by_id(
+                paciente,
+                str(h5_file),
+                [details["id"] for details in signal_info.values()],
+                date_str,
+                init_time,
+                end_time,
+                numeric_signal_ids=(
+                    Config.heart_rate_id,
+                    Config.spo2_trend_id,
+                ),
+            )
+        except (OSError, TypeError, ValueError) as exc:
+            messagebox.showerror("Erro ao ler sinais", str(exc))
+            return
+
+        if not loaded_signals:
+            invalid_names = [
+                name for name, details in signal_info.items()
+                if details["id"] in invalid_signal_ids
+            ]
+            detail = f"\n\nVetor inválido: {', '.join(invalid_names)}." if invalid_names else ""
+            messagebox.showwarning(
+                "Sinais indisponíveis",
+                f"Nenhum dos sinais solicitados foi encontrado como vetor válido no H5.{detail}",
+            )
+            return
+
+        if invalid_signal_ids:
+            invalid_names = [
+                name for name, details in signal_info.items()
+                if details["id"] in invalid_signal_ids
+            ]
+            messagebox.showwarning(
+                "Sinais ignorados",
+                f"Estes sinais foram encontrados, mas não formam vetores válidos e não serão exibidos: {', '.join(invalid_names)}.",
+            )
+
+        valid_names = [
+            name for name, details in signal_info.items()
+            if details["id"] in loaded_signals
+        ]
+        fig, axes = plt.subplots(len(valid_names), 1, figsize=(14, 4 * len(valid_names)), sharex=True)
+        if len(valid_names) == 1:
+            axes = [axes]
+
+        for ax, name in zip(axes, valid_names):
+            dates, raw_signal, mask, _ = loaded_signals[signal_info[name]["id"]]
+            signal = raw_signal.astype(float) * signal_info[name]["scale"]
+            ax.plot(dates, signal, color="tab:blue", linewidth=1.5, label="sinal completo")
+            if np.any(mask):
+                ax.plot(dates[mask], signal[mask], color="tab:red", linewidth=2.5, label="intervalo salvo")
+            ax.set_title(f"{name} - sinal completo e intervalo salvo")
+            ax.set_ylabel(signal_info[name]["unit"])
+            ax.grid(True, alpha=0.3)
+            ax.legend(loc="upper right")
+
+        axes[-1].set_xlabel("Horário")
+        fig.autofmt_xdate()
+        fig.tight_layout()
+        plt.show()
+        plt.close(fig)
+
+        if not messagebox.askyesno(
+            "Salvar sinais adicionais",
+            "Deseja salvar algum dos sinais exibidos como TXT?",
+        ):
+            return
+
+        if not all(self._is_filled(value) for value in (date_str, init_time, end_time)):
+            messagebox.showwarning(
+                "Intervalo não selecionado",
+                "O paciente não possui um intervalo salvo. Os sinais foram exibidos completos, mas não há um trecho para salvar.",
+            )
+            return
+
+        signals_with_interval = [
+            name for name in valid_names
+            if np.any(loaded_signals[signal_info[name]["id"]][2])
+        ]
+        if not signals_with_interval:
+            messagebox.showwarning(
+                "Intervalo sem amostras",
+                "Nenhum sinal possui amostras dentro do intervalo salvo deste paciente.",
+            )
+            return
+
+        selected_names = self._choose_additional_signals_to_save(signals_with_interval)
+        if not selected_names:
+            return
+
+        date_for_filename = date_str.replace("/", "-")
+        start_for_filename = init_time.replace(":", "-")
+        end_for_filename = end_time.replace(":", "-")
+        bed = str(paciente.get("Leito", "")).strip()
+        patient_output_dir = self._patient_data_dir(paciente.get("Id do paciente", ""))
+        output_paths = {}
+        for name in selected_names:
+            details = signal_info[name]
+            filename = APP_SETTINGS.signal_filename_templates[details["template"]].format(
+                date=date_for_filename,
+                bed=bed,
+                start=start_for_filename,
+                end=end_for_filename,
+            )
+            output_paths[name] = patient_output_dir / filename
+
+        existing_paths = [path for path in output_paths.values() if path.exists()]
+        if existing_paths and not messagebox.askyesno(
+            "Sobrescrever sinais",
+            "Já existem arquivos para um ou mais sinais selecionados. Deseja sobrescrevê-los?",
+        ):
+            return
+
+        try:
+            patient_output_dir.mkdir(parents=True, exist_ok=True)
+            for name in selected_names:
+                details = signal_info[name]
+                signal_id = details["id"]
+                _, raw_signal, mask, _ = loaded_signals[signal_id]
+                signal = raw_signal.astype(float) * details["scale"]
+                np.savetxt(output_paths[name], signal[mask], fmt="%.7e")
+                self.df.at[idx, signal_info[name]["column"]] = output_paths[name].name
+
+            self.df.to_csv(self.dataset_raw_file, index=False)
+        except (OSError, ValueError) as exc:
+            messagebox.showerror(
+                "Erro ao salvar sinais",
+                f"Não foi possível salvar todos os sinais selecionados ou atualizar a planilha:\n{exc}",
+            )
+            return
+
+        self.update_treeview()
+        self._select_row_by_idx(idx)
+        messagebox.showinfo(
+            "Sinais salvos",
+            "Sinais salvos com sucesso:\n" + "\n".join(str(path) for path in output_paths.values()),
+        )
 
     def process_signals_for_selected(self, skip_overwrite_warning=False):
         selected_item = self.tree.selection()

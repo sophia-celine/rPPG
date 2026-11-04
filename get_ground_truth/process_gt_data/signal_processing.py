@@ -103,6 +103,56 @@ def load_hdf5_packets(file_path, data_pack_head, data_add):
     return datas, np.array(ids), np.array(seqs), np.array(seqsts)
 
 
+def load_hdf5_numeric_packets(file_path, signal_ids):
+    with h5py.File(file_path, "r") as hdf:
+        raw_packets = hdf["data"][:]
+        timestamps = hdf["data_timestamps"][:]
+
+    if len(raw_packets) != len(timestamps):
+        raise ValueError(f"O H5 {file_path} possui quantidades diferentes de pacotes e timestamps.")
+
+    requested_ids = set(signal_ids)
+    records = {signal_id: ([], []) for signal_id in requested_ids}
+    for raw_packet, timestamp in zip(raw_packets, timestamps):
+        if bytes(raw_packet[:4]) != b"\x02\x0B\x00\x00":
+            continue
+        packet_end = int.from_bytes(raw_packet[4:6], "big")
+        if packet_end < 37 or packet_end > len(raw_packet) or int(raw_packet[20]) != 2:
+            continue
+
+        count_header_length = int(raw_packet[36])
+        count_offset = 74 + 2 * count_header_length
+        if count_offset + 2 > packet_end:
+            continue
+        value_count = int(raw_packet[count_offset])
+        values_start = count_offset + 2
+        if (
+            int(raw_packet[37]) != 0
+            or int(raw_packet[count_offset + 1]) != 0
+            or values_start + value_count * 10 != packet_end
+        ):
+            continue
+
+        for value_offset in range(values_start, packet_end, 10):
+            signal_id = int.from_bytes(raw_packet[value_offset:value_offset + 2], "big")
+            if signal_id not in requested_ids:
+                continue
+            value = int.from_bytes(
+                raw_packet[value_offset + 8:value_offset + 10],
+                "big",
+                signed=True,
+            )
+            signal_times, signal_values = records[signal_id]
+            signal_times.append(float(timestamp))
+            signal_values.append(value)
+
+    return {
+        signal_id: (np.asarray(signal_times), np.asarray(signal_values, dtype=np.int16))
+        for signal_id, (signal_times, signal_values) in records.items()
+        if signal_times
+    }
+
+
 def build_time_vectors(ts, datas_chunk, fs):
     dt = 1 / fs
     time_vector = []

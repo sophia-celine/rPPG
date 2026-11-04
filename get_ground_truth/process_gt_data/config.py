@@ -30,6 +30,12 @@ class AppSettings:
         "ecg": "ecg_{date}_{bed}_{start}_{end}.csv",
         "ppg": "ppg_{date}_{bed}_{start}_{end}.txt",
         "respiration": "respiration_{date}_{bed}_{start}_{end}.txt",
+        "p1": "p1_{date}_{bed}_{start}_{end}.txt",
+        "pvc": "pvc_{date}_{bed}_{start}_{end}.txt",
+        "art": "art_{date}_{bed}_{start}_{end}.txt",
+        "co2": "co2_{date}_{bed}_{start}_{end}.txt",
+        "heart_rate": "heart_rate_{date}_{bed}_{start}_{end}.txt",
+        "spo2_trend": "spo2_trend_{date}_{bed}_{start}_{end}.txt",
     })
     reference_filename_template: str = "{signal}_{patient_id}.txt"
     video_filename_template: str = "{bed}-{date}-{hour}.avi"
@@ -55,6 +61,12 @@ class Config:
     ecg_id: int = 65796
     spo2_id: int = 458768
     resp_id: int = 327688
+    p1_id: int = 4063240
+    pvc_id: int = 3473416
+    art_id: int = 2883592
+    co2_id: int = 4784136
+    heart_rate_id: int = 0x0100
+    spo2_trend_id: int = 0x0700
     interactive_select_time: bool = True
     duration_seconds: float = 120.0
     selected_start_ts: float | None = None
