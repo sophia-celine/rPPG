@@ -12,6 +12,7 @@ import urllib.request
 from pathlib import Path
 
 import cv2
+import h5py
 import mediapipe as mp
 import numpy as np
 
@@ -376,6 +377,9 @@ def process_video(
     output_video_path = video_path.with_name(
         f"{standardized_id}{video_path.suffix}"
     )
+    output_landmarks_path = output_video_path.with_name(
+        f"{output_video_path.stem}_landmarks.h5"
+    )
     if output_video_path.resolve() == video_path.resolve():
         raise ValueError(
             "O nome padronizado do vídeo anonimizado não pode sobrescrever "
@@ -469,6 +473,9 @@ def process_video(
     # Frame number
     frame_number = 0
     video_writer = None
+    landmarks_file = None
+    landmark_datasets = None
+    last_landmarks_source_frame = -1
     movement_frames = []
     reference_distances = []
     movement_percentages = []
@@ -569,12 +576,111 @@ def process_video(
                         f"Could not create anonymized video: "
                         f"{output_video_path}"
                     )
+                chunk_frames = max(1, min(total_frames or 64, 64))
+                landmarks_file = h5py.File(output_landmarks_path, "w")
+                landmarks_file.attrs["video_filename"] = output_video_path.name
+                landmarks_file.attrs["frame_width"] = width
+                landmarks_file.attrs["frame_height"] = height
+                landmarks_file.attrs["fps"] = fps
+                landmarks_file.attrs["coordinate_system"] = (
+                    "MediaPipe normalized face coordinates"
+                )
+                landmarks_file.attrs["coordinate_order"] = "x, y, z"
+                landmarks_file.attrs["z_definition"] = (
+                    "Relative depth estimate; not a physical distance."
+                )
+                landmarks_file.attrs["landmark_count"] = 478
+                landmarks_file.attrs["frame_indexing"] = (
+                    "Zero-based; dataset row i matches video frame i"
+                )
+                landmark_datasets = {
+                    "landmarks": landmarks_file.create_dataset(
+                        "landmarks",
+                        shape=(total_frames, 478, 3),
+                        maxshape=(None, 478, 3),
+                        dtype=np.float32,
+                        chunks=(chunk_frames, 478, 3),
+                        compression="gzip",
+                        compression_opts=4,
+                        shuffle=True,
+                    ),
+                    "face_detected": landmarks_file.create_dataset(
+                        "face_detected",
+                        shape=(total_frames,),
+                        maxshape=(None,),
+                        dtype=np.bool_,
+                        chunks=(chunk_frames,),
+                        compression="gzip",
+                        compression_opts=4,
+                    ),
+                    "source_frame": landmarks_file.create_dataset(
+                        "source_frame",
+                        shape=(total_frames,),
+                        maxshape=(None,),
+                        dtype=np.int64,
+                        chunks=(chunk_frames,),
+                        compression="gzip",
+                        compression_opts=4,
+                    ),
+                }
+                landmark_datasets["landmarks"].attrs["description"] = (
+                    "Normalized x, y, z coordinates for the first face in each "
+                    "video frame. Values are carried forward when detection fails."
+                )
+                landmark_datasets["face_detected"].attrs["description"] = (
+                    "True when this frame has a new face detection; False when "
+                    "the previous valid landmarks are reused."
+                )
+                landmark_datasets["source_frame"].attrs["description"] = (
+                    "Zero-based frame index where the landmarks in this row "
+                    "were last detected."
+                )
 
             blur_result = (
                 face_result
                 if face_result.face_landmarks
                 else last_result
             )
+            frame_index = frame_number - 1
+            if face_result.face_landmarks:
+                last_landmarks_source_frame = frame_index
+
+            if blur_result is None or not blur_result.face_landmarks:
+                raise RuntimeError(
+                    "No current or previous face landmarks are available for "
+                    f"frame {frame_index}."
+                )
+
+            frame_landmarks = np.asarray(
+                [
+                    [landmark.x, landmark.y, landmark.z]
+                    for landmark in blur_result.face_landmarks[0]
+                ],
+                dtype=np.float32,
+            )
+            if frame_landmarks.shape != (478, 3):
+                raise ValueError(
+                    f"Expected 478 landmarks with x, y, z coordinates, got "
+                    f"{frame_landmarks.shape} in frame {frame_index}."
+                )
+
+            if frame_index >= landmark_datasets["landmarks"].shape[0]:
+                new_capacity = max(
+                    frame_index + 1,
+                    landmark_datasets["landmarks"].shape[0] * 2,
+                    1,
+                )
+                for dataset in landmark_datasets.values():
+                    dataset.resize(new_capacity, axis=0)
+
+            landmark_datasets["landmarks"][frame_index] = frame_landmarks
+            landmark_datasets["face_detected"][frame_index] = bool(
+                face_result.face_landmarks
+            )
+            landmark_datasets["source_frame"][frame_index] = (
+                last_landmarks_source_frame
+            )
+
             anonymized_frame = frame.copy()
             if blur_result is not None and blur_result.face_landmarks:
                 anonymized_frame = anonymize_frame(
@@ -817,6 +923,11 @@ def process_video(
     cap.release()
     if video_writer is not None:
         video_writer.release()
+    if landmarks_file is not None:
+        for dataset in landmark_datasets.values():
+            dataset.resize(frame_number, axis=0)
+        landmarks_file.attrs["frame_count"] = frame_number
+        landmarks_file.close()
 
     if show:
         cv2.destroyAllWindows()
@@ -827,6 +938,7 @@ def process_video(
         f"{accumulated_movement_index:.2f}"
     )
     print(f"Anonymized video saved to: {output_video_path}")
+    print(f"Landmark data saved to: {output_landmarks_path}")
     total_frames = frames_with_face + frames_without_face
     detection_rate = frames_with_face / total_frames if total_frames else 0.0
 
