@@ -301,10 +301,12 @@ def get_mov_index(video_path, show: bool = True):
                             )
                         ]
 
-                        moved_count = sum(
-                            distance > MOVEMENT_THRESHOLD_PIXELS
+                        moved_distances = [
+                            distance
                             for distance in distances
-                        )
+                            if distance > MOVEMENT_THRESHOLD_PIXELS
+                        ]
+                        moved_count = len(moved_distances)
                         movement_percentage = (
                             moved_count / len(distances) * 100
                             if distances
@@ -316,8 +318,8 @@ def get_mov_index(video_path, show: bool = True):
                             else 0.0
                         )
                         average_displacement = (
-                            sum(distances) / len(distances)
-                            if distances
+                            sum(moved_distances) / len(moved_distances)
+                            if moved_distances
                             else 0.0
                         )
                         average_displacement_reference_units = (
