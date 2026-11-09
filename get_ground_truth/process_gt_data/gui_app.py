@@ -390,7 +390,7 @@ class SignalExtractorApp:
             "init_time", "end_time", "sinal_ECG", "sinal_PPG", "sinal_resp",
             "sinal_P1", "sinal_PVC", "sinal_ART", "sinal_CO2", "sinal_FC", "sinal_SpO2",
             "sinal_FR_impedancia", "sinal_FR_CO2",
-            "video_path", "video_duration", "h5_file", "evolucoes_path"
+            "video_path", "video_duration", "init_frame", "h5_file", "evolucoes_path"
         ]
         for col in local_specific_cols:
             if col not in base_df.columns:
@@ -478,7 +478,7 @@ class SignalExtractorApp:
                     "init_time", "end_time", "sinal_ECG", "sinal_PPG",
                     "sinal_resp", "sinal_P1", "sinal_PVC", "sinal_ART", "sinal_CO2",
                     "sinal_FC", "sinal_SpO2", "sinal_FR_impedancia", "sinal_FR_CO2",
-                    "video_path", "video_duration", "evolucoes_path",
+                    "video_path", "video_duration", "init_frame", "evolucoes_path",
                 ]
                 for col in novas_colunas:
                     self.df[col] = pd.NA
@@ -494,7 +494,7 @@ class SignalExtractorApp:
                 "init_time", "end_time", "sinal_ECG", "sinal_PPG", "sinal_resp",
                 "sinal_P1", "sinal_PVC", "sinal_ART", "sinal_CO2", "sinal_FC", "sinal_SpO2",
                 "sinal_FR_impedancia", "sinal_FR_CO2",
-                "video_path", "video_duration", "evolucoes_path",
+                "video_path", "video_duration", "init_frame", "evolucoes_path",
             ]
             for col in novas_colunas:
                 if col not in self.df.columns:
@@ -1046,12 +1046,12 @@ class SignalExtractorApp:
             filetypes=[("Video files", "*.avi *.mp4 *.mkv")]
         )
         if not input_path:
-            return None, 120.0
+            return None, 120.0, None
 
         cap = cv2.VideoCapture(input_path)
         if not cap.isOpened():
             messagebox.showerror("Erro", "Não foi possível abrir o vídeo selecionado.")
-            return None, 120.0
+            return None, 120.0, None
 
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0)
         fps = cap.get(cv2.CAP_PROP_FPS) or 30.0
@@ -1119,12 +1119,12 @@ class SignalExtractorApp:
                     )
                     cap.release()
                     cv2.destroyAllWindows()
-                    return Path(output_path).name, duration_seconds
+                    return Path(output_path).name, duration_seconds, start_frame
                 except Exception as exc:
                     messagebox.showerror("Erro", f"Não foi possível cortar o vídeo:\n{exc}")
                     cap.release()
                     cv2.destroyAllWindows()
-                    return None, 120.0
+                    return None, 120.0, None
             elif key == ord('q'):
                 break
             else:
@@ -1133,7 +1133,7 @@ class SignalExtractorApp:
 
         cap.release()
         cv2.destroyAllWindows()
-        return None, 120.0
+        return None, 120.0, None
 
     def cut_video_for_selected(self):
         selected_item = self.tree.selection()
@@ -1152,11 +1152,12 @@ class SignalExtractorApp:
             if not sobrescrever:
                 return
 
-        res_path, res_dur = self.cut_video_dialog(patient_row=paciente)
+        res_path, res_dur, init_frame = self.cut_video_dialog(patient_row=paciente)
 
         if res_path:
             self.df.at[idx, "video_path"] = res_path
             self.df.at[idx, "video_duration"] = res_dur
+            self.df.at[idx, "init_frame"] = init_frame
             try:
                 self.df.to_csv(self.dataset_raw_file, index=False)
                 self.update_treeview()
