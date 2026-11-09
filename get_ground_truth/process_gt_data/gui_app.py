@@ -51,21 +51,40 @@ class SignalExtractorApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Extrator de Sinais - UTI")
-        self.root.geometry("1920x1080")
+        self.root.geometry("1600x950")
+        self.root.minsize(1120, 720)
 
         self.dataset_raw_file = APP_SETTINGS.dataset_raw_file
         self.df = None
 
+        self._configure_ui_style()
+        self.root.configure(bg="#10131a")
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(1, weight=1)
 
-        header_frame = tk.Frame(self.root, pady=10)
+        header_frame = ttk.Frame(self.root, style="App.TFrame", padding=(24, 20, 24, 14))
         header_frame.grid(row=0, column=0, sticky="ew")
+        header_frame.columnconfigure(0, weight=1)
 
-        tk.Label(header_frame, text="Selecione um paciente para Processar Sinais ou Cortar Vídeo", font=("Arial", 14, "bold")).pack()
+        ttk.Label(
+            header_frame,
+            text="Extrator de Sinais",
+            style="Title.TLabel",
+        ).grid(row=0, column=0, sticky="w")
+        ttk.Label(
+            header_frame,
+            text="Selecione um paciente para processar sinais ou cortar vídeo.",
+            style="Subtitle.TLabel",
+        ).grid(row=1, column=0, sticky="w", pady=(3, 0))
 
         columns = ("index", "id", "leito", "data", "hora", "status", "video_status")
-        self.tree = ttk.Treeview(self.root, columns=columns, show="headings", selectmode="browse")
+        table_frame = ttk.Frame(self.root, style="Panel.TFrame", padding=12)
+        table_frame.grid(row=1, column=0, sticky="nsew", padx=24, pady=8)
+        table_frame.columnconfigure(0, weight=1)
+        table_frame.rowconfigure(0, weight=1)
+        self.tree = ttk.Treeview(
+            table_frame, columns=columns, show="headings", selectmode="browse"
+        )
         self.tree.heading("index", text="Índice")
         self.tree.heading("id", text="ID Paciente")
         self.tree.heading("leito", text="Leito")
@@ -82,40 +101,108 @@ class SignalExtractorApp:
         self.tree.column("status", width=120, anchor="center")
         self.tree.column("video_status", width=120, anchor="center")
 
-        self.tree.grid(row=1, column=0, sticky="nsew", padx=20)
+        self.tree.grid(row=0, column=0, sticky="nsew")
 
-        scrollbar = ttk.Scrollbar(self.root, orient=tk.VERTICAL, command=self.tree.yview)
+        scrollbar = ttk.Scrollbar(table_frame, orient=tk.VERTICAL, command=self.tree.yview)
         self.tree.configure(yscroll=scrollbar.set)
-        scrollbar.grid(row=1, column=1, sticky='ns', pady=0)
+        scrollbar.grid(row=0, column=1, sticky="ns")
 
-        self.tree.tag_configure('pendente', foreground='red')
-        self.tree.tag_configure('preenchido', foreground='green')
+        self.tree.tag_configure("pendente", foreground="#f08a8a")
+        self.tree.tag_configure("preenchido", foreground="#62d6a5")
 
-        btn_frame = tk.Frame(self.root, pady=15)
+        btn_frame = ttk.Frame(self.root, style="App.TFrame", padding=(18, 12, 18, 20))
         btn_frame.grid(row=2, column=0, sticky="ew")
 
-        btn_sync_remote = tk.Button(btn_frame, text="Sincronizar Planilha", command=self.sync_local_dataset_with_remote, bg="#9C27B0", fg="white", font=("Arial", 11, "bold"), width=20)
-        btn_sync_remote.pack(side=tk.LEFT, padx=15)
+        btn_sync_remote = ttk.Button(btn_frame, text="Sincronizar Planilha", command=self.sync_local_dataset_with_remote, style="Purple.TButton", width=20)
+        btn_sync_remote.pack(side=tk.LEFT, padx=6)
 
-        btn_cut_video = tk.Button(btn_frame, text="Cortar Vídeo", command=self.cut_video_for_selected, bg="#2196F3", fg="white", font=("Arial", 11, "bold"), width=15)
-        btn_cut_video.pack(side=tk.LEFT, padx=15)
+        btn_cut_video = ttk.Button(btn_frame, text="Cortar Vídeo", command=self.cut_video_for_selected, style="Secondary.TButton", width=15)
+        btn_cut_video.pack(side=tk.LEFT, padx=6)
 
-        btn_process_signals = tk.Button(btn_frame, text="Processar Sinais", command=self.process_signals_for_selected, bg="#4CAF50", fg="white", font=("Arial", 11, "bold"), width=18)
-        btn_process_signals.pack(side=tk.LEFT, padx=15)
+        btn_process_signals = ttk.Button(btn_frame, text="Processar Sinais", command=self.process_signals_for_selected, style="Success.TButton", width=18)
+        btn_process_signals.pack(side=tk.LEFT, padx=6)
 
-        btn_visualize_signals = tk.Button(btn_frame, text="Visualizar Sinais", command=self.visualize_saved_signals_for_selected, bg="#FF9800", fg="white", font=("Arial", 11, "bold"), width=18)
-        btn_visualize_signals.pack(side=tk.LEFT, padx=15)
+        btn_visualize_signals = ttk.Button(btn_frame, text="Visualizar Sinais", command=self.visualize_saved_signals_for_selected, style="Secondary.TButton", width=18)
+        btn_visualize_signals.pack(side=tk.LEFT, padx=6)
 
-        btn_add_signals = tk.Button(btn_frame, text="Adicionar sinais", command=self.add_additional_signals_for_selected, bg="#607D8B", fg="white", font=("Arial", 11, "bold"), width=18)
-        btn_add_signals.pack(side=tk.LEFT, padx=15)
+        btn_add_signals = ttk.Button(btn_frame, text="Adicionar sinais", command=self.add_additional_signals_for_selected, style="Secondary.TButton", width=18)
+        btn_add_signals.pack(side=tk.LEFT, padx=6)
 
-        btn_load_clinical = tk.Button(btn_frame, text="Carregar dados clínicos", command=self.load_clinical_data_for_selected, bg="#E91E63", fg="white", font=("Arial", 11, "bold"), width=22)
-        btn_load_clinical.pack(side=tk.LEFT, padx=15)
+        btn_load_clinical = ttk.Button(btn_frame, text="Carregar dados clínicos", command=self.load_clinical_data_for_selected, style="Secondary.TButton", width=22)
+        btn_load_clinical.pack(side=tk.LEFT, padx=6)
 
-        btn_analyze_dataset = tk.Button(btn_frame, text="Analisar Planilha", command=self.show_dataset_analysis, bg="#795548", fg="white", font=("Arial", 11, "bold"), width=18)
-        btn_analyze_dataset.pack(side=tk.LEFT, padx=15)
+        btn_analyze_dataset = ttk.Button(btn_frame, text="Analisar Planilha", command=self.show_dataset_analysis, style="Accent.TButton", width=18)
+        btn_analyze_dataset.pack(side=tk.LEFT, padx=6)
 
         self.load_data()
+
+    def _configure_ui_style(self):
+        style = ttk.Style(self.root)
+        style.theme_use("clam")
+        style.configure(".", font=("Segoe UI", 10))
+        style.configure("App.TFrame", background="#10131a")
+        style.configure("Panel.TFrame", background="#191e28")
+        style.configure("Title.TLabel", background="#10131a", foreground="#eef2f8", font=("Segoe UI Semibold", 21))
+        style.configure("Subtitle.TLabel", background="#10131a", foreground="#a3adbd", font=("Segoe UI", 10))
+        style.configure(
+            "Treeview",
+            background="#191e28",
+            fieldbackground="#191e28",
+            foreground="#e7ebf2",
+            rowheight=32,
+            borderwidth=0,
+            font=("Segoe UI", 10),
+        )
+        style.configure(
+            "Treeview.Heading",
+            background="#222a37",
+            foreground="#cbd4e2",
+            relief="flat",
+            padding=(10, 10),
+            font=("Segoe UI Semibold", 9),
+        )
+        style.map(
+            "Treeview",
+            background=[("selected", "#394d82")],
+            foreground=[("selected", "#ffffff")],
+        )
+        style.map("Treeview.Heading", background=[("active", "#303a4b")])
+        style.configure(
+            "Accent.TButton",
+            background="#6c8cff",
+            foreground="#ffffff",
+            padding=(12, 10),
+            borderwidth=0,
+            font=("Segoe UI Semibold", 9),
+        )
+        style.map("Accent.TButton", background=[("active", "#829cff")])
+        style.configure(
+            "Secondary.TButton",
+            background="#222a37",
+            foreground="#e7ebf2",
+            padding=(12, 10),
+            borderwidth=0,
+            font=("Segoe UI Semibold", 9),
+        )
+        style.map("Secondary.TButton", background=[("active", "#303a4b")])
+        style.configure(
+            "Success.TButton",
+            background="#21875f",
+            foreground="#ffffff",
+            padding=(12, 10),
+            borderwidth=0,
+            font=("Segoe UI Semibold", 9),
+        )
+        style.map("Success.TButton", background=[("active", "#2ba675")])
+        style.configure(
+            "Purple.TButton",
+            background="#6147a8",
+            foreground="#ffffff",
+            padding=(12, 10),
+            borderwidth=0,
+            font=("Segoe UI Semibold", 9),
+        )
+        style.map("Purple.TButton", background=[("active", "#795fbd")])
 
     def _normalize_sheet_like_get_h5(self, df):
         if df is None or df.empty:
@@ -558,11 +645,27 @@ class SignalExtractorApp:
         ]
 
         figure = Figure(figsize=(16, 14), dpi=100)
-        figure.patch.set_facecolor("#F5F7FA")
-        figure.suptitle("Panorama dos dados da planilha", fontsize=16, fontweight="bold", color="#263238")
+        figure.patch.set_facecolor("#10131a")
+        figure.suptitle(
+            "Panorama dos dados da planilha",
+            fontsize=18,
+            fontweight="bold",
+            color="#eef2f8",
+        )
         axes = figure.subplots(4, 4).ravel()
+        chart_colors = [
+            "#6c8cff",
+            "#44c08a",
+            "#f0a35e",
+            "#d879d8",
+            "#4fc3c7",
+            "#e16b76",
+            "#9d8df1",
+            "#e7c96a",
+        ]
         for axis in axes:
-            axis.set_facecolor("#F5F7FA")
+            axis.set_facecolor("#191e28")
+            axis.set_prop_cycle(color=chart_colors)
         distance_column = analysis_columns[0]
         distance_values = pd.to_numeric(
             self.df[distance_column].astype(str).str.replace(",", ".", regex=False),
@@ -573,7 +676,11 @@ class SignalExtractorApp:
             distance_axis.text(0.5, 0.5, "Sem dados", ha="center", va="center")
         else:
             distance_summary = [distance_values.min(), distance_values.mean(), distance_values.max()]
-            distance_axis.bar(["Mínimo", "Média", "Máximo"], distance_summary, color=["#4C78A8", "#59A14F", "#E15759"])
+            distance_axis.bar(
+                ["Mínimo", "Média", "Máximo"],
+                distance_summary,
+                color=["#6c8cff", "#44c08a", "#e16b76"],
+            )
             distance_axis.set_ylabel("cm")
             for position, value in enumerate(distance_summary):
                 distance_axis.text(position, value, f"{value:.2f}", ha="center", va="bottom")
@@ -618,7 +725,7 @@ class SignalExtractorApp:
                     axis.bar(
                         ["Mínimo", "Média", "Máximo"],
                         illumination_summary,
-                        color=["#4C78A8", "#59A14F", "#E15759"],
+                        color=["#6c8cff", "#44c08a", "#e16b76"],
                     )
                     axis.set_ylabel("lux")
                     axis.grid(axis="y", alpha=0.3)
@@ -644,8 +751,8 @@ class SignalExtractorApp:
                     autopct="%1.1f%%",
                     startangle=90,
                     counterclock=False,
-                    wedgeprops={"edgecolor": "white", "linewidth": 1.5},
-                    textprops={"fontsize": 8},
+                    wedgeprops={"edgecolor": "#191e28", "linewidth": 1.5},
+                    textprops={"fontsize": 8, "color": "#d9e0eb"},
                 )
             else:
                 axis.text(0.5, 0.5, "Sem dados", ha="center", va="center")
@@ -769,8 +876,8 @@ class SignalExtractorApp:
                     autopct="%1.1f%%",
                     startangle=90,
                     counterclock=False,
-                    wedgeprops={"edgecolor": "white", "linewidth": 1.5},
-                    textprops={"fontsize": 8},
+                    wedgeprops={"edgecolor": "#191e28", "linewidth": 1.5},
+                    textprops={"fontsize": 8, "color": "#d9e0eb"},
                 )
             else:
                 cid_axis.text(0.5, 0.5, "Sem dados", ha="center", va="center")
@@ -806,9 +913,9 @@ class SignalExtractorApp:
                     autopct="%1.1f%%",
                     startangle=90,
                     counterclock=False,
-                    colors=["#59A14F", "#E15759"],
-                    wedgeprops={"edgecolor": "white", "linewidth": 1.5},
-                    textprops={"fontsize": 8},
+                    colors=["#44c08a", "#e16b76"],
+                    wedgeprops={"edgecolor": "#191e28", "linewidth": 1.5},
+                    textprops={"fontsize": 8, "color": "#d9e0eb"},
                 )
                 axes[signal_index].set_title(label)
                 report_lines.append(f"  Capturado (Verdadeiro): {captured} ({captured / total * 100:.2f}%)")
@@ -833,8 +940,8 @@ class SignalExtractorApp:
                     autopct="%1.1f%%",
                     startangle=90,
                     counterclock=False,
-                    wedgeprops={"edgecolor": "white", "linewidth": 1.5},
-                    textprops={"fontsize": 8},
+                    wedgeprops={"edgecolor": "#191e28", "linewidth": 1.5},
+                    textprops={"fontsize": 8, "color": "#d9e0eb"},
                 )
             else:
                 oxygen_axis.text(0.5, 0.5, "Sem dados", ha="center", va="center")
@@ -847,6 +954,17 @@ class SignalExtractorApp:
                     report_lines.append(f"  {value}: {count} ({percentage:.2f}%)")
         report_lines.append("")
 
+        for axis in axes:
+            axis.title.set_color("#eef2f8")
+            axis.title.set_fontsize(10)
+            axis.tick_params(colors="#a3adbd", labelsize=8)
+            axis.yaxis.label.set_color("#a3adbd")
+            axis.xaxis.label.set_color("#a3adbd")
+            axis.grid(color="#384152", alpha=0.45)
+            for spine in axis.spines.values():
+                spine.set_color("#384152")
+            for chart_text in axis.texts:
+                chart_text.set_color("#d9e0eb")
         figure.tight_layout(rect=(0, 0, 1, 0.97), h_pad=2.0, w_pad=1.5)
         self._open_analysis_window("Análise da Planilha", "\n".join(report_lines), figure)
 
@@ -866,24 +984,59 @@ class SignalExtractorApp:
     def _open_analysis_window(self, title, content, figure=None):
         window = tk.Toplevel(self.root)
         window.title(title)
-        window.geometry("1200x900")
+        window.geometry("1440x1000")
+        window.minsize(1000, 700)
+        window.configure(bg="#10131a")
         window.columnconfigure(0, weight=1)
-        window.rowconfigure(0, weight=3)
-        window.rowconfigure(1, weight=1)
+        window.rowconfigure(1, weight=4)
+        window.rowconfigure(2, weight=1)
+
+        header = ttk.Frame(window, style="App.TFrame", padding=(22, 18, 22, 14))
+        header.grid(row=0, column=0, sticky="ew")
+        ttk.Label(header, text=title, style="Title.TLabel").pack(anchor="w")
+        ttk.Label(
+            header,
+            text="Panorama, distribuição e qualidade dos dados locais.",
+            style="Subtitle.TLabel",
+        ).pack(anchor="w", pady=(3, 0))
 
         if figure is not None:
-            chart_frame = tk.Frame(window)
-            chart_frame.grid(row=0, column=0, columnspan=2, sticky="nsew")
+            chart_frame = ttk.Frame(window, style="Panel.TFrame", padding=10)
+            chart_frame.grid(row=1, column=0, sticky="nsew", padx=20, pady=(0, 10))
             chart_frame.columnconfigure(0, weight=1)
             chart_frame.rowconfigure(0, weight=1)
             canvas = FigureCanvasTkAgg(figure, master=chart_frame)
             canvas.draw()
-            canvas.get_tk_widget().grid(row=0, column=0, sticky="nsew")
+            chart_widget = canvas.get_tk_widget()
+            chart_widget.configure(
+                background="#10131a",
+                highlightthickness=0,
+                borderwidth=0,
+            )
+            chart_widget.grid(row=0, column=0, sticky="nsew")
 
-        text = tk.Text(window, wrap=tk.WORD, font=("Consolas", 10))
-        text.grid(row=1, column=0, sticky="nsew")
-        scrollbar = ttk.Scrollbar(window, orient=tk.VERTICAL, command=text.yview)
-        scrollbar.grid(row=1, column=1, sticky="ns")
+        report_frame = ttk.Frame(window, style="Panel.TFrame", padding=10)
+        report_frame.grid(row=2, column=0, sticky="nsew", padx=20, pady=(0, 18))
+        report_frame.columnconfigure(0, weight=1)
+        report_frame.rowconfigure(0, weight=1)
+        text = tk.Text(
+            report_frame,
+            wrap=tk.WORD,
+            font=("Segoe UI", 10),
+            background="#191e28",
+            foreground="#d9e0eb",
+            insertbackground="#eef2f8",
+            selectbackground="#394d82",
+            relief=tk.FLAT,
+            borderwidth=0,
+            padx=14,
+            pady=12,
+            spacing1=2,
+            spacing3=2,
+        )
+        text.grid(row=0, column=0, sticky="nsew")
+        scrollbar = ttk.Scrollbar(report_frame, orient=tk.VERTICAL, command=text.yview)
+        scrollbar.grid(row=0, column=1, sticky="ns")
         text.configure(yscrollcommand=scrollbar.set)
         text.insert("1.0", content)
         text.configure(state=tk.DISABLED)
