@@ -1,5 +1,8 @@
+import importlib.util
 import os
+import queue
 import re
+import threading
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 from datetime import datetime
@@ -56,11 +59,18 @@ class SignalExtractorApp:
 
         self.dataset_raw_file = APP_SETTINGS.dataset_raw_file
         self.df = None
+        self.video_batch_messages = queue.Queue()
+        self.video_batch_running = False
+        self.video_batch_errors = []
+        self.video_batch_results = []
+        self.pending_video_patients = None
+        self.action_buttons = []
 
         self._configure_ui_style()
         self.root.configure(bg="#10131a")
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(1, weight=1)
+        self.root.protocol("WM_DELETE_WINDOW", self._close_window)
 
         header_frame = ttk.Frame(self.root, style="App.TFrame", padding=(24, 20, 24, 14))
         header_frame.grid(row=0, column=0, sticky="ew")
@@ -83,7 +93,7 @@ class SignalExtractorApp:
         table_frame.columnconfigure(0, weight=1)
         table_frame.rowconfigure(0, weight=1)
         self.tree = ttk.Treeview(
-            table_frame, columns=columns, show="headings", selectmode="browse"
+            table_frame, columns=columns, show="headings", selectmode="extended"
         )
         self.tree.heading("index", text="Índice")
         self.tree.heading("id", text="ID Paciente")
@@ -133,6 +143,55 @@ class SignalExtractorApp:
 
         btn_analyze_dataset = ttk.Button(btn_frame, text="Analisar Planilha", command=self.show_dataset_analysis, style="Accent.TButton", width=18)
         btn_analyze_dataset.pack(side=tk.LEFT, padx=6)
+
+        btn_process_videos = ttk.Button(
+            btn_frame,
+            text="Processar vídeos",
+            command=self.process_selected_videos,
+            style="Process.TButton",
+            width=18,
+        )
+        btn_process_videos.pack(side=tk.LEFT, padx=6)
+
+        btn_start_video_processing = ttk.Button(
+            btn_frame,
+            text="Começar",
+            command=self.start_video_batch,
+            style="Success.TButton",
+            width=12,
+            state="disabled",
+        )
+        btn_start_video_processing.pack(side=tk.LEFT, padx=6)
+
+        self.action_buttons = [
+            btn_sync_remote,
+            btn_cut_video,
+            btn_process_signals,
+            btn_visualize_signals,
+            btn_add_signals,
+            btn_load_clinical,
+            btn_analyze_dataset,
+        ]
+        self.process_videos_button = btn_process_videos
+        self.start_video_processing_button = btn_start_video_processing
+
+        batch_frame = ttk.Frame(self.root, style="Panel.TFrame", padding=(14, 9))
+        batch_frame.grid(row=3, column=0, sticky="ew", padx=24, pady=(0, 14))
+        batch_frame.columnconfigure(0, weight=1)
+        self.video_batch_status = ttk.Label(
+            batch_frame,
+            text="Selecione os pacientes, clique em “Processar vídeos” e depois em “Começar”.",
+            style="Panel.TLabel",
+        )
+        self.video_batch_status.grid(row=0, column=0, sticky="w", pady=(0, 6))
+        self.video_batch_progress = ttk.Progressbar(
+            batch_frame,
+            mode="determinate",
+            maximum=1,
+            value=0,
+            style="Horizontal.TProgressbar",
+        )
+        self.video_batch_progress.grid(row=1, column=0, sticky="ew")
 
         self.load_data()
 
@@ -203,6 +262,27 @@ class SignalExtractorApp:
             font=("Segoe UI Semibold", 9),
         )
         style.map("Purple.TButton", background=[("active", "#795fbd")])
+        style.configure(
+            "Process.TButton",
+            background="#287f91",
+            foreground="#ffffff",
+            padding=(12, 10),
+            borderwidth=0,
+            font=("Segoe UI Semibold", 9),
+        )
+        style.map("Process.TButton", background=[("active", "#3298aa")])
+        style.configure(
+            "Panel.TLabel",
+            background="#191e28",
+            foreground="#a3adbd",
+            font=("Segoe UI", 9),
+        )
+        style.configure(
+            "Horizontal.TProgressbar",
+            background="#44c08a",
+            troughcolor="#303747",
+            borderwidth=0,
+        )
 
     def _normalize_sheet_like_get_h5(self, df):
         if df is None or df.empty:
@@ -477,7 +557,8 @@ class SignalExtractorApp:
             "init_time", "end_time", "sinal_ECG", "sinal_PPG", "sinal_resp",
             "sinal_P1", "sinal_PVC", "sinal_ART", "sinal_CO2", "sinal_FC", "sinal_SpO2",
             "sinal_FR_impedancia", "sinal_FR_CO2",
-            "video_path", "video_duration", "init_frame", "h5_file", "evolucoes_path"
+            "video_path", "video_duration", "init_frame", "h5_file", "evolucoes_path",
+            "Movement index", "Detection rate",
         ]
         for col in local_specific_cols:
             if col not in base_df.columns:
@@ -566,6 +647,7 @@ class SignalExtractorApp:
                     "sinal_resp", "sinal_P1", "sinal_PVC", "sinal_ART", "sinal_CO2",
                     "sinal_FC", "sinal_SpO2", "sinal_FR_impedancia", "sinal_FR_CO2",
                     "video_path", "video_duration", "init_frame", "evolucoes_path",
+                    "Movement index", "Detection rate",
                 ]
                 for col in novas_colunas:
                     self.df[col] = pd.NA
@@ -582,6 +664,7 @@ class SignalExtractorApp:
                 "sinal_P1", "sinal_PVC", "sinal_ART", "sinal_CO2", "sinal_FC", "sinal_SpO2",
                 "sinal_FR_impedancia", "sinal_FR_CO2",
                 "video_path", "video_duration", "init_frame", "evolucoes_path",
+                "Movement index", "Detection rate",
             ]
             for col in novas_colunas:
                 if col not in self.df.columns:
@@ -1159,6 +1242,286 @@ class SignalExtractorApp:
                 self.tree.focus(item)
                 self.tree.see(item)
                 break
+
+    def process_selected_videos(self):
+        if self.video_batch_running:
+            return
+        if self.df is None or self.df.empty:
+            messagebox.showwarning("Processar vídeos", "A planilha local ainda não foi carregada.")
+            return
+
+        selected_items = self.tree.selection()
+        if not selected_items:
+            messagebox.showwarning(
+                "Processar vídeos", "Selecione um ou mais pacientes na tabela."
+            )
+            return
+
+        patients = []
+        for item in selected_items:
+            values = self.tree.item(item, "values")
+            row_index = int(values[0])
+            patient = self.df.loc[row_index].copy()
+            patient_id = str(patient.get("Id do paciente", "")).strip()
+            patient_label = patient_id or f"linha {row_index}"
+            video_value = patient.get("video_path", "")
+
+            if not self._is_filled(video_value):
+                video_path = None
+                validation_error = "A coluna video_path está vazia."
+            else:
+                video_filename = Path(str(video_value).strip().replace("\\", "/")).name
+                if not video_filename:
+                    video_path = None
+                    validation_error = "O nome do vídeo em video_path está vazio."
+                elif not self._is_filled(patient.get("Id do paciente", "")):
+                    video_path = None
+                    validation_error = "O ID do paciente está vazio."
+                else:
+                    video_path = self._patient_data_dir(patient_id) / video_filename
+                    validation_error = (
+                        "" if video_path.is_file()
+                        else f"Vídeo original não encontrado: {video_path}"
+                    )
+
+            patients.append(
+                (row_index, patient_label, video_path, validation_error)
+            )
+
+        self.pending_video_patients = patients
+        self.video_batch_progress.configure(maximum=len(patients), value=0)
+        self.video_batch_status.configure(
+            text=(
+                f"{len(patients)} paciente(s) selecionado(s). "
+                "Clique em “Começar” para iniciar o processamento."
+            )
+        )
+        self.start_video_processing_button.configure(state="normal")
+
+    def start_video_batch(self):
+        if self.video_batch_running:
+            return
+        if not self.pending_video_patients:
+            messagebox.showwarning(
+                "Processar vídeos",
+                "Selecione os pacientes e clique em “Processar vídeos” antes de começar.",
+            )
+            return
+
+        selected_row_indices = {
+            int(self.tree.item(item, "values")[0])
+            for item in self.tree.selection()
+        }
+        pending_row_indices = {
+            patient[0] for patient in self.pending_video_patients
+        }
+        if selected_row_indices != pending_row_indices:
+            self.pending_video_patients = None
+            self.start_video_processing_button.configure(state="disabled")
+            self.video_batch_status.configure(
+                text="A seleção mudou. Clique em “Processar vídeos” para preparar os pacientes novamente."
+            )
+            messagebox.showwarning(
+                "Seleção alterada",
+                "A seleção de pacientes mudou. Clique em “Processar vídeos” novamente antes de começar.",
+            )
+            return
+
+        patients = self.pending_video_patients
+        new_metric_columns = [
+            column
+            for column in ("Movement index", "Detection rate")
+            if column not in self.df.columns
+        ]
+        for column in new_metric_columns:
+            self.df[column] = pd.NA
+        if new_metric_columns:
+            try:
+                self.df.to_csv(self.dataset_raw_file, index=False)
+            except Exception as exc:
+                self.df.drop(columns=new_metric_columns, inplace=True)
+                messagebox.showerror(
+                    "Erro ao Salvar",
+                    f"Não foi possível criar as colunas de métricas na planilha:\n{exc}",
+                )
+                return
+
+        self.video_batch_running = True
+        self.pending_video_patients = None
+        self.video_batch_errors = []
+        self.video_batch_results = []
+        total = len(patients)
+        self.video_batch_progress.configure(maximum=total, value=0)
+        self.video_batch_status.configure(
+            text=f"Preparando processamento de {total} paciente(s)..."
+        )
+        self.process_videos_button.configure(state="disabled")
+        self.start_video_processing_button.configure(state="disabled")
+        for button in self.action_buttons:
+            button.configure(state="disabled")
+        self.tree.state(["disabled"])
+
+        threading.Thread(
+            target=self._process_videos_worker,
+            args=(patients,),
+            daemon=True,
+        ).start()
+        self.root.after(100, self._poll_video_batch_messages)
+
+    @staticmethod
+    def _load_process_video_function():
+        process_video_path = (
+            Path(__file__).resolve().parents[2]
+            / "face_detection"
+            / "process_video.py"
+        )
+        if not process_video_path.is_file():
+            raise FileNotFoundError(f"Arquivo de processamento não encontrado: {process_video_path}")
+
+        spec = importlib.util.spec_from_file_location(
+            "_rppg_face_detection_process_video",
+            process_video_path,
+        )
+        if spec is None or spec.loader is None:
+            raise ImportError(f"Não foi possível carregar o módulo: {process_video_path}")
+
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        module.MODEL_DIR = process_video_path.parent / "mediapipe_models"
+        module.FACE_MODEL_PATH = module.MODEL_DIR / "face_landmarker.task"
+        return module.process_video
+
+    def _process_videos_worker(self, patients):
+        self.video_batch_messages.put(("status", "Carregando o processador de vídeos..."))
+        try:
+            process_video = self._load_process_video_function()
+        except Exception as exc:
+            self.video_batch_messages.put(("fatal_error", str(exc)))
+            self.video_batch_messages.put(("finished", None))
+            return
+
+        total = len(patients)
+        for position, (row_index, patient_label, video_path, validation_error) in enumerate(
+            patients, start=1
+        ):
+            self.video_batch_messages.put(
+                ("patient_started", (position, total, patient_label))
+            )
+            if validation_error:
+                self.video_batch_messages.put(
+                    ("patient_finished", (position, row_index, patient_label, None, validation_error))
+                )
+                continue
+
+            try:
+                result = process_video(video_path, show=False)
+                if result is None:
+                    error = "Nenhum rosto detectado no primeiro frame; não foram retornadas métricas."
+                    self.video_batch_messages.put(
+                        ("patient_finished", (position, row_index, patient_label, None, error))
+                    )
+                    continue
+                movement_index, detection_rate = result
+                self.video_batch_messages.put(
+                    (
+                        "patient_finished",
+                        (
+                            position,
+                            row_index,
+                            patient_label,
+                            (movement_index, detection_rate),
+                            "",
+                        ),
+                    )
+                )
+            except (Exception, SystemExit) as exc:
+                self.video_batch_messages.put(
+                    (
+                        "patient_finished",
+                        (position, row_index, patient_label, None, str(exc)),
+                    )
+                )
+
+        self.video_batch_messages.put(("finished", None))
+
+    def _poll_video_batch_messages(self):
+        try:
+            while True:
+                kind, payload = self.video_batch_messages.get_nowait()
+                if kind == "status":
+                    self.video_batch_status.configure(text=payload)
+                elif kind == "patient_started":
+                    position, total, patient_label = payload
+                    self.video_batch_progress.configure(value=position - 1)
+                    self.video_batch_status.configure(
+                        text=f"Paciente {position}/{total} sendo processado: {patient_label}"
+                    )
+                elif kind == "patient_finished":
+                    position, row_index, patient_label, metrics, error = payload
+                    if error:
+                        self.video_batch_errors.append(f"{patient_label}: {error}")
+                        self.video_batch_results.append(False)
+                    else:
+                        self.df.at[row_index, "Movement index"] = metrics[0]
+                        self.df.at[row_index, "Detection rate"] = metrics[1]
+                        try:
+                            self.df.to_csv(self.dataset_raw_file, index=False)
+                            self.video_batch_results.append(True)
+                        except Exception as exc:
+                            self.video_batch_errors.append(
+                                f"{patient_label}: métricas calculadas, mas não foi possível salvar "
+                                f"a planilha: {exc}"
+                            )
+                            self.video_batch_results.append(False)
+                    self.video_batch_progress.configure(value=position)
+                    self.video_batch_status.configure(
+                        text=f"Paciente {position}/{self.video_batch_progress.cget('maximum')} concluído: "
+                        f"{patient_label}"
+                    )
+                elif kind == "fatal_error":
+                    self.video_batch_errors.append(
+                        f"Falha ao carregar o processador de vídeos: {payload}"
+                    )
+                elif kind == "finished":
+                    self.video_batch_running = False
+                    self.process_videos_button.configure(state="normal")
+                    self.start_video_processing_button.configure(state="disabled")
+                    for button in self.action_buttons:
+                        button.configure(state="normal")
+                    self.tree.state(["!disabled"])
+                    succeeded = sum(self.video_batch_results)
+                    failed = len(self.video_batch_errors)
+                    self.video_batch_status.configure(
+                        text=f"Processamento concluído: {succeeded} sucesso(s), {failed} falha(s)."
+                    )
+                    if self.video_batch_errors:
+                        details = "\n".join(f"• {error}" for error in self.video_batch_errors[:8])
+                        if len(self.video_batch_errors) > 8:
+                            details += f"\n... e mais {len(self.video_batch_errors) - 8} erro(s)."
+                        messagebox.showwarning(
+                            "Processamento concluído com falhas",
+                            f"Sucesso: {succeeded}\nFalhas: {failed}\n\n{details}",
+                        )
+                    else:
+                        messagebox.showinfo(
+                            "Processamento concluído",
+                            f"{succeeded} paciente(s) processado(s) e salvo(s) na planilha.",
+                        )
+                    return
+        except queue.Empty:
+            pass
+
+        if self.video_batch_running:
+            self.root.after(100, self._poll_video_batch_messages)
+
+    def _close_window(self):
+        if self.video_batch_running:
+            messagebox.showwarning(
+                "Processamento em andamento",
+                "Aguarde o processamento dos vídeos terminar antes de fechar o programa.",
+            )
+            return
+        self.root.destroy()
 
     def _build_video_output_path(self, patient_row=None, start_time=None):
         base_dir = Path(APP_SETTINGS.patient_data_root)
