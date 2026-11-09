@@ -562,7 +562,8 @@ def process_video(
                 return None
 
             if video_writer is None:
-                codec = "XVID" if video_path.suffix.lower() == ".avi" else "mp4v"
+                codec = "I420" if video_path.suffix.lower() == ".avi" else "mp4v"
+                print('codec:', codec)
                 video_writer = cv2.VideoWriter(
                     str(output_video_path),
                     cv2.VideoWriter_fourcc(*codec),
