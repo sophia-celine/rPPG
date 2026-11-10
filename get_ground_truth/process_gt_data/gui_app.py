@@ -16,6 +16,7 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 from config import APP_SETTINGS, Config
+from clinical_data import ClinicalDataApp
 from signal_processing import (
     build_time_vectors,
     load_hdf5_packets,
@@ -26,6 +27,15 @@ from signal_processing import (
 
 ANONYMIZATION_COLUMNS = ("Anonimização padrão", "Anonimização completa")
 CHECKBOX_MARKS = {True: "☑", False: "☐"}
+CLINICAL_DATA_COLUMNS = (
+    "Diabetes",
+    "Hipertensão",
+    "Problema cardiovascular",
+    "Outras comorbidades",
+    "MUC",
+    "Alergia",
+    "Ultima prescrição",
+)
 
 
 def classify_cid(cid):
@@ -68,6 +78,7 @@ class SignalExtractorApp:
         self.video_batch_results = []
         self.pending_video_patients = None
         self.action_buttons = []
+        self.clinical_data_window = None
 
         self._configure_ui_style()
         self.root.configure(bg="#10131a")
@@ -159,6 +170,15 @@ class SignalExtractorApp:
         btn_load_clinical = ttk.Button(btn_frame, text="Carregar dados clínicos", command=self.load_clinical_data_for_selected, style="Secondary.TButton", width=22)
         btn_load_clinical.pack(side=tk.LEFT, padx=6)
 
+        btn_clinical_data = ttk.Button(
+            btn_frame,
+            text="Preencher dados clínicos",
+            command=self.open_clinical_data_window,
+            style="Secondary.TButton",
+            width=20,
+        )
+        btn_clinical_data.pack(side=tk.LEFT, padx=6)
+
         btn_analyze_dataset = ttk.Button(btn_frame, text="Analisar Planilha", command=self.show_dataset_analysis, style="Accent.TButton", width=18)
         btn_analyze_dataset.pack(side=tk.LEFT, padx=6)
 
@@ -192,6 +212,7 @@ class SignalExtractorApp:
         ]
         self.process_videos_button = btn_process_videos
         self.start_video_processing_button = btn_start_video_processing
+        self.clinical_data_button = btn_clinical_data
 
         batch_frame = ttk.Frame(self.root, style="Panel.TFrame", padding=(14, 9))
         batch_frame.grid(row=3, column=0, sticky="ew", padx=24, pady=(0, 14))
@@ -641,6 +662,7 @@ class SignalExtractorApp:
             base_df["Id do paciente"] = base_df["Id do paciente"].astype(str)
 
         self._ensure_anonymization_columns(base_df)
+        self._ensure_clinical_columns(base_df)
         base_df.to_csv(self.dataset_raw_file, index=False)
         self.df = base_df
         self.update_treeview()
@@ -671,6 +693,7 @@ class SignalExtractorApp:
                 for col in novas_colunas:
                     self.df[col] = pd.NA
                 self._ensure_anonymization_columns(self.df)
+                self._ensure_clinical_columns(self.df)
                 self.df.to_csv(self.dataset_raw_file, index=False)
                 self.update_treeview()
                 messagebox.showwarning(
@@ -691,7 +714,9 @@ class SignalExtractorApp:
                 if col not in self.df.columns:
                     self.df[col] = pd.NA
 
-            if self._ensure_anonymization_columns(self.df):
+            anonymization_columns_added = self._ensure_anonymization_columns(self.df)
+            clinical_columns_added = self._ensure_clinical_columns(self.df)
+            if anonymization_columns_added or clinical_columns_added:
                 self.df.to_csv(self.dataset_raw_file, index=False)
             self.update_treeview()
         except Exception as e:
@@ -725,6 +750,15 @@ class SignalExtractorApp:
                 if not dataframe[column].equals(normalized):
                     changed = True
                 dataframe[column] = normalized.astype(bool)
+        return changed
+
+    @staticmethod
+    def _ensure_clinical_columns(dataframe):
+        changed = False
+        for column in CLINICAL_DATA_COLUMNS:
+            if column not in dataframe.columns:
+                dataframe[column] = pd.NA
+                changed = True
         return changed
 
     def _toggle_anonymization_from_click(self, event):
@@ -1207,6 +1241,54 @@ class SignalExtractorApp:
         text.configure(yscrollcommand=scrollbar.set)
         text.insert("1.0", content)
         text.configure(state=tk.DISABLED)
+
+    def open_clinical_data_window(self):
+        if self.df is None:
+            messagebox.showwarning(
+                "Dados clínicos", "A planilha local ainda não foi carregada."
+            )
+            return
+
+        if (
+            self.clinical_data_window is not None
+            and self.clinical_data_window.winfo_exists()
+        ):
+            self.clinical_data_window.lift()
+            self.clinical_data_window.focus_set()
+            return
+
+        window = tk.Toplevel(self.root)
+        self.clinical_data_window = window
+        self.clinical_data_app = ClinicalDataApp(
+            window,
+            dataframe=self.df,
+            save_callback=self._save_clinical_data,
+        )
+        if window.winfo_exists():
+            window.protocol("WM_DELETE_WINDOW", self._close_clinical_data_window)
+
+    def _close_clinical_data_window(self):
+        if (
+            self.clinical_data_window is not None
+            and self.clinical_data_window.winfo_exists()
+        ):
+            self.clinical_data_window.destroy()
+        self.clinical_data_window = None
+        self.clinical_data_app = None
+
+    def _save_clinical_data(self, row_index, values):
+        previous_values = {
+            column: self.df.at[row_index, column] for column in values
+        }
+        for column, value in values.items():
+            self.df.at[row_index, column] = value
+
+        try:
+            self.df.to_csv(self.dataset_raw_file, index=False)
+        except (OSError, PermissionError, ValueError):
+            for column, value in previous_values.items():
+                self.df.at[row_index, column] = value
+            raise
 
     def load_clinical_data_for_selected(self):
         selected_item = self.tree.selection()
