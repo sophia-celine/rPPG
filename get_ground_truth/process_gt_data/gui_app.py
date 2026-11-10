@@ -24,6 +24,9 @@ from signal_processing import (
     write_cut_video,
 )
 
+ANONYMIZATION_COLUMNS = ("Anonimização padrão", "Anonimização completa")
+CHECKBOX_MARKS = {True: "☑", False: "☐"}
+
 
 def classify_cid(cid):
     cid = cid.upper().strip()
@@ -87,7 +90,17 @@ class SignalExtractorApp:
             style="Subtitle.TLabel",
         ).grid(row=1, column=0, sticky="w", pady=(3, 0))
 
-        columns = ("index", "id", "leito", "data", "hora", "status", "video_status")
+        columns = (
+            "index",
+            "id",
+            "leito",
+            "data",
+            "hora",
+            "status",
+            "video_status",
+            "anon_padrao",
+            "anon_completa",
+        )
         table_frame = ttk.Frame(self.root, style="Panel.TFrame", padding=12)
         table_frame.grid(row=1, column=0, sticky="nsew", padx=24, pady=8)
         table_frame.columnconfigure(0, weight=1)
@@ -102,6 +115,8 @@ class SignalExtractorApp:
         self.tree.heading("hora", text="Hora")
         self.tree.heading("status", text="Status (Sinais)")
         self.tree.heading("video_status", text="Vídeo")
+        self.tree.heading("anon_padrao", text="Anonimização padrão")
+        self.tree.heading("anon_completa", text="Anonimização completa")
 
         self.tree.column("index", width=50, anchor="center")
         self.tree.column("id", width=120, anchor="center")
@@ -110,8 +125,11 @@ class SignalExtractorApp:
         self.tree.column("hora", width=80, anchor="center")
         self.tree.column("status", width=120, anchor="center")
         self.tree.column("video_status", width=120, anchor="center")
+        self.tree.column("anon_padrao", width=190, anchor="center")
+        self.tree.column("anon_completa", width=210, anchor="center")
 
         self.tree.grid(row=0, column=0, sticky="nsew")
+        self.tree.bind("<ButtonRelease-1>", self._toggle_anonymization_from_click)
 
         scrollbar = ttk.Scrollbar(table_frame, orient=tk.VERTICAL, command=self.tree.yview)
         self.tree.configure(yscroll=scrollbar.set)
@@ -622,6 +640,7 @@ class SignalExtractorApp:
         if "Id do paciente" in base_df.columns:
             base_df["Id do paciente"] = base_df["Id do paciente"].astype(str)
 
+        self._ensure_anonymization_columns(base_df)
         base_df.to_csv(self.dataset_raw_file, index=False)
         self.df = base_df
         self.update_treeview()
@@ -651,6 +670,8 @@ class SignalExtractorApp:
                 ]
                 for col in novas_colunas:
                     self.df[col] = pd.NA
+                self._ensure_anonymization_columns(self.df)
+                self.df.to_csv(self.dataset_raw_file, index=False)
                 self.update_treeview()
                 messagebox.showwarning(
                     "Planilha vazia",
@@ -670,9 +691,72 @@ class SignalExtractorApp:
                 if col not in self.df.columns:
                     self.df[col] = pd.NA
 
+            if self._ensure_anonymization_columns(self.df):
+                self.df.to_csv(self.dataset_raw_file, index=False)
             self.update_treeview()
         except Exception as e:
             messagebox.showerror("Erro de Leitura", f"Erro ao ler o CSV:\n{e}\n{self.dataset_raw_file}")
+
+    @staticmethod
+    def _parse_boolean_value(value):
+        if pd.isna(value):
+            return False
+        if isinstance(value, (bool, np.bool_)):
+            return bool(value)
+        if isinstance(value, (int, float, np.integer, np.floating)) and value in (0, 1):
+            return bool(value)
+
+        normalized = str(value).strip().lower()
+        if normalized in ("true", "1", "sim", "verdadeiro", "yes"):
+            return True
+        if normalized in ("false", "0", "não", "nao", "falso", "no", ""):
+            return False
+        raise ValueError(f"Valor booleano inválido na planilha: {value!r}")
+
+    @classmethod
+    def _ensure_anonymization_columns(cls, dataframe):
+        changed = False
+        for column in ANONYMIZATION_COLUMNS:
+            if column not in dataframe.columns:
+                dataframe[column] = False
+                changed = True
+            else:
+                normalized = dataframe[column].map(cls._parse_boolean_value)
+                if not dataframe[column].equals(normalized):
+                    changed = True
+                dataframe[column] = normalized.astype(bool)
+        return changed
+
+    def _toggle_anonymization_from_click(self, event):
+        item = self.tree.identify_row(event.y)
+        column_id = self.tree.identify_column(event.x)
+        column_by_id = {
+            "#8": (ANONYMIZATION_COLUMNS[0], "anon_padrao"),
+            "#9": (ANONYMIZATION_COLUMNS[1], "anon_completa"),
+        }
+        target = column_by_id.get(column_id)
+        if not item or target is None or self.df is None:
+            return
+
+        column, tree_column = target
+        row_index = int(self.tree.item(item, "values")[0])
+        previous_value = bool(self.df.at[row_index, column])
+        self.df.at[row_index, column] = not previous_value
+        try:
+            self.df.to_csv(self.dataset_raw_file, index=False)
+        except (OSError, PermissionError, ValueError) as exc:
+            self.df.at[row_index, column] = previous_value
+            self.update_treeview()
+            messagebox.showerror(
+                "Erro ao salvar",
+                f"Não foi possível atualizar a planilha:\n{exc}",
+                parent=self.root,
+            )
+            return
+
+        self.tree.selection_set(item)
+        self.tree.focus(item)
+        self.tree.set(item, tree_column, CHECKBOX_MARKS[not previous_value])
 
     @staticmethod
     def _format_analysis_value(value):
@@ -1233,7 +1317,18 @@ class SignalExtractorApp:
                 tag = "pendente"
 
             video_status = "Cortado" if pd.notna(row.get("video_path")) and str(row.get("video_path")).strip() != "" else "Sem vídeo"
-            self.tree.insert("", tk.END, values=(idx, id_pac, leito, data, hora, status, video_status), tags=(tag,))
+            values = (
+                idx,
+                id_pac,
+                leito,
+                data,
+                hora,
+                status,
+                video_status,
+                CHECKBOX_MARKS[bool(row[ANONYMIZATION_COLUMNS[0]])],
+                CHECKBOX_MARKS[bool(row[ANONYMIZATION_COLUMNS[1]])],
+            )
+            self.tree.insert("", tk.END, values=values, tags=(tag,))
 
     def _select_row_by_idx(self, target_idx):
         for item in self.tree.get_children():
@@ -1373,7 +1468,7 @@ class SignalExtractorApp:
         process_video_path = (
             Path(__file__).resolve().parents[2]
             / "face_detection"
-            / "process_video.py"
+            / "process_video_optimized.py"
         )
         if not process_video_path.is_file():
             raise FileNotFoundError(f"Arquivo de processamento não encontrado: {process_video_path}")
