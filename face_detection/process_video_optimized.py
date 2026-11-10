@@ -165,7 +165,7 @@ def anonymize_frame(frame, face_landmarks, blur_indices):
         blur_kernel_size = max((eye_distance // 2) * 2 + 1, 3)
         frame_blur_radius = blur_kernel_size
         mask_blur_radius = 7
-        border_thickness = eye_distance * 3
+        border_thickness = eye_distance * 2
         # Include the outline, mask feather, and image-blur support in the crop.
         margin = (
             (border_thickness + 1) // 2
@@ -591,7 +591,6 @@ def process_video(
 
             if video_writer is None:
                 codec = "I420" if video_path.suffix.lower() == ".avi" else "mp4v"
-                print('codec:', codec)
                 video_writer = cv2.VideoWriter(
                     str(output_video_path),
                     cv2.VideoWriter_fourcc(*codec),
