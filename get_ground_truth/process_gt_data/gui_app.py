@@ -3,6 +3,7 @@ import os
 import queue
 import re
 import threading
+import time
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 from datetime import datetime
@@ -76,6 +77,7 @@ class SignalExtractorApp:
         self.video_batch_running = False
         self.video_batch_errors = []
         self.video_batch_results = []
+        self.last_video_processing_duration = None
         self.pending_video_patients = None
         self.action_buttons = []
         self.clinical_data_window = None
@@ -1527,6 +1529,7 @@ class SignalExtractorApp:
         self.pending_video_patients = None
         self.video_batch_errors = []
         self.video_batch_results = []
+        self.last_video_processing_duration = None
         total = len(patients)
         self.video_batch_progress.configure(maximum=total, value=0)
         self.video_batch_status.configure(
@@ -1586,16 +1589,24 @@ class SignalExtractorApp:
             )
             if validation_error:
                 self.video_batch_messages.put(
-                    ("patient_finished", (position, row_index, patient_label, None, validation_error))
+                    (
+                        "patient_finished",
+                        (position, row_index, patient_label, None, validation_error, None),
+                    )
                 )
                 continue
 
+            started_at = time.perf_counter()
             try:
-                result = process_video(video_path, show=False)
+                result = process_video(video_path, show=False, ids_csv_path=APP_SETTINGS.ids_file)
+                elapsed_seconds = time.perf_counter() - started_at
                 if result is None:
                     error = "Nenhum rosto detectado no primeiro frame; não foram retornadas métricas."
                     self.video_batch_messages.put(
-                        ("patient_finished", (position, row_index, patient_label, None, error))
+                        (
+                            "patient_finished",
+                            (position, row_index, patient_label, None, error, elapsed_seconds),
+                        )
                     )
                     continue
                 movement_index, detection_rate = result
@@ -1608,14 +1619,16 @@ class SignalExtractorApp:
                             patient_label,
                             (movement_index, detection_rate),
                             "",
+                            elapsed_seconds,
                         ),
                     )
                 )
             except (Exception, SystemExit) as exc:
+                elapsed_seconds = time.perf_counter() - started_at
                 self.video_batch_messages.put(
                     (
                         "patient_finished",
-                        (position, row_index, patient_label, None, str(exc)),
+                        (position, row_index, patient_label, None, str(exc), elapsed_seconds),
                     )
                 )
 
@@ -1631,10 +1644,29 @@ class SignalExtractorApp:
                     position, total, patient_label = payload
                     self.video_batch_progress.configure(value=position - 1)
                     self.video_batch_status.configure(
-                        text=f"Paciente {position}/{total} sendo processado: {patient_label}"
+                        text=f"Vídeo {position}/{total} sendo processado: {patient_label}"
                     )
                 elif kind == "patient_finished":
-                    position, row_index, patient_label, metrics, error = payload
+                    (
+                        position,
+                        row_index,
+                        patient_label,
+                        metrics,
+                        error,
+                        elapsed_seconds,
+                    ) = payload
+                    duration_text = ""
+                    if elapsed_seconds is not None:
+                        total_seconds = int(elapsed_seconds)
+                        hours, remainder = divmod(total_seconds, 3600)
+                        minutes, seconds = divmod(remainder, 60)
+                        self.last_video_processing_duration = (
+                            f"{hours:02}:{minutes:02}:{seconds:02}"
+                        )
+                        duration_text = (
+                            f" | Tempo do último vídeo: "
+                            f"{self.last_video_processing_duration}"
+                        )
                     if error:
                         self.video_batch_errors.append(f"{patient_label}: {error}")
                         self.video_batch_results.append(False)
@@ -1652,8 +1684,8 @@ class SignalExtractorApp:
                             self.video_batch_results.append(False)
                     self.video_batch_progress.configure(value=position)
                     self.video_batch_status.configure(
-                        text=f"Paciente {position}/{self.video_batch_progress.cget('maximum')} concluído: "
-                        f"{patient_label}"
+                        text=f"Vídeo {position}/{self.video_batch_progress.cget('maximum')} concluído: "
+                        f"{patient_label}{duration_text}"
                     )
                 elif kind == "fatal_error":
                     self.video_batch_errors.append(
@@ -1668,8 +1700,16 @@ class SignalExtractorApp:
                     self.tree.state(["!disabled"])
                     succeeded = sum(self.video_batch_results)
                     failed = len(self.video_batch_errors)
+                    completion_status = (
+                        f"Processamento concluído: {succeeded} sucesso(s), {failed} falha(s)."
+                    )
+                    if self.last_video_processing_duration is not None:
+                        completion_status += (
+                            f" Tempo do último vídeo processado: "
+                            f"{self.last_video_processing_duration}."
+                        )
                     self.video_batch_status.configure(
-                        text=f"Processamento concluído: {succeeded} sucesso(s), {failed} falha(s)."
+                        text=completion_status
                     )
                     if self.video_batch_errors:
                         details = "\n".join(f"• {error}" for error in self.video_batch_errors[:8])
