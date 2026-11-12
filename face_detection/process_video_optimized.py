@@ -38,6 +38,7 @@ IDS_CSV_PATH = Path(r"C:/Users/Sophia/Documents/rPPG_data/dataset/ids.csv")
 
 MOVEMENT_INTERVAL_FRAMES = 1
 MOVEMENT_THRESHOLD_EYE_DISTANCE_FACTOR = 0.1
+MARGIN_MASK_THICKNESS_FACTOR = 3
 
 
 def load_standardized_ids(csv_path):
@@ -165,7 +166,7 @@ def anonymize_frame(frame, face_landmarks, blur_indices):
         blur_kernel_size = max((eye_distance // 2) * 2 + 1, 3)
         frame_blur_radius = blur_kernel_size
         mask_blur_radius = 7
-        border_thickness = eye_distance * 2
+        border_thickness = eye_distance * MARGIN_MASK_THICKNESS_FACTOR
         # Include the outline, mask feather, and image-blur support in the crop.
         margin = (
             (border_thickness + 1) // 2
