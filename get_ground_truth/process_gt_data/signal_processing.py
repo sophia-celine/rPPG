@@ -18,10 +18,14 @@ def human_filename(path):
     return name
 
 
-def write_cut_video(input_path, start_frame, output_path=None, codec='I420'):
+def write_cut_video(input_path, start_frame, output_path=None, codec='I420', end_frame=None):
     cap = cv2.VideoCapture(input_path)
     if not cap.isOpened():
         raise RuntimeError(f"Can't open input: {input_path}")
+
+    if end_frame is not None and end_frame < start_frame:
+        cap.release()
+        raise ValueError("End frame must be greater than or equal to start frame.")
 
     total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0)
     fps = cap.get(cv2.CAP_PROP_FPS) or 30.0
@@ -41,12 +45,15 @@ def write_cut_video(input_path, start_frame, output_path=None, codec='I420'):
     writer = cv2.VideoWriter(output_path, fourcc, fps, (w, h))
 
     cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
-    print(f"Writing from frame {start_frame} to end into: {output_path}")
-    while True:
+    end_description = end_frame if end_frame is not None else "end"
+    print(f"Writing from frame {start_frame} to {end_description} into: {output_path}")
+    frame_index = start_frame
+    while end_frame is None or frame_index <= end_frame:
         ret, frame = cap.read()
         if not ret:
             break
         writer.write(frame)
+        frame_index += 1
 
     writer.release()
     cap.release()

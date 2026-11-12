@@ -598,7 +598,7 @@ class SignalExtractorApp:
             "init_time", "end_time", "sinal_ECG", "sinal_PPG", "sinal_resp",
             "sinal_P1", "sinal_PVC", "sinal_ART", "sinal_CO2", "sinal_FC", "sinal_SpO2",
             "sinal_FR_impedancia", "sinal_FR_CO2",
-            "video_path", "video_duration", "init_frame", "h5_file", "evolucoes_path",
+            "video_path", "video_duration", "init_frame", "end_frame", "h5_file", "evolucoes_path",
             "Movement index", "Detection rate",
         ]
         for col in local_specific_cols:
@@ -689,7 +689,7 @@ class SignalExtractorApp:
                     "init_time", "end_time", "sinal_ECG", "sinal_PPG",
                     "sinal_resp", "sinal_P1", "sinal_PVC", "sinal_ART", "sinal_CO2",
                     "sinal_FC", "sinal_SpO2", "sinal_FR_impedancia", "sinal_FR_CO2",
-                    "video_path", "video_duration", "init_frame", "evolucoes_path",
+                    "video_path", "video_duration", "init_frame", "end_frame", "evolucoes_path",
                     "Movement index", "Detection rate",
                 ]
                 for col in novas_colunas:
@@ -709,7 +709,7 @@ class SignalExtractorApp:
                 "init_time", "end_time", "sinal_ECG", "sinal_PPG", "sinal_resp",
                 "sinal_P1", "sinal_PVC", "sinal_ART", "sinal_CO2", "sinal_FC", "sinal_SpO2",
                 "sinal_FR_impedancia", "sinal_FR_CO2",
-                "video_path", "video_duration", "init_frame", "evolucoes_path",
+                "video_path", "video_duration", "init_frame", "end_frame", "evolucoes_path",
                 "Movement index", "Detection rate",
             ]
             for col in novas_colunas:
@@ -1793,11 +1793,13 @@ class SignalExtractorApp:
 
         current = 0
         start_frame = None
+        end_frame = None
         win = "Cut Video"
         cv2.namedWindow(win, cv2.WINDOW_NORMAL)
 
         instructions = [
-            "Controls: a - prev, d - next, s - select start",
+            "Controls: a - prev, d - next, s - select start, e - select end",
+            "c - clear end",
             "w - write cut video, q - quit"
         ]
 
@@ -1814,12 +1816,17 @@ class SignalExtractorApp:
                 lines.append(f"Selected start: {start_frame + 1}")
             else:
                 lines.append("Selected start: -")
+            lines.append(f"Selected end: {end_frame + 1 if end_frame is not None else '-'}")
             lines.extend(instructions)
 
             for i, line in enumerate(lines):
                 cv2.putText(display, line, (10, 20 + i * 18), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
 
-            if start_frame is not None and current >= start_frame:
+            if (
+                start_frame is not None
+                and current >= start_frame
+                and (end_frame is None or current <= end_frame)
+            ):
                 cv2.rectangle(display, (0, 0), (width - 1, height - 1), (0, 0, 255), 4)
 
             cv2.imshow(win, display)
@@ -1833,31 +1840,54 @@ class SignalExtractorApp:
                     current -= 1
             elif key == ord('s'):
                 start_frame = current
+                if end_frame is not None and end_frame < start_frame:
+                    end_frame = None
                 print(f"Selected start frame: {start_frame}")
+            elif key == ord('e'):
+                if start_frame is None:
+                    messagebox.showwarning("Aviso", "Selecione o frame inicial antes do frame final.")
+                elif current < start_frame:
+                    messagebox.showwarning("Aviso", "O frame final deve ser igual ou posterior ao inicial.")
+                else:
+                    end_frame = current
+                    print(f"Selected end frame: {end_frame}")
+            elif key == ord('c'):
+                end_frame = None
             elif key == ord('w'):
                 if start_frame is None:
-                    print("No start selected; using current frame as start")
-                    start_frame = current
+                    messagebox.showwarning("Aviso", "Selecione o frame inicial usando a tecla 's' antes de salvar.")
+                    continue
 
                 output_path = self._build_video_output_path(
                     patient_row=patient_row,
                     start_time=(patient_row.get("Hora") if patient_row is not None else None),
                 )
                 try:
-                    output_path = write_cut_video(input_path, start_frame, str(output_path), codec='I420')
-                    duration_seconds = (total_frames - start_frame) / fps if fps else 0.0
+                    output_path = write_cut_video(
+                        input_path,
+                        start_frame,
+                        str(output_path),
+                        codec='I420',
+                        end_frame=end_frame,
+                    )
+                    frame_count = (
+                        end_frame - start_frame + 1
+                        if end_frame is not None
+                        else total_frames - start_frame
+                    )
+                    duration_seconds = frame_count / fps if fps else 0.0
                     messagebox.showinfo(
                         "Sucesso",
                         f"Vídeo cortado e salvo com sucesso!\nDuração final: {duration_seconds:.2f} segundos."
                     )
                     cap.release()
                     cv2.destroyAllWindows()
-                    return Path(output_path).name, duration_seconds, start_frame
+                    return Path(output_path).name, duration_seconds, start_frame, end_frame
                 except Exception as exc:
                     messagebox.showerror("Erro", f"Não foi possível cortar o vídeo:\n{exc}")
                     cap.release()
                     cv2.destroyAllWindows()
-                    return None, 120.0, None
+                    return None, 120.0, None, None
             elif key == ord('q'):
                 break
             else:
@@ -1866,7 +1896,7 @@ class SignalExtractorApp:
 
         cap.release()
         cv2.destroyAllWindows()
-        return None, 120.0, None
+        return None, 120.0, None, None
 
     def cut_video_for_selected(self):
         selected_item = self.tree.selection()
@@ -1885,12 +1915,15 @@ class SignalExtractorApp:
             if not sobrescrever:
                 return
 
-        res_path, res_dur, init_frame = self.cut_video_dialog(patient_row=paciente)
+        res_path, res_dur, init_frame, end_frame = self.cut_video_dialog(patient_row=paciente)
 
         if res_path:
+            if "end_frame" not in self.df.columns:
+                self.df["end_frame"] = pd.NA
             self.df.at[idx, "video_path"] = res_path
             self.df.at[idx, "video_duration"] = res_dur
             self.df.at[idx, "init_frame"] = init_frame
+            self.df.at[idx, "end_frame"] = end_frame if end_frame is not None else pd.NA
             try:
                 self.df.to_csv(self.dataset_raw_file, index=False)
                 self.update_treeview()
