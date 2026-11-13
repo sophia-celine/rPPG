@@ -208,22 +208,30 @@ def anonymize_frame(frame, face_landmarks, blur_indices):
         features_mask = np.zeros((roi_height, roi_width), dtype=np.uint8)
         left_eye_brow_indices = (
             blur_indices["left_eye"] + blur_indices["left_eyebrow"]
+            # + [340, 346, 347, 348, 349, 350, 357]
+            + [341, 256, 252, 253, 254, 339, 255, 463]
+            
         )
         right_eye_brow_indices = (
             blur_indices["right_eye"] + blur_indices["right_eyebrow"]
+            # + [467, 260, 259, 257]
+            # + [111, 117, 118, 119, 120, 121, 128]
+            + [130, 25, 110, 24, 23, 22, 26, 112]
         )
         left_eye_brow_hull = cv2.convexHull(local_points[left_eye_brow_indices])
         right_eye_brow_hull = cv2.convexHull(local_points[right_eye_brow_indices])
         cv2.fillConvexPoly(features_mask, left_eye_brow_hull, 255)
         cv2.fillConvexPoly(features_mask, right_eye_brow_hull, 255)
-        cv2.fillConvexPoly(
-            features_mask,
-            cv2.convexHull(local_points[blur_indices["lips"]]),
-            255,
+        nose_triangle = cv2.convexHull(local_points[[6, 423, 203]])
+        cv2.fillConvexPoly(features_mask, nose_triangle, 255)
+        mouth_indices = (blur_indices["lips"]
+            + [43, 106, 182, 83, 18, 313, 406, 335, 273]
         )
+        mouth_hull = cv2.convexHull(local_points[mouth_indices])
+        cv2.fillConvexPoly(features_mask, mouth_hull, 255)
 
-        mouth_left = local_points[291]
-        mouth_right = local_points[61]
+        mouth_left = local_points[422]
+        mouth_right = local_points[202]
         lower_face_trapezoid = np.array(
             [
                 mouth_left,
@@ -1226,7 +1234,9 @@ def process_dataset(
 
 
 if __name__ == "__main__":
+    # (accumulated_movement_index, detection_rate) = process_video(
+    # r"A:\dataset_raw\367781_0\L05-22-10-2026-16-28.avi", show=True)
     (accumulated_movement_index, detection_rate) = process_video(
-    r"A:\dataset_raw\367781_0\L05-22-10-2026-16-28.avi")
+        "/home/soph/ssd/dataset_raw/378675_0/L03-24-09-2026-15-22.avi", ids_csv_path="/home/soph/rppg/rPPG_data/dataset/ids.csv")
     print(f"Accumulated movement index: {accumulated_movement_index:.2f}")
     print(f"Detection rate: {detection_rate:.2f}")
