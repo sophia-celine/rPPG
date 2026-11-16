@@ -3,6 +3,9 @@
 Run this script with a video path. By default, it looks for a matching
 ``<video_stem>_landmarks.h5`` file in the same folder and displays the
 landmarks frame by frame. Use ``--output`` to save an annotated copy.
+Inspect an HDF5 file with 
+``python read_landmarks.py --inspect-h5 "path/to/2_1_landmarks.h5"`` 
+to see its metadata, dataset shapes, and example field access.
 
 Example:
 
@@ -25,6 +28,70 @@ from pathlib import Path
 import cv2
 import h5py
 import numpy as np
+
+
+def print_h5_contents(landmarks_path, sample_frames=3, sample_landmarks=3):
+    """Print HDF5 metadata, dataset shapes, and examples of reading each field."""
+    landmarks_path = Path(landmarks_path)
+    if not landmarks_path.is_file():
+        raise FileNotFoundError(f"Landmark file not found: {landmarks_path}")
+
+    with h5py.File(landmarks_path, "r") as landmark_data:
+        print(f"HDF5 file: {landmarks_path}")
+        print("\nFile attributes (metadata):")
+        if landmark_data.attrs:
+            for name, value in landmark_data.attrs.items():
+                print(f"  {name} = {value}")
+        else:
+            print("  (no attributes)")
+
+        print("\nDatasets:")
+        for name, dataset in landmark_data.items():
+            if not isinstance(dataset, h5py.Dataset):
+                print(f"  {name}: group")
+                continue
+            print(
+                f"  {name}: shape={dataset.shape}, dtype={dataset.dtype}"
+            )
+            if dataset.attrs:
+                for attr_name, attr_value in dataset.attrs.items():
+                    print(f"    attribute {attr_name} = {attr_value}")
+
+        if "landmarks" not in landmark_data:
+            raise ValueError("The file does not contain the 'landmarks' dataset.")
+
+        landmarks = landmark_data["landmarks"]
+        if landmarks.ndim != 3 or landmarks.shape[1:] != (478, 3):
+            raise ValueError(
+                "Expected 'landmarks' to have shape "
+                f"(frames, 478, 3); got {landmarks.shape}."
+            )
+
+        frame_count = min(sample_frames, len(landmarks))
+        landmark_count = min(sample_landmarks, landmarks.shape[1])
+        print(
+            "\nExample: x, y, z coordinates for the first "
+            f"{landmark_count} landmarks in each of the first "
+            f"{frame_count} frames:"
+        )
+        for frame_index in range(frame_count):
+            print(
+                f"  landmarks[{frame_index}, :{landmark_count}, :] = "
+                f"{landmarks[frame_index, :landmark_count, :].tolist()}"
+            )
+
+        for name in ("face_detected", "source_frame"):
+            if name in landmark_data:
+                values = landmark_data[name][:sample_frames]
+                print(f"\nExample: {name}[:{len(values)}] = {values.tolist()}")
+
+        print(
+            "\nAccess in Python:\n"
+            "  with h5py.File(caminho_h5, 'r') as h5:\n"
+            "      coordinates = h5['landmarks'][frame, landmark, :]\n"
+            "      detected = h5['face_detected'][frame]\n"
+            "      source_frame = h5['source_frame'][frame]\n"
+        )
 
 
 def draw_landmarks_on_video(
@@ -166,10 +233,8 @@ def draw_landmarks_on_video(
                         -1,
                     )
 
-                detection_source = int(source_frame[processed_frames])
                 status = (
                     f"Frame {processed_frames + 1}/{len(landmarks)} | "
-                    f"Landmarks from frame {detection_source + 1}"
                 )
                 cv2.putText(
                     frame,
@@ -213,14 +278,22 @@ def draw_landmarks_on_video(
 
 
 def main():
-    """Parse command-line options and run the landmark visualization."""
+    """Inspect an HDF5 file or run the landmark video visualization."""
     parser = argparse.ArgumentParser(
-        description="Draw saved HDF5 face landmarks on an anonymized video."
+        description=(
+            "Inspect saved HDF5 face landmarks or draw them on a video."
+        )
     )
     parser.add_argument(
         "video",
         type=Path,
+        nargs="?",
         help="Path to the anonymized video.",
+    )
+    parser.add_argument(
+        "--inspect-h5",
+        type=Path,
+        help="Print HDF5 metadata, dataset shapes, and example field access.",
     )
     parser.add_argument(
         "--landmarks",
@@ -242,6 +315,12 @@ def main():
     )
     args = parser.parse_args()
 
+    if args.inspect_h5 is not None:
+        print_h5_contents(args.inspect_h5)
+        return
+
+    if args.video is None:
+        parser.error("Provide a video path or use --inspect-h5.")
     if args.no_display and args.output is None:
         parser.error("--no-display requires --output so the result is saved.")
 
