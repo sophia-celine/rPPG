@@ -10,6 +10,7 @@ from datetime import datetime
 from pathlib import Path
 
 import cv2
+import h5py
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -19,9 +20,6 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from config import APP_SETTINGS, Config
 from clinical_data import ClinicalDataApp
 from signal_processing import (
-    build_time_vectors,
-    load_hdf5_packets,
-    load_hdf5_numeric_packets,
     run_extraction_for_patient,
     write_cut_video,
 )
@@ -2005,84 +2003,190 @@ class SignalExtractorApp:
                 if next_h5_file and os.path.exists(next_h5_file):
                     h5_files.append(next_h5_file)
 
-        datas = []
-        ids = []
-        seqsts = []
-        numeric_records = {signal_id: [] for signal_id in numeric_signal_ids}
+        numeric_ids = set(numeric_signal_ids)
+        wave_ids = set(signal_ids) - numeric_ids
+        wave_records = {signal_id: [] for signal_id in wave_ids}
+        numeric_records = {signal_id: [] for signal_id in numeric_ids}
+        invalid_wave_ids = set()
+
+        def decode_numeric(packet, begin, end, timestamp):
+            if begin + 2 > end:
+                return None
+
+            header_length = int(packet[begin])
+            count_offset = begin + 38 + 2 * header_length
+            if count_offset + 2 > end:
+                return None
+
+            count = int(packet[count_offset])
+            values_start = count_offset + 2
+            if (
+                int(packet[begin + 1]) != 0
+                or int(packet[count_offset + 1]) != 0
+                or values_start + count * 10 != end
+            ):
+                return None
+
+            records = []
+            for offset in range(values_start, end, 10):
+                signal_id = int.from_bytes(packet[offset:offset + 2], "big")
+                if signal_id not in numeric_records:
+                    continue
+                value = int.from_bytes(
+                    packet[offset + 8:offset + 10],
+                    "big",
+                    signed=True,
+                )
+                records.append((signal_id, float(timestamp), value))
+            return records
+
         for current_h5 in h5_files:
             try:
-                current_datas, current_ids, _, current_seqsts = load_hdf5_packets(
-                    current_h5,
-                    b"\x02\x0B\x00\x00",
-                    36,
-                )
+                with h5py.File(current_h5, "r") as hdf:
+                    raw_packets = hdf["data"][:]
+                    reception_times = hdf["data_timestamps"][:]
             except (OSError, KeyError, TypeError, ValueError) as exc:
                 raise OSError(f"Não foi possível ler o arquivo H5 {current_h5}:\n{exc}") from exc
 
-            datas.extend(current_datas)
-            ids.extend(current_ids.tolist())
-            seqsts.extend(current_seqsts.tolist())
+            if (
+                raw_packets.ndim != 2
+                or raw_packets.dtype != np.uint8
+                or raw_packets.shape[1] < 36
+                or len(raw_packets) != len(reception_times)
+            ):
+                raise ValueError(f"Formato H5 não suportado em {current_h5}: esperado data N×bytes uint8.")
+            if not len(reception_times) or not np.isfinite(reception_times).all():
+                raise ValueError(f"O H5 {current_h5} possui timestamps ausentes ou não finitos.")
 
-            if numeric_records:
-                try:
-                    current_numeric_records = load_hdf5_numeric_packets(
-                        current_h5,
-                        numeric_records,
+            wave_sequences = []
+            wave_reception_times = []
+            file_wave_chunks = {signal_id: [] for signal_id in wave_ids}
+            for packet, timestamp in zip(raw_packets, reception_times):
+                if bytes(packet[:4]) != b"\x02\x0B\x00\x00":
+                    continue
+
+                packet_end = int.from_bytes(packet[4:6], "big")
+                if not 36 <= packet_end <= len(packet):
+                    continue
+
+                packet_type = int(packet[20])
+                if packet_type == 1:
+                    position = 36
+                    blocks = []
+                    valid = True
+                    for _ in range(int(packet[22])):
+                        if position + 4 > packet_end:
+                            valid = False
+                            break
+                        signal_id = int.from_bytes(packet[position:position + 3], "big")
+                        sample_count = int(packet[position + 3])
+                        stop = position + 4 + 2 * sample_count
+                        if sample_count == 0 or stop > packet_end:
+                            valid = False
+                            break
+                        samples = np.frombuffer(
+                            packet[position + 4:stop].tobytes(),
+                            dtype=">i2",
+                        ).astype(np.int16)
+                        blocks.append((signal_id, samples))
+                        position = stop
+
+                    if not valid:
+                        continue
+
+                    packet_index = len(wave_sequences)
+                    wave_sequences.append(int.from_bytes(packet[24:26], "big"))
+                    wave_reception_times.append(float(timestamp))
+                    for signal_id, samples in blocks:
+                        if signal_id in file_wave_chunks:
+                            file_wave_chunks[signal_id].append((packet_index, samples))
+
+                    if position < packet_end:
+                        embedded_records = decode_numeric(
+                            packet,
+                            position,
+                            packet_end,
+                            timestamp,
+                        )
+                        if embedded_records is not None:
+                            for signal_id, record_time, value in embedded_records:
+                                numeric_records[signal_id].append((record_time, value))
+                elif packet_type == 2:
+                    numeric_packet_records = decode_numeric(
+                        packet,
+                        36,
+                        packet_end,
+                        timestamp,
                     )
-                except (OSError, KeyError, TypeError, ValueError) as exc:
-                    raise OSError(
-                        f"Não foi possível decodificar tendências numéricas de {current_h5}:\n{exc}"
-                    ) from exc
+                    if numeric_packet_records is not None:
+                        for signal_id, record_time, value in numeric_packet_records:
+                            numeric_records[signal_id].append((record_time, value))
 
-                for numeric_id, (numeric_times, numeric_values) in current_numeric_records.items():
-                    numeric_records[numeric_id].extend(
-                        zip(numeric_times.tolist(), numeric_values.tolist())
+            if wave_sequences:
+                sequence = np.asarray(wave_sequences, dtype=np.int64)
+                sequence_diffs = np.diff(sequence) % 65536
+                if np.any(sequence_diffs == 0) or np.any(sequence_diffs > 32768):
+                    raise ValueError(
+                        f"O contador de sequência do H5 {current_h5} está repetido, fora de ordem ou reiniciado."
                     )
 
-        if not datas and not any(numeric_records.values()):
+                ticks = np.concatenate(([0], np.cumsum(sequence_diffs)))
+                wave_reception_times = np.asarray(wave_reception_times, dtype=float)
+                if sequence_diffs.size:
+                    packet_period = float(
+                        np.median(np.diff(wave_reception_times) / sequence_diffs)
+                    )
+                else:
+                    packet_period = 0.256
+                if not np.isfinite(packet_period) or abs(packet_period - 0.256) > 0.01:
+                    raise ValueError(
+                        f"Cadência de pacotes incompatível com o perfil do H5 {current_h5}: "
+                        f"{packet_period:g}s."
+                    )
+
+                packet_times = wave_reception_times[0] + ticks * 0.256
+                for signal_id, chunks in file_wave_chunks.items():
+                    if not chunks:
+                        continue
+                    chunk_lengths = {len(samples) for _, samples in chunks}
+                    if len(chunk_lengths) != 1:
+                        invalid_wave_ids.add(signal_id)
+                        continue
+
+                    sample_count = next(iter(chunk_lengths))
+                    sampling_rate = sample_count / 0.256
+                    for packet_index, samples in chunks:
+                        sample_times = (
+                            packet_times[packet_index]
+                            + np.arange(sample_count, dtype=float) / sampling_rate
+                        )
+                        wave_records[signal_id].append((sample_times, samples))
+
+        if not any(wave_records.values()) and not any(numeric_records.values()):
             raise ValueError("Nenhum pacote de dados foi encontrado nos arquivos H5.")
 
-        ids = np.asarray(ids)
-        seqsts = np.asarray(seqsts)
         loaded_signals = {}
         invalid_signal_ids = []
 
-        for signal_id in signal_ids:
-            indices = np.flatnonzero(ids == signal_id)
-            if indices.size == 0:
+        for signal_id, chunks in wave_records.items():
+            if signal_id in invalid_wave_ids:
+                invalid_signal_ids.append(signal_id)
+                continue
+            if not chunks:
                 continue
 
-            chunks = [np.asarray(datas[index]) for index in indices]
-            timestamps = np.asarray(seqsts[indices], dtype=float)
+            timestamps = np.concatenate([record[0] for record in chunks])
+            values = [np.asarray(record[1]) for record in chunks]
             if (
-                any(
-                    chunk.ndim != 1
-                    or chunk.size == 0
-                    or not np.issubdtype(chunk.dtype, np.number)
-                    or not np.isfinite(chunk).all()
-                    for chunk in chunks
-                )
-                or timestamps.size != len(chunks)
+                any(chunk.ndim != 1 or chunk.size == 0 or not np.isfinite(chunk).all() for chunk in values)
                 or not np.isfinite(timestamps).all()
             ):
                 invalid_signal_ids.append(signal_id)
                 continue
 
-            positive_diffs = np.diff(timestamps)
-            positive_diffs = positive_diffs[positive_diffs > 0]
-            if positive_diffs.size == 0:
-                invalid_signal_ids.append(signal_id)
-                continue
-
-            sample_interval = float(np.median(positive_diffs))
-            sampling_rate = len(chunks[0]) / sample_interval
-            if not np.isfinite(sampling_rate) or sampling_rate <= 0:
-                invalid_signal_ids.append(signal_id)
-                continue
-
             try:
-                signal = np.concatenate(chunks)
-                time_vector = build_time_vectors(timestamps, chunks, sampling_rate)
+                signal = np.concatenate(values)
+                time_vector = timestamps
                 if (
                     signal.size == 0
                     or signal.size != time_vector.size
