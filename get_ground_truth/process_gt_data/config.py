@@ -30,18 +30,18 @@ class AppSettings:
     default_video_filename: str = "video_cropped.avi"
     signal_filename_templates: dict[str, str] = field(default_factory=lambda: {
         "ecg": "ecg_{date}_{bed}_{start}_{end}.csv",
-        "ppg": "ppg_{date}_{bed}_{start}_{end}.txt",
-        "respiration": "respiration_{date}_{bed}_{start}_{end}.txt",
-        "p1": "p1_{date}_{bed}_{start}_{end}.txt",
-        "pvc": "pvc_{date}_{bed}_{start}_{end}.txt",
-        "art": "art_{date}_{bed}_{start}_{end}.txt",
-        "co2": "co2_{date}_{bed}_{start}_{end}.txt",
-        "heart_rate": "heart_rate_{date}_{bed}_{start}_{end}.txt",
-        "spo2_trend": "spo2_trend_{date}_{bed}_{start}_{end}.txt",
-        "respiratory_rate_impedance": "respiratory_rate_impedance_{date}_{bed}_{start}_{end}.txt",
-        "respiratory_rate_co2": "respiratory_rate_co2_{date}_{bed}_{start}_{end}.txt",
+        "ppg": "ppg_{date}_{bed}_{start}_{end}.csv",
+        "respiration": "respiration_{date}_{bed}_{start}_{end}.csv",
+        "p1": "p1_{date}_{bed}_{start}_{end}.csv",
+        "pvc": "pvc_{date}_{bed}_{start}_{end}.csv",
+        "art": "art_{date}_{bed}_{start}_{end}.csv",
+        "co2": "co2_{date}_{bed}_{start}_{end}.csv",
+        "heart_rate": "heart_rate_{date}_{bed}_{start}_{end}.csv",
+        "spo2_trend": "spo2_trend_{date}_{bed}_{start}_{end}.csv",
+        "respiratory_rate_impedance": "respiratory_rate_impedance_{date}_{bed}_{start}_{end}.csv",
+        "respiratory_rate_co2": "respiratory_rate_co2_{date}_{bed}_{start}_{end}.csv",
     })
-    reference_filename_template: str = "{signal}_{patient_id}.txt"
+    reference_filename_template: str = "{signal}_{patient_id}.csv"
     video_filename_template: str = "{bed}-{date}-{hour}.avi"
 
 

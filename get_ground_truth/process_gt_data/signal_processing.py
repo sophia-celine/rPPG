@@ -307,7 +307,7 @@ def process_spo2(config, datas, ids, seqsts):
         output_file = config.spo2_dir / APP_SETTINGS.signal_filename_templates["ppg"].format(
             date=config.date, bed=config.bed, start=config.hora_inicio, end=config.hora_fim
         )
-        np.savetxt(output_file, sig_m, fmt="%.7e")
+    np.savetxt(output_file, sig_m, fmt="%.7e", delimiter=",")
 
     return output_file.name if output_file else ""
 
@@ -333,7 +333,7 @@ def process_rr(config, datas, ids, seqsts):
     output_file = config.rr_dir / APP_SETTINGS.signal_filename_templates["respiration"].format(
         date=config.date, bed=config.bed, start=config.hora_inicio, end=config.hora_fim
     )
-    np.savetxt(output_file, sig_m, fmt="%.7e")
+    np.savetxt(output_file, sig_m, fmt="%.7e", delimiter=",")
 
     return output_file.name if output_file else ""
 

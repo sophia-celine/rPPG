@@ -2440,7 +2440,7 @@ class SignalExtractorApp:
                 signal_id = details["id"]
                 _, raw_signal, mask, _ = loaded_signals[signal_id]
                 signal = raw_signal.astype(float) * details["scale"]
-                np.savetxt(output_paths[name], signal[mask], fmt="%.7e")
+                np.savetxt(output_paths[name], signal[mask], fmt="%.7e", delimiter=",")
                 self.df.at[idx, signal_info[name]["column"]] = output_paths[name].name
 
             self.df.to_csv(self.dataset_raw_file, index=False)
