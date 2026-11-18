@@ -2415,7 +2415,38 @@ class SignalExtractorApp:
                 "scale": 1.0,
                 "unit": "rpm",
             },
+            "EtCO₂": {
+                "id": 0x4901,
+                "template": "etco2",
+                "column": "sinal_ETCO2",
+                "scale": 0.1,
+                "unit": "mmHg",
+            },
         }
+        ecg_leads = {
+            0: "I",
+            1: "II",
+            2: "III",
+            3: "aVR",
+            4: "aVL",
+            5: "aVF",
+        }
+        for channel_index in range(13):
+            signal_id = 0x010004 + 256 * channel_index
+            if signal_id == Config.ecg_id:
+                continue
+
+            lead = ecg_leads.get(channel_index)
+            channel_name = f"ECG - Lead {lead}" if lead else f"ECG - Channel {channel_index}"
+            filename_prefix = f"ecg_{lead}" if lead else f"ecg_channel_{channel_index}"
+            column_name = f"sinal_ECG_{lead}" if lead else f"sinal_ECG_channel_{channel_index}"
+            signal_info[channel_name] = {
+                "id": signal_id,
+                "filename_prefix": filename_prefix,
+                "column": column_name,
+                "scale": 1.0,
+                "unit": "counts",
+            }
         date_str = str(paciente.get("Dia", "")).strip()
         init_time = str(paciente.get("init_time", "")).strip()
         end_time = str(paciente.get("end_time", "")).strip()
@@ -2433,6 +2464,7 @@ class SignalExtractorApp:
                     Config.spo2_trend_id,
                     Config.respiratory_rate_impedance_id,
                     Config.respiratory_rate_co2_id,
+                    0x4901,
                 ),
             )
         except (OSError, TypeError, ValueError) as exc:
@@ -2522,12 +2554,18 @@ class SignalExtractorApp:
         output_paths = {}
         for name in selected_names:
             details = signal_info[name]
-            filename = APP_SETTINGS.signal_filename_templates[details["template"]].format(
-                date=date_for_filename,
-                bed=bed,
-                start=start_for_filename,
-                end=end_for_filename,
-            )
+            if "filename_prefix" in details:
+                filename = (
+                    f"{details['filename_prefix']}_{date_for_filename}_{bed}_"
+                    f"{start_for_filename}_{end_for_filename}.csv"
+                )
+            else:
+                filename = APP_SETTINGS.signal_filename_templates[details["template"]].format(
+                    date=date_for_filename,
+                    bed=bed,
+                    start=start_for_filename,
+                    end=end_for_filename,
+                )
             output_paths[name] = patient_output_dir / filename
 
         existing_paths = [path for path in output_paths.values() if path.exists()]

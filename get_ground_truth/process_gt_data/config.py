@@ -36,6 +36,7 @@ class AppSettings:
         "pvc": "pvc_{date}_{bed}_{start}_{end}.csv",
         "art": "art_{date}_{bed}_{start}_{end}.csv",
         "co2": "co2_{date}_{bed}_{start}_{end}.csv",
+        "etco2": "etco2_{date}_{bed}_{start}_{end}.csv",
         "heart_rate": "heart_rate_{date}_{bed}_{start}_{end}.csv",
         "spo2_trend": "spo2_trend_{date}_{bed}_{start}_{end}.csv",
         "respiratory_rate_impedance": "respiratory_rate_impedance_{date}_{bed}_{start}_{end}.csv",
