@@ -31,6 +31,26 @@ python video_anonymization\blur_regions.py
 O polígono permanece exatamente na mesma posição e formato em todos os frames entre
 o início e o fim selecionados; não há tracking automático.
 
+Ao exportar, o aplicativo também procura na pasta do vídeo pelo arquivo
+`*_landmarks.h5` criado por `process_video_optimized.py` e grava nele o grupo
+`blur_regions`. Esse grupo contém os intervalos inclusivos de frames e os vértices
+dos polígonos em coordenadas de pixel (origem no canto superior esquerdo). Os
+polígonos são uma representação compacta da máscara: rasterizá-los com OpenCV
+recria os pixels cobertos, sem armazenar uma máscara completa para cada frame.
+Se não houver um HDF5 compatível ou houver vários candidatos sem correspondência
+pelo nome do vídeo, a exportação é interrompida para evitar editar o arquivo errado.
+
+Para assistir ao vídeo anonimizado e destacar em vermelho os pixels cobertos pelas
+regiões salvas, use o leitor de landmarks:
+
+```powershell
+python face_detection\read_landmarks.py "C:\dados\video_borrado.avi" --show-blur-regions --landmarks "C:\dados\video_landmarks.h5"
+```
+
+O vídeo anonimizado e o HDF5 bastam para consultar as regiões; o vídeo original
+não é necessário. Se o HDF5 não tiver o mesmo nome-base do vídeo, informe-o com
+`--landmarks`.
+
 O codec I420 não comprime o vídeo. Assim, vídeos de origem AVI já sem compressão
 podem ter tamanho final semelhante ao original. Vídeos de origem comprimidos (como
 MP4/H.264) podem gerar arquivos muito maiores; isso é esperado ao salvar sem

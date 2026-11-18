@@ -13,6 +13,7 @@ from tkinter import filedialog, messagebox, ttk
 from typing import Callable
 
 import cv2
+import h5py
 import numpy as np
 from PIL import Image, ImageTk
 
@@ -35,9 +36,148 @@ def _blur_polygon(frame: np.ndarray, polygons: list[np.ndarray], sigma: float) -
     return np.where(mask[:, :, None] != 0, blurred, frame)
 
 
+def _find_landmarks_file(
+    video_path: Path,
+    frame_count: int,
+    width: int,
+    height: int,
+) -> Path:
+    """Find and validate the matching HDF5 file created by process_video_optimized."""
+    candidates = sorted(video_path.parent.glob("*_landmarks.h5"))
+    expected_path = video_path.with_name(f"{video_path.stem}_landmarks.h5")
+    if expected_path in candidates:
+        candidates = [expected_path]
+    elif len(candidates) != 1:
+        if not candidates:
+            raise FileNotFoundError(
+                f"No *_landmarks.h5 file was found beside the video: {video_path.parent}"
+            )
+        raise ValueError(
+            "Multiple landmark HDF5 files were found beside the video; "
+            f"cannot choose one safely: {', '.join(str(path) for path in candidates)}"
+        )
+
+    landmarks_path = candidates[0]
+    with h5py.File(landmarks_path, "r") as landmark_data:
+        if "landmarks" not in landmark_data:
+            raise ValueError(
+                f"The HDF5 file does not contain a 'landmarks' dataset: {landmarks_path}"
+            )
+        landmarks = landmark_data["landmarks"]
+        if (
+            landmarks.ndim != 3
+            or landmarks.shape[1:] != (478, 3)
+            or len(landmarks) != frame_count
+        ):
+            raise ValueError(
+                f"The landmark data in {landmarks_path} does not match the video frame count."
+            )
+        if (
+            int(landmark_data.attrs.get("frame_width", -1)) != width
+            or int(landmark_data.attrs.get("frame_height", -1)) != height
+        ):
+            raise ValueError(
+                f"The landmark data in {landmarks_path} does not match the video dimensions."
+            )
+    return landmarks_path
+
+
+def _save_blur_regions(
+    landmarks_path: Path,
+    regions: list[BlurRegion],
+    frame_count: int,
+    width: int,
+    height: int,
+) -> None:
+    """Store polygons and inclusive frame ranges in the landmark HDF5 file."""
+    frame_ranges = np.asarray(
+        [(region.start_frame, region.end_frame) for region in regions],
+        dtype=np.int64,
+    )
+    polygon_offsets = np.zeros(len(regions) + 1, dtype=np.uint64)
+    if regions:
+        polygon_offsets[1:] = np.cumsum(
+            [len(region.polygon) for region in regions],
+            dtype=np.uint64,
+        )
+        polygon_points = np.concatenate(
+            [np.asarray(region.polygon, dtype=np.int32).reshape(-1, 2) for region in regions]
+        )
+    else:
+        polygon_points = np.empty((0, 2), dtype=np.int32)
+
+    with h5py.File(landmarks_path, "r+") as landmark_data:
+        if (
+            "landmarks" not in landmark_data
+            or landmark_data["landmarks"].shape[0] != frame_count
+            or int(landmark_data.attrs.get("frame_width", -1)) != width
+            or int(landmark_data.attrs.get("frame_height", -1)) != height
+        ):
+            raise ValueError(
+                f"The landmark HDF5 file no longer matches the video: {landmarks_path}"
+            )
+
+        pending_name = "_blur_regions_pending"
+        backup_name = "_blur_regions_backup"
+        if pending_name in landmark_data:
+            del landmark_data[pending_name]
+        if backup_name in landmark_data:
+            del landmark_data[backup_name]
+
+        pending = landmark_data.create_group(pending_name)
+        try:
+            pending.attrs["schema_version"] = 1
+            pending.attrs["coordinate_system"] = (
+                "Zero-based video pixel coordinates (x, y), origin at top left"
+            )
+            pending.attrs["frame_indexing"] = (
+                "Zero-based frame indices; start_frame and end_frame are inclusive"
+            )
+            pending.attrs["description"] = (
+                "Each polygon is blurred on every frame in its inclusive frame range. "
+                "Rasterizing the polygon reproduces the selected pixel mask."
+            )
+            pending.attrs["frame_width"] = width
+            pending.attrs["frame_height"] = height
+            pending.create_dataset(
+                "frame_ranges",
+                data=frame_ranges,
+                compression="gzip",
+                compression_opts=4,
+            )
+            pending.create_dataset(
+                "polygon_offsets",
+                data=polygon_offsets,
+                compression="gzip",
+                compression_opts=4,
+            )
+            pending.create_dataset(
+                "polygon_points",
+                data=polygon_points,
+                compression="gzip",
+                compression_opts=4,
+            )
+            landmark_data.flush()
+
+            if "blur_regions" in landmark_data:
+                landmark_data.move("blur_regions", backup_name)
+            landmark_data.move(pending_name, "blur_regions")
+            if backup_name in landmark_data:
+                del landmark_data[backup_name]
+            landmark_data.flush()
+        except Exception:
+            if "blur_regions" not in landmark_data and backup_name in landmark_data:
+                landmark_data.move(backup_name, "blur_regions")
+            if pending_name in landmark_data:
+                del landmark_data[pending_name]
+            landmark_data.flush()
+            raise
+
+
 def export_video(
     input_path: Path,
     output_path: Path,
+    landmarks_path: Path,
     regions: list[BlurRegion],
     ffmpeg_path: str,
     blur_sigma: float,
@@ -177,6 +317,13 @@ def export_video(
         if not temporary_output.is_file() or temporary_output.stat().st_size == 0:
             raise RuntimeError("FFmpeg não gerou o arquivo AVI final.")
         os.replace(temporary_output, output_path)
+        _save_blur_regions(
+            landmarks_path,
+            regions,
+            frame_count,
+            width,
+            height,
+        )
 
 
 class BlurRegionsApp:
@@ -675,6 +822,17 @@ class BlurRegionsApp:
         if output_path.suffix.lower() != ".avi":
             output_path = output_path.with_suffix(".avi")
 
+        try:
+            landmarks_path = _find_landmarks_file(
+                self.video_path,
+                self.frame_count,
+                self.video_width,
+                self.video_height,
+            )
+        except (OSError, ValueError) as error:
+            messagebox.showerror("Arquivo HDF5 inválido", str(error))
+            return
+
         self.exporting = True
         self.export_button.configure(state="disabled")
         self.open_button.configure(state="disabled")
@@ -686,7 +844,7 @@ class BlurRegionsApp:
         ]
         worker = threading.Thread(
             target=self._export_worker,
-            args=(self.video_path, output_path, regions, ffmpeg_path),
+            args=(self.video_path, output_path, landmarks_path, regions, ffmpeg_path),
             daemon=True,
         )
         worker.start()
@@ -695,6 +853,7 @@ class BlurRegionsApp:
         self,
         input_path: Path,
         output_path: Path,
+        landmarks_path: Path,
         regions: list[BlurRegion],
         ffmpeg_path: str,
     ) -> None:
@@ -702,12 +861,19 @@ class BlurRegionsApp:
             export_video(
                 input_path,
                 output_path,
+                landmarks_path,
                 regions,
                 ffmpeg_path,
                 blur_sigma=22.0,
                 progress=lambda done, total: self.messages.put(("progress", (done, total))),
             )
-            self.messages.put(("done", output_path))
+            self.messages.put(
+                (
+                    "done",
+                    f"Vídeo criado:\n{output_path}\n\n"
+                    f"Regiões borradas registradas em:\n{landmarks_path}",
+                )
+            )
         except Exception as error:
             self.messages.put(("error", str(error)))
 
@@ -724,7 +890,7 @@ class BlurRegionsApp:
                     self.export_button.configure(state="normal")
                     self.open_button.configure(state="normal")
                     self.status_label.configure(text="Exportação concluída.")
-                    messagebox.showinfo("Vídeo salvo", f"Arquivo criado:\n{payload}")
+                    messagebox.showinfo("Vídeo salvo", str(payload))
                 elif kind == "error":
                     self.exporting = False
                     self.export_button.configure(state="normal")

@@ -6,6 +6,8 @@ landmarks frame by frame. Use ``--output`` to save an annotated copy.
 Inspect an HDF5 file with 
 ``python read_landmarks.py --inspect-h5 "path/to/2_1_landmarks.h5"`` 
 to see its metadata, dataset shapes, and example field access.
+Use ``--show-blur-regions`` to highlight the pixels covered by saved blur
+polygons while playing the anonymized video.
 
 Example:
 
@@ -18,6 +20,8 @@ The HDF5 file contains:
 * ``face_detected``: boolean array marking frames with a fresh detection.
 * ``source_frame``: zero-based frame where that row's landmarks were last
   detected. Missing detections reuse the previous valid landmark positions.
+* ``blur_regions``: polygon vertices and inclusive frame ranges for additional
+  blurred areas. Rasterizing each active polygon reproduces its pixel mask.
 * File attributes with video name, dimensions, FPS, coordinate convention,
   landmark count, and total frame count.
 """
@@ -49,6 +53,20 @@ def print_h5_contents(landmarks_path, sample_frames=3, sample_landmarks=3):
         for name, dataset in landmark_data.items():
             if not isinstance(dataset, h5py.Dataset):
                 print(f"  {name}: group")
+                if isinstance(dataset, h5py.Group):
+                    for attr_name, attr_value in dataset.attrs.items():
+                        print(f"    attribute {attr_name} = {attr_value}")
+                    for child_name, child in dataset.items():
+                        if isinstance(child, h5py.Dataset):
+                            print(
+                                f"    {child_name}: shape={child.shape}, "
+                                f"dtype={child.dtype}"
+                            )
+                            if child_name == "frame_ranges":
+                                print(
+                                    "      example values = "
+                                    f"{child[:3].tolist()}"
+                                )
                 continue
             print(
                 f"  {name}: shape={dataset.shape}, dtype={dataset.dtype}"
@@ -92,6 +110,229 @@ def print_h5_contents(landmarks_path, sample_frames=3, sample_landmarks=3):
             "      detected = h5['face_detected'][frame]\n"
             "      source_frame = h5['source_frame'][frame]\n"
         )
+
+
+def _find_blur_regions_file(video_path, landmarks_path=None):
+    """Find the HDF5 metadata file containing blur regions for a video."""
+    video_path = Path(video_path)
+    if landmarks_path is not None:
+        path = Path(landmarks_path)
+        if not path.is_file():
+            raise FileNotFoundError(f"Landmark file not found: {path}")
+        return path
+
+    expected_path = video_path.with_name(f"{video_path.stem}_landmarks.h5")
+    if expected_path.is_file():
+        with h5py.File(expected_path, "r") as landmark_data:
+            if "blur_regions" in landmark_data:
+                return expected_path
+
+    candidates = []
+    for path in sorted(video_path.parent.glob("*_landmarks.h5")):
+        with h5py.File(path, "r") as landmark_data:
+            if "blur_regions" in landmark_data:
+                candidates.append(path)
+
+    if not candidates:
+        raise FileNotFoundError(
+            "No landmark HDF5 file containing 'blur_regions' was found beside "
+            f"the video: {video_path.parent}"
+        )
+    if len(candidates) > 1:
+        raise ValueError(
+            "Multiple landmark HDF5 files containing 'blur_regions' were found; "
+            f"specify one with --landmarks: {', '.join(str(path) for path in candidates)}"
+        )
+    return candidates[0]
+
+
+def show_blur_regions_on_video(
+    video_path,
+    landmarks_path=None,
+    overlay_color=(0, 0, 255),
+    overlay_alpha=0.4,
+):
+    """Play an anonymized video and tint every pixel covered by saved blur polygons.
+
+    The HDF5 ``blur_regions`` group stores polygons in video pixel coordinates
+    and their inclusive frame ranges. For each frame, this function rasterizes
+    only the active polygons, so the colored overlay marks the same mask used
+    to blur that frame without storing a full image mask for every frame.
+
+    Args:
+        video_path: Path to the anonymized video to display.
+        landmarks_path: Optional HDF5 metadata path. If omitted, the function
+            looks for a matching ``<video_stem>_landmarks.h5`` file and then
+            for a unique ``*_landmarks.h5`` file containing ``blur_regions``.
+        overlay_color: BGR color used to highlight blurred pixels.
+        overlay_alpha: Overlay strength between 0 (transparent) and 1 (opaque).
+
+    Returns:
+        The number of video frames displayed.
+
+    Raises:
+        FileNotFoundError: If the video or matching HDF5 file does not exist.
+        RuntimeError: If the video cannot be opened.
+        ValueError: If the HDF5 blur-region data is missing or malformed.
+
+    Press ``q`` or ``Esc`` in the video window to stop playback.
+    """
+    video_path = Path(video_path)
+    if not video_path.is_file():
+        raise FileNotFoundError(f"Video not found: {video_path}")
+    if not 0 <= overlay_alpha <= 1:
+        raise ValueError("overlay_alpha must be between 0 and 1.")
+    if len(overlay_color) != 3 or any(
+        not isinstance(channel, int) or not 0 <= channel <= 255
+        for channel in overlay_color
+    ):
+        raise ValueError("overlay_color must contain three BGR values from 0 to 255.")
+
+    metadata_path = _find_blur_regions_file(video_path, landmarks_path)
+    video = cv2.VideoCapture(str(video_path))
+    if not video.isOpened():
+        video.release()
+        raise RuntimeError(f"Could not open video: {video_path}")
+
+    displayed_frames = 0
+    stopped_early = False
+    try:
+        with h5py.File(metadata_path, "r") as landmark_data:
+            if "blur_regions" not in landmark_data:
+                raise ValueError(
+                    f"The HDF5 file does not contain 'blur_regions': {metadata_path}"
+                )
+            regions = landmark_data["blur_regions"]
+            if not isinstance(regions, h5py.Group):
+                raise ValueError("The HDF5 'blur_regions' entry must be a group.")
+            required_datasets = ("frame_ranges", "polygon_offsets", "polygon_points")
+            if any(name not in regions for name in required_datasets):
+                raise ValueError(
+                    "The 'blur_regions' group must contain frame_ranges, "
+                    "polygon_offsets, and polygon_points."
+                )
+
+            frame_ranges = regions["frame_ranges"][:]
+            polygon_offsets = regions["polygon_offsets"][:]
+            polygon_points = regions["polygon_points"][:]
+            if (
+                frame_ranges.ndim != 2
+                or frame_ranges.shape[1] != 2
+                or not np.issubdtype(frame_ranges.dtype, np.integer)
+                or polygon_offsets.shape != (len(frame_ranges) + 1,)
+                or not np.issubdtype(polygon_offsets.dtype, np.integer)
+                or polygon_points.ndim != 2
+                or polygon_points.shape[1] != 2
+                or not np.issubdtype(polygon_points.dtype, np.integer)
+                or not len(polygon_offsets)
+                or polygon_offsets[0] != 0
+                or polygon_offsets[-1] != len(polygon_points)
+                or np.any(polygon_offsets[1:] < polygon_offsets[:-1])
+            ):
+                raise ValueError("The HDF5 blur-region arrays have invalid shapes or offsets.")
+
+            frame_count = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+            video_width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
+            video_height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            fps = float(video.get(cv2.CAP_PROP_FPS))
+            if fps <= 0:
+                fps = float(landmark_data.attrs.get("fps", 25.0))
+            if not np.isfinite(fps) or fps <= 0:
+                fps = 25.0
+            saved_width = int(regions.attrs.get("frame_width", -1))
+            saved_height = int(regions.attrs.get("frame_height", -1))
+            if (
+                frame_count <= 0
+                or video_width < saved_width
+                or video_height < saved_height
+                or video_width - saved_width > 1
+                or video_height - saved_height > 1
+            ):
+                raise ValueError(
+                    "The video dimensions do not match the blur-region metadata."
+                )
+            if len(frame_ranges) and (
+                np.any(frame_ranges[:, 0] < 0)
+                or np.any(frame_ranges[:, 1] < frame_ranges[:, 0])
+                or np.any(frame_ranges[:, 1] >= frame_count)
+            ):
+                raise ValueError(
+                    "A saved blur-region frame range is outside the video."
+                )
+            for region_index in range(len(frame_ranges)):
+                start = int(polygon_offsets[region_index])
+                end = int(polygon_offsets[region_index + 1])
+                polygon = polygon_points[start:end]
+                if (
+                    len(polygon) < 3
+                    or np.any(polygon[:, 0] < 0)
+                    or np.any(polygon[:, 0] >= saved_width)
+                    or np.any(polygon[:, 1] < 0)
+                    or np.any(polygon[:, 1] >= saved_height)
+                ):
+                    raise ValueError(
+                        f"Blur region {region_index} contains invalid polygon points."
+                    )
+
+            regions_starting = {}
+            regions_ending = {}
+            for region_index, (start_frame, end_frame) in enumerate(frame_ranges):
+                regions_starting.setdefault(int(start_frame), []).append(region_index)
+                regions_ending.setdefault(int(end_frame) + 1, []).append(region_index)
+            active_regions = set()
+
+            while True:
+                success, frame = video.read()
+                if not success:
+                    break
+                pixel_mask = np.zeros((video_height, video_width), dtype=np.uint8)
+
+                # The saved frame ranges are inclusive and use zero-based frame numbers.
+                active_regions.update(regions_starting.get(displayed_frames, ()))
+                active_regions.difference_update(regions_ending.get(displayed_frames, ()))
+                for region_index in active_regions:
+                    start = int(polygon_offsets[region_index])
+                    end = int(polygon_offsets[region_index + 1])
+                    polygon = np.round(polygon_points[start:end]).astype(np.int32)
+                    cv2.fillPoly(pixel_mask, [polygon], 255)
+
+                selected_pixels = pixel_mask != 0
+                if np.any(selected_pixels):
+                    color = np.asarray(overlay_color, dtype=np.float32)
+                    original = frame[selected_pixels].astype(np.float32)
+                    frame[selected_pixels] = np.clip(
+                        original * (1.0 - overlay_alpha) + color * overlay_alpha,
+                        0,
+                        255,
+                    ).astype(np.uint8)
+
+                cv2.putText(
+                    frame,
+                    f"Frame {displayed_frames + 1}/{frame_count} | "
+                    f"Blur regions: {len(active_regions)} | Press Q to quit",
+                    (15, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.6,
+                    (255, 255, 255),
+                    2,
+                )
+                cv2.imshow("Blurred pixel regions", frame)
+                key = cv2.waitKey(max(1, int(1000 / fps))) & 0xFF
+                displayed_frames += 1
+                if key == ord("q") or key == 27:
+                    stopped_early = True
+                    break
+
+            if not stopped_early and displayed_frames != frame_count:
+                raise ValueError(
+                    "The video and HDF5 blur-region metadata have different "
+                    f"frame counts: displayed {displayed_frames}, expected {frame_count}."
+                )
+    finally:
+        video.release()
+        cv2.destroyAllWindows()
+
+    return displayed_frames
 
 
 def draw_landmarks_on_video(
@@ -278,7 +519,7 @@ def draw_landmarks_on_video(
 
 
 def main():
-    """Inspect an HDF5 file or run the landmark video visualization."""
+    """Inspect HDF5 data or visualize saved landmarks or blurred regions."""
     parser = argparse.ArgumentParser(
         description=(
             "Inspect saved HDF5 face landmarks or draw them on a video."
@@ -294,6 +535,11 @@ def main():
         "--inspect-h5",
         type=Path,
         help="Print HDF5 metadata, dataset shapes, and example field access.",
+    )
+    parser.add_argument(
+        "--show-blur-regions",
+        action="store_true",
+        help="Play the video and highlight pixels covered by saved blur regions.",
     )
     parser.add_argument(
         "--landmarks",
@@ -316,11 +562,25 @@ def main():
     args = parser.parse_args()
 
     if args.inspect_h5 is not None:
+        if args.show_blur_regions:
+            parser.error("--inspect-h5 cannot be combined with --show-blur-regions.")
         print_h5_contents(args.inspect_h5)
         return
 
     if args.video is None:
         parser.error("Provide a video path or use --inspect-h5.")
+    if args.show_blur_regions:
+        if args.output is not None or args.no_display:
+            parser.error(
+                "--show-blur-regions displays the video and cannot be combined "
+                "with --output or --no-display."
+            )
+        frame_count = show_blur_regions_on_video(
+            args.video,
+            landmarks_path=args.landmarks,
+        )
+        print(f"Displayed {frame_count} frames.")
+        return
     if args.no_display and args.output is None:
         parser.error("--no-display requires --output so the result is saved.")
 
