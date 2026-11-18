@@ -27,8 +27,8 @@ CLINICAL_COLUMNS = {
     "Ultima prescrição": "Ultima prescrição",
 }
 OPTIONAL_CLINICAL_COLUMNS = ("MUC", "Alergia", "Ultima prescrição")
-DIABETES_OPTIONS = ("Não", "DM1", "DM2")
-HYPERTENSION_OPTIONS = ("Sim", "Não")
+DIABETES_OPTIONS = ("Não", "DM1", "DM2", "Não se sabe")
+HYPERTENSION_OPTIONS = ("Sim", "Não", "Não se sabe")
 
 
 class ClinicalDataApp:
