@@ -14,11 +14,11 @@ RESPIRATION_WINDOW_SIZE = 60
 # EXEMPLO MAIS DIFÍCIL
 # VIDEO_PATH, ECG_DATA_PATH, PPG_DATA_PATH, RESPIRATION_DATA_PATH, RPPG_FOLDER_PATH = find_patient_info(r"A:\dataset_raw\test\10227_1")
 # BRADICARDIA 
-# VIDEO_PATH, ECG_DATA_PATH, PPG_DATA_PATH, RESPIRATION_DATA_PATH, RPPG_FOLDER_PATH = find_patient_info(r"A:\dataset_raw\batch4\2356759_2")
+VIDEO_PATH, ECG_DATA_PATH, PPG_DATA_PATH, RESPIRATION_DATA_PATH, RPPG_FOLDER_PATH = find_patient_info(r"A:\dataset_raw\2357983_0")
 # VIDEO_PATH, ECG_DATA_PATH, PPG_DATA_PATH, RESPIRATION_DATA_PATH, RPPG_FOLDER_PATH = find_patient_info("/home/soph/ssd/dataset_raw/batch4/2356759_2")
 
 # VIDEO_PATH, ECG_DATA_PATH, PPG_DATA_PATH, RESPIRATION_DATA_PATH, RPPG_FOLDER_PATH = find_patient_info('/home/soph/ssd/dataset_raw/batch2/2358200_0')
-VIDEO_PATH, ECG_DATA_PATH, PPG_DATA_PATH, RESPIRATION_DATA_PATH, RPPG_FOLDER_PATH = find_patient_info('/home/soph/ssd/dataset_raw/batch6/2357856_0')
+# VIDEO_PATH, ECG_DATA_PATH, PPG_DATA_PATH, RESPIRATION_DATA_PATH, RPPG_FOLDER_PATH = find_patient_info('/home/soph/ssd/dataset_raw/batch6/2357856_0')
 
 if __name__ == '__main__':
 

@@ -83,10 +83,22 @@ def find_patient_info(
             raise ValueError(f"Multiple {description} found under {root_path}: {matches}")
         return str(candidates[0]) if candidates else None
 
+    video_candidates = [
+        path for path in files
+        if path.suffix.casefold() == ".avi"
+    ]
+    if len(video_candidates) > 1:
+        videos_starting_with_l = [
+            path for path in video_candidates
+            if path.name.casefold().startswith("l")
+        ]
+        if videos_starting_with_l:
+            video_candidates = videos_starting_with_l
+
     return (
         str(find_unique(
             "AVI video",
-            [path for path in files if path.suffix.casefold() == ".avi"],
+            video_candidates,
         )),
         str(find_unique(
             "ECG CSV file",
@@ -108,7 +120,7 @@ def find_patient_info(
             "respiration TXT file",
             [
                 path for path in files
-                if path.name.casefold().startswith("resp")
+                if path.name.casefold().startswith("respiration")
                 and path.suffix.casefold() == ".txt"
             ],
         ),
