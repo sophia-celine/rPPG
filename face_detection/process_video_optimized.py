@@ -19,6 +19,11 @@ import numpy as np
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
+try:
+    from .face_back_tracking import find_first_face_and_backtrack
+except ImportError:
+    from face_back_tracking import find_first_face_and_backtrack
+
 
 # ============================================================
 # MODEL CONFIGURATION
@@ -382,7 +387,7 @@ def process_video(
 
     Returns:
         A tuple of ``(accumulated_movement_index, detection_rate)``. Returns
-        ``None`` if no face is detected in the first frame. The anonymized
+        ``None`` if no face is detected anywhere in the video. The anonymized
         video is saved in the same folder as the original, using the
         standardized ID.
 
@@ -534,12 +539,32 @@ def process_video(
         face_options
     ) as face_landmarker:
 
+        first_face_result, first_face_index = find_first_face_and_backtrack(
+            cap,
+            face_landmarker,
+            fps,
+            face_options=face_options,
+        )
+        if first_face_result is None:
+            print("No face detected in the video.")
+            cap.release()
+            cv2.destroyAllWindows()
+            return None
+
+        if first_face_index > 0:
+            print(
+                "No face detected in the first "
+                f"{first_face_index} frame(s). "
+                "Using the first detected face for back-tracking."
+            )
+        last_result = first_face_result
+        last_landmarks_source_frame = first_face_index
+
         # ====================================================
         # Process the video
         # ====================================================
         frames_with_face = 0
         frames_without_face = 0
-        last_result = None
         while True:
 
             ret, frame = cap.read()
@@ -591,12 +616,6 @@ def process_video(
                 mp_image,
                 timestamp_ms
             )
-
-            if frame_number == 1 and not face_result.face_landmarks:
-                print("No face detected in the first frame.")
-                cap.release()
-                cv2.destroyAllWindows()
-                return None
 
             if video_writer is None:
                 codec = "I420" if video_path.suffix.lower() == ".avi" else "mp4v"
@@ -673,12 +692,20 @@ def process_video(
                     "were last detected."
                 )
 
-            blur_result = (
-                face_result
-                if face_result.face_landmarks
-                else last_result
-            )
             frame_index = frame_number - 1
+            is_backtracked_frame = (
+                not face_result.face_landmarks
+                and frame_index < first_face_index
+            )
+            blur_result = (
+                first_face_result
+                if is_backtracked_frame
+                else (
+                    face_result
+                    if face_result.face_landmarks
+                    else last_result
+                )
+            )
             if face_result.face_landmarks:
                 last_landmarks_source_frame = frame_index
 
@@ -1234,9 +1261,9 @@ def process_dataset(
 
 
 if __name__ == "__main__":
-    # (accumulated_movement_index, detection_rate) = process_video(
-    # r"A:\dataset_raw\367781_0\L05-22-10-2026-16-28.avi", show=True)
     (accumulated_movement_index, detection_rate) = process_video(
-        "/home/soph/ssd/dataset_raw/378675_0/L03-24-09-2026-15-22.avi", ids_csv_path="/home/soph/rppg/rPPG_data/dataset/ids.csv")
+    r"C:\Users\Sophia\Videos\Baumer Video Records\VCXU.2-57C\UTI-20-08-2026\2356473_1\L10-20-08-2026-15-32.avi")
+    # (accumulated_movement_index, detection_rate) = process_video(
+    #     "/home/soph/ssd/dataset_raw/378675_0/L03-24-09-2026-15-22.avi", ids_csv_path="/home/soph/rppg/rPPG_data/dataset/ids.csv")
     print(f"Accumulated movement index: {accumulated_movement_index:.2f}")
     print(f"Detection rate: {detection_rate:.2f}")
