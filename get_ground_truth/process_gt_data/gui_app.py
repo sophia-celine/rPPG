@@ -6,7 +6,7 @@ import threading
 import time
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import cv2
@@ -479,6 +479,43 @@ class SignalExtractorApp:
                 pass
         return str(value).strip().lower()
 
+    @staticmethod
+    def _patient_datetime(patient_row):
+        date_text = str(patient_row.get("Dia", "")).strip()
+        hour_text = str(patient_row.get("Hora", "")).strip()
+
+        sheet_date = None
+        for date_format in ("%d/%m/%Y", "%d-%m-%Y", "%Y-%m-%d"):
+            try:
+                sheet_date = datetime.strptime(date_text, date_format)
+                break
+            except ValueError:
+                continue
+        if sheet_date is None:
+            raise ValueError(f"Data inválida: {date_text!r}")
+
+        if ":" in hour_text:
+            for time_format in ("%H:%M:%S", "%H:%M"):
+                try:
+                    parsed_time = datetime.strptime(
+                        hour_text,
+                        time_format,
+                    ).time()
+                    break
+                except ValueError:
+                    parsed_time = None
+            if parsed_time is None:
+                raise ValueError(f"Hora inválida: {hour_text!r}")
+            return datetime.combine(sheet_date.date(), parsed_time)
+
+        try:
+            target_hour = int(float(hour_text))
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise ValueError(f"Hora inválida: {hour_text!r}") from exc
+        if not 0 <= target_hour <= 23:
+            raise ValueError(f"Hora inválida: {hour_text!r}")
+        return sheet_date.replace(hour=target_hour)
+
     def _get_bed_ip(self, bed, ip_ids_file):
         bed_norm = str(bed).strip()
         if bed_norm.isdigit():
@@ -597,6 +634,8 @@ class SignalExtractorApp:
             "init_time", "end_time", "sinal_ECG", "sinal_PPG", "sinal_resp",
             "sinal_P1", "sinal_PVC", "sinal_ART", "sinal_CO2", "sinal_FC", "sinal_SpO2",
             "sinal_FR_impedancia", "sinal_FR_CO2",
+            "NIBP sistólica (mmHg)", "NIBP diastólica (mmHg)", "NIBP média (mmHg)",
+            "sinal_ECG_Vn1", "sinal_ECG_Vn2",
             "video_path", "video_duration", "init_frame", "end_frame", "h5_file", "evolucoes_path",
             "Movement index", "Detection rate",
         ]
@@ -688,6 +727,8 @@ class SignalExtractorApp:
                     "init_time", "end_time", "sinal_ECG", "sinal_PPG",
                     "sinal_resp", "sinal_P1", "sinal_PVC", "sinal_ART", "sinal_CO2",
                     "sinal_FC", "sinal_SpO2", "sinal_FR_impedancia", "sinal_FR_CO2",
+                    "NIBP sistólica (mmHg)", "NIBP diastólica (mmHg)", "NIBP média (mmHg)",
+                    "sinal_ECG_Vn1", "sinal_ECG_Vn2",
                     "video_path", "video_duration", "init_frame", "end_frame", "evolucoes_path",
                     "Movement index", "Detection rate",
                 ]
@@ -708,6 +749,8 @@ class SignalExtractorApp:
                 "init_time", "end_time", "sinal_ECG", "sinal_PPG", "sinal_resp",
                 "sinal_P1", "sinal_PVC", "sinal_ART", "sinal_CO2", "sinal_FC", "sinal_SpO2",
                 "sinal_FR_impedancia", "sinal_FR_CO2",
+                "NIBP sistólica (mmHg)", "NIBP diastólica (mmHg)", "NIBP média (mmHg)",
+                "sinal_ECG_Vn1", "sinal_ECG_Vn2",
                 "video_path", "video_duration", "init_frame", "end_frame", "evolucoes_path",
                 "Movement index", "Detection rate",
             ]
@@ -1990,6 +2033,8 @@ class SignalExtractorApp:
         numeric_signal_ids=(),
     ):
         h5_files = [h5_file]
+        nibp_history_files = set()
+        numeric_ids = set(numeric_signal_ids)
         time_parts = str(paciente.get("Hora", "")).strip().split(":")
         if len(time_parts) >= 2:
             try:
@@ -2004,13 +2049,31 @@ class SignalExtractorApp:
                 if next_h5_file and os.path.exists(next_h5_file):
                     h5_files.append(next_h5_file)
 
-        numeric_ids = set(numeric_signal_ids)
+        nibp_ids = {0x0900, 0x0901, 0x0902}
+        if nibp_ids.issubset(numeric_ids):
+            previous_hour = self._patient_datetime(paciente) - timedelta(hours=1)
+            previous_row = paciente.to_dict()
+            previous_row["Dia"] = previous_hour.strftime("%d/%m/%Y")
+            previous_row["Hora"] = previous_hour.strftime("%H:%M")
+            previous_h5_file = self._build_h5_path_from_row(previous_row)
+            if (
+                previous_h5_file
+                and os.path.exists(previous_h5_file)
+                and os.path.normcase(previous_h5_file)
+                != os.path.normcase(str(h5_file))
+            ):
+                h5_files.insert(0, previous_h5_file)
+                nibp_history_files.add(os.path.normcase(previous_h5_file))
+
         wave_ids = set(signal_ids) - numeric_ids
         wave_records = {signal_id: [] for signal_id in wave_ids}
         numeric_records = {signal_id: [] for signal_id in numeric_ids}
         invalid_wave_ids = set()
+        nibp_last_event = None
 
         def decode_numeric(packet, begin, end, timestamp):
+            nonlocal nibp_last_event
+
             if begin + 2 > end:
                 return None
 
@@ -2028,6 +2091,7 @@ class SignalExtractorApp:
             ):
                 return None
 
+            frame_numbers = {}
             records = []
             for offset in range(values_start, end, 10):
                 signal_id = int.from_bytes(packet[offset:offset + 2], "big")
@@ -2038,10 +2102,33 @@ class SignalExtractorApp:
                     "big",
                     signed=True,
                 )
+                frame_numbers[signal_id] = value
                 records.append((signal_id, float(timestamp), value))
+
+            if all(signal_id in frame_numbers for signal_id in (0x0900, 0x0901, 0x0902)):
+                marker_offset = begin + 18 + 2 * header_length
+                if marker_offset + 4 <= end:
+                    marker = int.from_bytes(
+                        packet[marker_offset:marker_offset + 4],
+                        "big",
+                    )
+                    pressure = tuple(
+                        frame_numbers[signal_id]
+                        for signal_id in (0x0900, 0x0901, 0x0902)
+                    )
+                    event_key = (marker, pressure)
+                    if event_key == nibp_last_event:
+                        return [
+                            record for record in records
+                            if record[0] not in (0x0900, 0x0901, 0x0902)
+                        ]
+                    nibp_last_event = event_key
             return records
 
         for current_h5 in h5_files:
+            is_nibp_history_file = (
+                os.path.normcase(str(current_h5)) in nibp_history_files
+            )
             try:
                 with h5py.File(current_h5, "r") as hdf:
                     raw_packets = hdf["data"][:]
@@ -2061,7 +2148,11 @@ class SignalExtractorApp:
 
             wave_sequences = []
             wave_reception_times = []
-            file_wave_chunks = {signal_id: [] for signal_id in wave_ids}
+            file_wave_chunks = (
+                {}
+                if is_nibp_history_file
+                else {signal_id: [] for signal_id in wave_ids}
+            )
             for packet, timestamp in zip(raw_packets, reception_times):
                 if bytes(packet[:4]) != b"\x02\x0B\x00\x00":
                     continue
@@ -2095,12 +2186,17 @@ class SignalExtractorApp:
                     if not valid:
                         continue
 
-                    packet_index = len(wave_sequences)
-                    wave_sequences.append(int.from_bytes(packet[24:26], "big"))
-                    wave_reception_times.append(float(timestamp))
-                    for signal_id, samples in blocks:
-                        if signal_id in file_wave_chunks:
-                            file_wave_chunks[signal_id].append((packet_index, samples))
+                    if not is_nibp_history_file:
+                        packet_index = len(wave_sequences)
+                        wave_sequences.append(
+                            int.from_bytes(packet[24:26], "big")
+                        )
+                        wave_reception_times.append(float(timestamp))
+                        for signal_id, samples in blocks:
+                            if signal_id in file_wave_chunks:
+                                file_wave_chunks[signal_id].append(
+                                    (packet_index, samples)
+                                )
 
                     if position < packet_end:
                         embedded_records = decode_numeric(
@@ -2224,16 +2320,14 @@ class SignalExtractorApp:
             ]
             if (
                 not np.isfinite(timestamps).all()
-                or positive_diffs.size == 0
                 or not np.isfinite(signal).any()
             ):
                 invalid_signal_ids.append(signal_id)
                 continue
 
-            sampling_rate = 1.0 / float(np.median(positive_diffs))
-            if not np.isfinite(sampling_rate) or sampling_rate <= 0:
-                invalid_signal_ids.append(signal_id)
-                continue
+            sampling_rate = 0.0
+            if positive_diffs.size:
+                sampling_rate = 1.0 / float(np.median(positive_diffs))
 
             try:
                 dates = np.array([datetime.fromtimestamp(value) for value in timestamps])
@@ -2326,7 +2420,7 @@ class SignalExtractorApp:
         dialog.transient(self.root)
         dialog.resizable(False, False)
 
-        tk.Label(dialog, text="Selecione os sinais que deseja salvar como TXT:").pack(
+        tk.Label(dialog, text="Selecione os sinais que deseja salvar:").pack(
             padx=20,
             pady=(15, 8),
             anchor="w",
@@ -2431,6 +2525,8 @@ class SignalExtractorApp:
             3: "aVR",
             4: "aVL",
             5: "aVF",
+            6: "Vn1",
+            7: "Vn2",
         }
         for channel_index in range(13):
             signal_id = 0x010004 + 256 * channel_index
@@ -2466,11 +2562,102 @@ class SignalExtractorApp:
                     Config.respiratory_rate_impedance_id,
                     Config.respiratory_rate_co2_id,
                     0x4901,
+                    0x0900,
+                    0x0901,
+                    0x0902,
                 ),
             )
         except (OSError, TypeError, ValueError) as exc:
             messagebox.showerror("Erro ao ler sinais", str(exc))
             return
+
+        nibp_signal_ids = {
+            0x0900: "NIBP sistólica (mmHg)",
+            0x0901: "NIBP diastólica (mmHg)",
+            0x0902: "NIBP média (mmHg)",
+        }
+        try:
+            target_datetime = self._patient_datetime(paciente)
+        except (TypeError, ValueError) as exc:
+            messagebox.showerror(
+                "Data ou hora inválida",
+                "Não foi possível interpretar as colunas 'Dia' e 'Hora' "
+                f"do paciente:\n{exc}",
+            )
+            return
+
+        target_timestamp = target_datetime.timestamp()
+        nibp_records = {}
+        for signal_id, column in nibp_signal_ids.items():
+            if signal_id not in loaded_signals:
+                continue
+            _, raw_values, _, timestamps = loaded_signals[signal_id]
+            nibp_records[signal_id] = {
+                float(timestamp): int(value)
+                for timestamp, value in zip(timestamps, raw_values)
+                if np.isfinite(timestamp) and np.isfinite(value)
+            }
+
+        if len(nibp_records) == len(nibp_signal_ids):
+            complete_nibp_timestamps = set.intersection(
+                *(set(records) for records in nibp_records.values())
+            )
+        else:
+            complete_nibp_timestamps = set()
+        nibp_column_values = {}
+        preceding_timestamps = [
+            timestamp
+            for timestamp in complete_nibp_timestamps
+            if timestamp < target_timestamp
+        ]
+        if preceding_timestamps:
+            last_nibp_timestamp = max(preceding_timestamps)
+            nibp_column_values = {
+                column: nibp_records[signal_id][last_nibp_timestamp]
+                for signal_id, column in nibp_signal_ids.items()
+            }
+        else:
+            messagebox.showwarning(
+                "NIBP não encontrado",
+                "Não há um registro NIBP completo anterior ao horário "
+                f"{target_datetime:%d/%m/%Y %H:%M:%S}.",
+            )
+
+        if nibp_column_values:
+            missing_nibp_columns = [
+                column
+                for column in nibp_column_values
+                if column not in self.df.columns
+            ]
+            previous_nibp_values = {
+                column: self.df.at[idx, column]
+                for column in nibp_column_values
+                if column in self.df.columns
+            }
+            try:
+                for column, value in nibp_column_values.items():
+                    if column not in self.df.columns:
+                        self.df[column] = pd.NA
+                    self.df.at[idx, column] = value
+                self.df.to_csv(self.dataset_raw_file, index=False)
+            except (OSError, PermissionError, ValueError) as exc:
+                for column, value in previous_nibp_values.items():
+                    self.df.at[idx, column] = value
+                self.df.drop(columns=missing_nibp_columns, inplace=True)
+                messagebox.showerror(
+                    "Erro ao salvar NIBP",
+                    f"Não foi possível salvar as medições NIBP na planilha:\n{exc}",
+                )
+                return
+
+            messagebox.showinfo(
+                "NIBP salvo",
+                "Última medida NIBP anterior ao horário da planilha "
+                f"({target_datetime:%d/%m/%Y %H:%M:%S}):\n"
+                f"Sistólica: {nibp_column_values['NIBP sistólica (mmHg)']} mmHg\n"
+                f"Diastólica: {nibp_column_values['NIBP diastólica (mmHg)']} mmHg\n"
+                f"Média: {nibp_column_values['NIBP média (mmHg)']} mmHg",
+            )
 
         if not loaded_signals:
             invalid_names = [
@@ -2498,30 +2685,70 @@ class SignalExtractorApp:
             name for name, details in signal_info.items()
             if details["id"] in loaded_signals
         ]
-        fig, axes = plt.subplots(len(valid_names), 1, figsize=(14, 4 * len(valid_names)), sharex=True)
-        if len(valid_names) == 1:
-            axes = [axes]
+        if not valid_names:
+            messagebox.showwarning(
+                "Sinais indisponíveis",
+                "Nenhum sinal adicional contínuo foi encontrado no H5.",
+            )
+            return
 
-        for ax, name in zip(axes, valid_names):
-            dates, raw_signal, mask, _ = loaded_signals[signal_info[name]["id"]]
-            signal = raw_signal.astype(float) * signal_info[name]["scale"]
-            ax.plot(dates, signal, color="tab:blue", linewidth=1.5, label="sinal completo")
-            if np.any(mask):
-                ax.plot(dates[mask], signal[mask], color="tab:red", linewidth=2.5, label="intervalo salvo")
-            ax.set_title(f"{name} - sinal completo e intervalo salvo")
-            ax.set_ylabel(signal_info[name]["unit"])
-            ax.grid(True, alpha=0.3)
-            ax.legend(loc="upper right")
+        signal_groups = {}
+        for name in valid_names:
+            if name.startswith("ECG"):
+                group = "ECG"
+            elif name in ("P1", "ART"):
+                group = "Pressão"
+            elif (
+                "CO2" in name
+                or "respiratória" in name.lower()
+                or name == "EtCO₂"
+            ):
+                group = "Respiração"
+            elif name == "PVC" or name == "Frequência cardíaca":
+                group = "Cardíaco"
+            elif name == "Saturação de oxigênio":
+                group = "Oxigenação"
+            else:
+                group = "Outros sinais"
+            signal_groups.setdefault(group, []).append(name)
 
-        axes[-1].set_xlabel("Horário")
-        fig.autofmt_xdate()
-        fig.tight_layout()
-        plt.show()
-        plt.close(fig)
+        for group_name, group_names in signal_groups.items():
+            fig, axes = plt.subplots(
+                len(group_names),
+                1,
+                figsize=(14, 4 * len(group_names)),
+                sharex=True,
+            )
+            if len(group_names) == 1:
+                axes = [axes]
+
+            for ax, name in zip(axes, group_names):
+                dates, raw_signal, mask, _ = loaded_signals[signal_info[name]["id"]]
+                signal = raw_signal.astype(float) * signal_info[name]["scale"]
+                ax.plot(dates, signal, color="tab:blue", linewidth=1.5, label="sinal completo")
+                if np.any(mask):
+                    ax.plot(
+                        dates[mask],
+                        signal[mask],
+                        color="tab:red",
+                        linewidth=2.5,
+                        label="intervalo salvo",
+                    )
+                ax.set_title(f"{name} - sinal completo e intervalo salvo")
+                ax.set_ylabel(signal_info[name]["unit"])
+                ax.grid(True, alpha=0.3)
+                ax.legend(loc="upper right")
+
+            fig.suptitle(f"{group_name} - sinais disponíveis", fontsize=14)
+            axes[-1].set_xlabel("Horário")
+            fig.autofmt_xdate()
+            fig.tight_layout()
+            plt.show()
+            plt.close(fig)
 
         if not messagebox.askyesno(
             "Salvar sinais adicionais",
-            "Deseja salvar algum dos sinais exibidos como TXT?",
+            "Deseja salvar algum dos sinais exibidos?",
         ):
             return
 
@@ -2583,7 +2810,16 @@ class SignalExtractorApp:
                 signal_id = details["id"]
                 _, raw_signal, mask, _ = loaded_signals[signal_id]
                 signal = raw_signal.astype(float) * details["scale"]
-                np.savetxt(output_paths[name], signal[mask], fmt="%.7e", delimiter=",")
+                formatted_signal = [
+                    str(int(value)) if np.isfinite(value) else "nan"
+                    for value in signal[mask]
+                ]
+                np.savetxt(
+                    output_paths[name],
+                    formatted_signal,
+                    fmt="%s",
+                    delimiter=",",
+                )
                 self.df.at[idx, signal_info[name]["column"]] = output_paths[name].name
 
             self.df.to_csv(self.dataset_raw_file, index=False)
