@@ -22,13 +22,20 @@ CLINICAL_COLUMNS = {
     "Hipertensão": "Hipertensão",
     "Condição cardiovascular": "Problema cardiovascular",
     "Outras comorbidades": "Outras comorbidades",
+    "DVA": "DVA (drogas vasoativas)",
     "MUC": "MUC",
     "Alergia": "Alergia",
     "Ultima prescrição": "Ultima prescrição",
 }
-OPTIONAL_CLINICAL_COLUMNS = ("MUC", "Alergia", "Ultima prescrição")
+OPTIONAL_CLINICAL_COLUMNS = (
+    "DVA (drogas vasoativas)",
+    "MUC",
+    "Alergia",
+    "Ultima prescrição",
+)
 DIABETES_OPTIONS = ("Não", "DM1", "DM2", "Não se sabe")
 HYPERTENSION_OPTIONS = ("Sim", "Não", "Não se sabe")
+DVA_OPTIONS = ("Noradrenalina", "Dobutamina", "Outro")
 
 
 class ClinicalDataApp:
@@ -67,6 +74,9 @@ class ClinicalDataApp:
         else:
             self.df = dataframe
             try:
+                for column in OPTIONAL_CLINICAL_COLUMNS:
+                    if column not in self.df.columns:
+                        self.df[column] = pd.NA
                 self._validate_columns()
             except ValueError as exc:
                 messagebox.showerror(
@@ -504,8 +514,64 @@ class ClinicalDataApp:
         allergy = tk.StringVar(value=self._display_value(row["Alergia"]))
         self._add_limited_entry(frame, 6, allergy, 250)
 
-        ttk.Label(frame, text="Ultima prescrição", style="Clinical.TLabel").grid(
+        stored_dva = self._display_value(row["DVA (drogas vasoativas)"])
+        if stored_dva in DVA_OPTIONS:
+            dva_selection = stored_dva
+            dva_other_value = ""
+        elif stored_dva:
+            dva_selection = "Outro"
+            dva_other_value = stored_dva
+        else:
+            dva_selection = ""
+            dva_other_value = ""
+
+        dva = tk.StringVar(value=dva_selection)
+        dva_other = tk.StringVar(value=dva_other_value)
+        ttk.Label(frame, text="DVA", style="Clinical.TLabel").grid(
             row=7, column=0, sticky="w", pady=8
+        )
+        dva_combobox = ttk.Combobox(
+            frame,
+            textvariable=dva,
+            values=DVA_OPTIONS,
+            state="readonly",
+            width=35,
+            style="Clinical.TCombobox",
+        )
+        dva_combobox.grid(row=7, column=1, sticky="ew", pady=8)
+
+        dva_other_label = ttk.Label(
+            frame,
+            text="DVA - Outro",
+            style="Clinical.TLabel",
+        )
+        dva_other_entry = ttk.Entry(
+            frame,
+            textvariable=dva_other,
+            width=38,
+            style="Clinical.TEntry",
+        )
+        dva_other_validate = dva_other_entry.register(
+            lambda value: len(value) <= 100
+        )
+        dva_other_entry.configure(
+            validate="key",
+            validatecommand=(dva_other_validate, "%P"),
+        )
+
+        def update_dva_other_field(*_args):
+            if dva.get() == "Outro":
+                dva_other_label.grid(row=8, column=0, sticky="w", pady=8)
+                dva_other_entry.grid(row=8, column=1, sticky="ew", pady=6)
+            else:
+                dva_other_label.grid_remove()
+                dva_other_entry.grid_remove()
+
+        dva.trace_add("write", update_dva_other_field)
+        update_dva_other_field()
+
+        ttk.Label(frame, text="Ultima prescrição", style="Clinical.TLabel").grid(
+            row=9, column=0, sticky="w", pady=8
         )
         prescription = tk.Text(
             frame,
@@ -524,19 +590,19 @@ class ClinicalDataApp:
             undo=True,
         )
         prescription.insert("1.0", self._display_value(row["Ultima prescrição"]))
-        prescription.grid(row=7, column=1, sticky="ew", pady=6)
+        prescription.grid(row=9, column=1, sticky="ew", pady=6)
         prescription_scrollbar = ttk.Scrollbar(
             frame,
             orient=tk.VERTICAL,
             command=prescription.yview,
             style="Clinical.Vertical.TScrollbar",
         )
-        prescription_scrollbar.grid(row=7, column=2, sticky="ns", pady=6)
+        prescription_scrollbar.grid(row=9, column=2, sticky="ns", pady=6)
         prescription.configure(yscrollcommand=prescription_scrollbar.set)
         self._limit_text_length(prescription, 500)
 
         buttons = ttk.Frame(frame, style="ClinicalApp.TFrame")
-        buttons.grid(row=8, column=0, columnspan=2, sticky="e", pady=(22, 0))
+        buttons.grid(row=10, column=0, columnspan=2, sticky="e", pady=(22, 0))
         ttk.Button(
             buttons,
             text="Salvar",
@@ -550,6 +616,8 @@ class ClinicalDataApp:
                 comorbidities.get(),
                 muc.get(),
                 allergy.get(),
+                dva.get(),
+                dva_other.get(),
                 prescription.get("1.0", "end-1c"),
             ),
         ).pack(side=tk.RIGHT, padx=(8, 0))
@@ -570,7 +638,7 @@ class ClinicalDataApp:
         ).pack(side=tk.LEFT, padx=(0, 8))
         ttk.Label(
             frame, textvariable=evolution_status, style="ClinicalHint.TLabel"
-        ).grid(row=9, column=0, columnspan=2, sticky="w", pady=(10, 0))
+        ).grid(row=11, column=0, columnspan=2, sticky="w", pady=(10, 0))
         window.protocol(
             "WM_DELETE_WINDOW", lambda: self._close_editor(index, window)
         )
@@ -615,6 +683,8 @@ class ClinicalDataApp:
         comorbidities,
         muc,
         allergy,
+        dva,
+        dva_other,
         prescription,
     ):
         if diabetes not in DIABETES_OPTIONS:
@@ -629,18 +699,34 @@ class ClinicalDataApp:
                 parent=window,
             )
             return
+        if dva not in DVA_OPTIONS:
+            messagebox.showerror(
+                "Campo obrigatório",
+                "Selecione uma opção para DVA.",
+                parent=window,
+            )
+            return
+        if dva == "Outro" and not dva_other.strip():
+            messagebox.showerror(
+                "Campo obrigatório",
+                "Informe o nome da DVA em 'Outro'.",
+                parent=window,
+            )
+            return
+        dva_value = dva_other.strip() if dva == "Outro" else dva
         if (
             len(cardiovascular) > 100
             or len(comorbidities) > 250
             or len(muc) > 250
             or len(allergy) > 250
+            or len(dva_value) > 100
             or len(prescription) > 500
         ):
             messagebox.showerror(
                 "Texto muito longo",
                 "Condição cardiovascular aceita até 100 caracteres e "
                 "Outras comorbidades, MUC e Alergia até 250 caracteres; "
-                "Ultima prescrição até 500 caracteres.",
+                "DVA até 100 caracteres; Ultima prescrição até 500 caracteres.",
                 parent=window,
             )
             return
@@ -650,6 +736,7 @@ class ClinicalDataApp:
             "Hipertensão": hypertension,
             "Problema cardiovascular": cardiovascular,
             "Outras comorbidades": comorbidities,
+            "DVA (drogas vasoativas)": dva_value,
             "MUC": muc,
             "Alergia": allergy,
             "Ultima prescrição": prescription,

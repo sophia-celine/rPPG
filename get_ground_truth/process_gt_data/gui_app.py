@@ -31,6 +31,7 @@ CLINICAL_DATA_COLUMNS = (
     "Hipertensão",
     "Problema cardiovascular",
     "Outras comorbidades",
+    "DVA (drogas vasoativas)",
     "MUC",
     "Alergia",
     "Ultima prescrição",
