@@ -1,7 +1,8 @@
-import importlib.util
+import importlib
 import os
 import queue
 import re
+import sys
 import threading
 import time
 import tkinter as tk
@@ -1592,23 +1593,18 @@ class SignalExtractorApp:
 
     @staticmethod
     def _load_process_video_function():
+        project_root = Path(__file__).resolve().parents[2]
         process_video_path = (
-            Path(__file__).resolve().parents[2]
-            / "face_detection"
-            / "process_video_optimized.py"
+            project_root / "face_detection" / "process_video_optimized.py"
         )
         if not process_video_path.is_file():
             raise FileNotFoundError(f"Arquivo de processamento não encontrado: {process_video_path}")
 
-        spec = importlib.util.spec_from_file_location(
-            "_rppg_face_detection_process_video",
-            process_video_path,
-        )
-        if spec is None or spec.loader is None:
-            raise ImportError(f"Não foi possível carregar o módulo: {process_video_path}")
+        project_root_string = str(project_root)
+        if project_root_string not in sys.path:
+            sys.path.insert(0, project_root_string)
 
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
+        module = importlib.import_module("face_detection.process_video_optimized")
         module.MODEL_DIR = process_video_path.parent / "mediapipe_models"
         module.FACE_MODEL_PATH = module.MODEL_DIR / "face_landmarker.task"
         return module.process_video
