@@ -1,8 +1,9 @@
 """Read saved face landmarks and visualize them on an anonymized video.
 
 Run this script with a video path. By default, it looks for a matching
-``<video_stem>_landmarks.h5`` file in the same folder and displays the
-landmarks frame by frame. Use ``--output`` to save an annotated copy.
+``<video_stem>_landmarks.h5`` file or, if absent, a unique ``*landmarks.h5``
+file in the same folder. It displays the landmarks frame by frame. Use
+``--output`` to save an annotated copy.
 Inspect an HDF5 file with 
 ``python read_landmarks.py --inspect-h5 "path/to/2_1_landmarks.h5"`` 
 to see its metadata, dataset shapes, and example field access.
@@ -20,8 +21,8 @@ The HDF5 file contains:
 * ``face_detected``: boolean array marking frames with a fresh detection.
 * ``source_frame``: zero-based frame where that row's landmarks were last
   detected. Missing detections reuse the previous valid landmark positions.
-* ``blur_regions``: polygon vertices and inclusive frame ranges for additional
-  blurred areas. Rasterizing each active polygon reproduces its pixel mask.
+* ``blur_regions``: manual polygon vertices and inclusive frame ranges, plus
+  ``face_blur`` with the standard per-frame face-blur polygons.
 * File attributes with video name, dimensions, FPS, coordinate convention,
   landmark count, and total frame count.
 """
@@ -124,26 +125,52 @@ def _find_blur_regions_file(video_path, landmarks_path=None):
     expected_path = video_path.with_name(f"{video_path.stem}_landmarks.h5")
     if expected_path.is_file():
         with h5py.File(expected_path, "r") as landmark_data:
-            if "blur_regions" in landmark_data:
+            if (
+                "blur_regions" in landmark_data
+                or "process_video_blur_regions" in landmark_data
+            ):
                 return expected_path
 
     candidates = []
     for path in sorted(video_path.parent.glob("*_landmarks.h5")):
         with h5py.File(path, "r") as landmark_data:
-            if "blur_regions" in landmark_data:
+            if (
+                "blur_regions" in landmark_data
+                or "process_video_blur_regions" in landmark_data
+            ):
                 candidates.append(path)
 
     if not candidates:
         raise FileNotFoundError(
-            "No landmark HDF5 file containing 'blur_regions' was found beside "
+            "No landmark HDF5 file containing manual or standard blur polygons "
+            "was found beside "
             f"the video: {video_path.parent}"
         )
     if len(candidates) > 1:
         raise ValueError(
-            "Multiple landmark HDF5 files containing 'blur_regions' were found; "
+            "Multiple landmark HDF5 files containing blur polygons were found; "
             f"specify one with --landmarks: {', '.join(str(path) for path in candidates)}"
         )
     return candidates[0]
+
+
+def _find_face_blur_group(landmark_data):
+    if "blur_regions" in landmark_data:
+        blur_regions = landmark_data["blur_regions"]
+        if isinstance(blur_regions, h5py.Group):
+            if "face_blur" in blur_regions:
+                return blur_regions["face_blur"]
+            if "process_video" in blur_regions:
+                return blur_regions["process_video"]
+    if "process_video_blur_regions" in landmark_data:
+        return landmark_data["process_video_blur_regions"]
+    return None
+
+
+def _decode_h5_text(value):
+    if isinstance(value, bytes):
+        return value.decode("ascii")
+    return str(value)
 
 
 def show_blur_regions_on_video(
@@ -154,16 +181,14 @@ def show_blur_regions_on_video(
 ):
     """Play an anonymized video and tint every pixel covered by saved blur polygons.
 
-    The HDF5 ``blur_regions`` group stores polygons in video pixel coordinates
-    and their inclusive frame ranges. For each frame, this function rasterizes
-    only the active polygons, so the colored overlay marks the same mask used
-    to blur that frame without storing a full image mask for every frame.
+    Manual polygons and the standard per-frame polygons are rasterized from the
+    HDF5 metadata and highlighted while the video plays.
 
     Args:
         video_path: Path to the anonymized video to display.
         landmarks_path: Optional HDF5 metadata path. If omitted, the function
             looks for a matching ``<video_stem>_landmarks.h5`` file and then
-            for a unique ``*_landmarks.h5`` file containing ``blur_regions``.
+            for a unique ``*_landmarks.h5`` file containing blur polygons.
         overlay_color: BGR color used to highlight blurred pixels.
         overlay_alpha: Overlay strength between 0 (transparent) and 1 (opaque).
 
@@ -198,38 +223,124 @@ def show_blur_regions_on_video(
     stopped_early = False
     try:
         with h5py.File(metadata_path, "r") as landmark_data:
-            if "blur_regions" not in landmark_data:
-                raise ValueError(
-                    f"The HDF5 file does not contain 'blur_regions': {metadata_path}"
-                )
-            regions = landmark_data["blur_regions"]
-            if not isinstance(regions, h5py.Group):
+            regions = landmark_data.get("blur_regions")
+            if regions is not None and not isinstance(regions, h5py.Group):
                 raise ValueError("The HDF5 'blur_regions' entry must be a group.")
-            required_datasets = ("frame_ranges", "polygon_offsets", "polygon_points")
-            if any(name not in regions for name in required_datasets):
+            face_blur = _find_face_blur_group(landmark_data)
+            if face_blur is not None and not isinstance(face_blur, h5py.Group):
+                raise ValueError("The standard blur-region entry must be a group.")
+            if regions is None and face_blur is None:
                 raise ValueError(
-                    "The 'blur_regions' group must contain frame_ranges, "
-                    "polygon_offsets, and polygon_points."
+                    "The HDF5 file does not contain manual or standard blur polygons."
                 )
 
-            frame_ranges = regions["frame_ranges"][:]
-            polygon_offsets = regions["polygon_offsets"][:]
-            polygon_points = regions["polygon_points"][:]
-            if (
-                frame_ranges.ndim != 2
-                or frame_ranges.shape[1] != 2
-                or not np.issubdtype(frame_ranges.dtype, np.integer)
-                or polygon_offsets.shape != (len(frame_ranges) + 1,)
-                or not np.issubdtype(polygon_offsets.dtype, np.integer)
-                or polygon_points.ndim != 2
-                or polygon_points.shape[1] != 2
-                or not np.issubdtype(polygon_points.dtype, np.integer)
-                or not len(polygon_offsets)
-                or polygon_offsets[0] != 0
-                or polygon_offsets[-1] != len(polygon_points)
-                or np.any(polygon_offsets[1:] < polygon_offsets[:-1])
-            ):
-                raise ValueError("The HDF5 blur-region arrays have invalid shapes or offsets.")
+            manual_names = ("frame_ranges", "polygon_offsets", "polygon_points")
+            has_manual_fields = regions is not None and any(
+                name in regions for name in manual_names
+            )
+            if has_manual_fields and any(name not in regions for name in manual_names):
+                raise ValueError(
+                    "The 'blur_regions' group must contain frame_ranges, "
+                    "polygon_offsets, and polygon_points together."
+                )
+            if has_manual_fields:
+                frame_ranges = regions["frame_ranges"][:]
+                polygon_offsets = regions["polygon_offsets"][:]
+                polygon_points = regions["polygon_points"][:]
+                if (
+                    frame_ranges.ndim != 2
+                    or frame_ranges.shape[1] != 2
+                    or not np.issubdtype(frame_ranges.dtype, np.integer)
+                    or polygon_offsets.shape != (len(frame_ranges) + 1,)
+                    or not np.issubdtype(polygon_offsets.dtype, np.integer)
+                    or polygon_points.ndim != 2
+                    or polygon_points.shape[1] != 2
+                    or not np.issubdtype(polygon_points.dtype, np.integer)
+                    or not len(polygon_offsets)
+                    or polygon_offsets[0] != 0
+                    or polygon_offsets[-1] != len(polygon_points)
+                    or np.any(polygon_offsets[1:] < polygon_offsets[:-1])
+                ):
+                    raise ValueError(
+                        "The HDF5 manual blur-region arrays have invalid shapes or offsets."
+                    )
+            else:
+                frame_ranges = np.empty((0, 2), dtype=np.int64)
+                polygon_offsets = np.asarray([0], dtype=np.uint64)
+                polygon_points = np.empty((0, 2), dtype=np.int32)
+
+            standard_frame_indices = np.empty((0,), dtype=np.int64)
+            standard_region_names = np.empty((0,), dtype="S32")
+            standard_region_roles = np.empty((0,), dtype="S8")
+            standard_stroke_widths = np.empty((0,), dtype=np.int32)
+            standard_polygon_offsets = np.asarray([0], dtype=np.uint64)
+            standard_polygon_points = np.empty((0, 2), dtype=np.int32)
+            standard_regions_by_frame = {}
+            standard_count = 0
+            if face_blur is not None:
+                required_datasets = (
+                    "frame_indices",
+                    "region_names",
+                    "region_roles",
+                    "stroke_width_px",
+                    "polygon_offsets",
+                    "polygon_points",
+                )
+                if any(name not in face_blur for name in required_datasets):
+                    raise ValueError(
+                        "The standard blur group must contain frame_indices, "
+                        "region_names, region_roles, stroke_width_px, "
+                        "polygon_offsets, and polygon_points."
+                    )
+                standard_frame_indices = face_blur["frame_indices"][:]
+                standard_region_names = face_blur["region_names"][:]
+                standard_region_roles = face_blur["region_roles"][:]
+                standard_stroke_widths = face_blur["stroke_width_px"][:]
+                standard_polygon_offsets = face_blur["polygon_offsets"][:]
+                standard_polygon_points = face_blur["polygon_points"][:]
+                standard_count = len(standard_frame_indices)
+                if (
+                    standard_frame_indices.ndim != 1
+                    or not np.issubdtype(standard_frame_indices.dtype, np.integer)
+                    or standard_region_names.shape != (standard_count,)
+                    or standard_region_roles.shape != (standard_count,)
+                    or standard_stroke_widths.shape != (standard_count,)
+                    or not np.issubdtype(standard_stroke_widths.dtype, np.integer)
+                    or standard_polygon_offsets.shape != (standard_count + 1,)
+                    or not np.issubdtype(standard_polygon_offsets.dtype, np.integer)
+                    or standard_polygon_points.ndim != 2
+                    or standard_polygon_points.shape[1] != 2
+                    or not np.issubdtype(standard_polygon_points.dtype, np.integer)
+                    or not len(standard_polygon_offsets)
+                    or standard_polygon_offsets[0] != 0
+                    or standard_polygon_offsets[-1] != len(standard_polygon_points)
+                    or np.any(
+                        standard_polygon_offsets[1:]
+                        < standard_polygon_offsets[:-1]
+                    )
+                    or np.any(standard_stroke_widths < 0)
+                ):
+                    raise ValueError(
+                        "The standard blur-region arrays have invalid shapes or offsets."
+                    )
+                for region_index, frame_index in enumerate(standard_frame_indices):
+                    region_name = _decode_h5_text(standard_region_names[region_index])
+                    region_role = _decode_h5_text(standard_region_roles[region_index])
+                    if region_role not in ("include", "exclude"):
+                        raise ValueError(
+                            f"Standard blur polygon {region_index} has an invalid role."
+                        )
+                    start = int(standard_polygon_offsets[region_index])
+                    end = int(standard_polygon_offsets[region_index + 1])
+                    if end - start < 3:
+                        raise ValueError(
+                            f"Standard blur polygon {region_index} has fewer than 3 points."
+                        )
+                    standard_regions_by_frame.setdefault(
+                        int(frame_index), []
+                    ).append((region_index, region_name, region_role))
+            if not len(frame_ranges) and not standard_count:
+                raise ValueError("The HDF5 file contains no blur polygons to display.")
 
             frame_count = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
             video_width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -239,10 +350,22 @@ def show_blur_regions_on_video(
                 fps = float(landmark_data.attrs.get("fps", 25.0))
             if not np.isfinite(fps) or fps <= 0:
                 fps = 25.0
-            saved_width = int(regions.attrs.get("frame_width", -1))
-            saved_height = int(regions.attrs.get("frame_height", -1))
+            default_width = int(landmark_data.attrs.get("frame_width", -1))
+            default_height = int(landmark_data.attrs.get("frame_height", -1))
+            saved_width = (
+                int(regions.attrs.get("frame_width", default_width))
+                if regions is not None
+                else default_width
+            )
+            saved_height = (
+                int(regions.attrs.get("frame_height", default_height))
+                if regions is not None
+                else default_height
+            )
             if (
                 frame_count <= 0
+                or saved_width <= 0
+                or saved_height <= 0
                 or video_width < saved_width
                 or video_height < saved_height
                 or video_width - saved_width > 1
@@ -274,6 +397,14 @@ def show_blur_regions_on_video(
                         f"Blur region {region_index} contains invalid polygon points."
                     )
 
+            if len(standard_frame_indices) and (
+                np.any(standard_frame_indices < 0)
+                or np.any(standard_frame_indices >= frame_count)
+            ):
+                raise ValueError(
+                    "A standard blur polygon frame index is outside the video."
+                )
+
             regions_starting = {}
             regions_ending = {}
             for region_index, (start_frame, end_frame) in enumerate(frame_ranges):
@@ -296,6 +427,49 @@ def show_blur_regions_on_video(
                     polygon = np.round(polygon_points[start:end]).astype(np.int32)
                     cv2.fillPoly(pixel_mask, [polygon], 255)
 
+                frame_standard_regions = standard_regions_by_frame.get(
+                    displayed_frames,
+                    (),
+                )
+                if frame_standard_regions:
+                    feature_mask = np.zeros_like(pixel_mask)
+                    face_border_mask = np.zeros_like(pixel_mask)
+                    face_interior_mask = np.zeros_like(pixel_mask)
+                    exclusion_mask = np.zeros_like(pixel_mask)
+                    for region_index, region_name, region_role in frame_standard_regions:
+                        start = int(standard_polygon_offsets[region_index])
+                        end = int(standard_polygon_offsets[region_index + 1])
+                        polygon = np.round(
+                            standard_polygon_points[start:end]
+                        ).astype(np.int32)
+                        if region_role == "exclude":
+                            cv2.fillPoly(exclusion_mask, [polygon], 255)
+                        elif region_name == "outside_face_ring":
+                            cv2.polylines(
+                                face_border_mask,
+                                [polygon],
+                                True,
+                                255,
+                                max(
+                                    1,
+                                    int(standard_stroke_widths[region_index]),
+                                ),
+                            )
+                            cv2.fillPoly(face_interior_mask, [polygon], 255)
+                        else:
+                            cv2.fillPoly(feature_mask, [polygon], 255)
+
+                    face_ring_mask = cv2.bitwise_and(
+                        face_border_mask,
+                        cv2.bitwise_not(face_interior_mask),
+                    )
+                    standard_mask = cv2.bitwise_or(feature_mask, face_ring_mask)
+                    standard_mask = cv2.bitwise_and(
+                        standard_mask,
+                        cv2.bitwise_not(exclusion_mask),
+                    )
+                    pixel_mask = cv2.bitwise_or(pixel_mask, standard_mask)
+
                 selected_pixels = pixel_mask != 0
                 if np.any(selected_pixels):
                     color = np.asarray(overlay_color, dtype=np.float32)
@@ -309,7 +483,9 @@ def show_blur_regions_on_video(
                 cv2.putText(
                     frame,
                     f"Frame {displayed_frames + 1}/{frame_count} | "
-                    f"Blur regions: {len(active_regions)} | Press Q to quit",
+                    f"Manual regions: {len(active_regions)} | "
+                    f"Standard polygons: {len(frame_standard_regions)} | "
+                    "Press Q to quit",
                     (15, 30),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     0.6,
@@ -347,7 +523,8 @@ def draw_landmarks_on_video(
     Args:
         video_path: Path to the anonymized video.
         landmarks_path: Path to the matching HDF5 file. If omitted, the
-            function looks for ``<video_stem>_landmarks.h5`` beside the video.
+            function looks for ``<video_stem>_landmarks.h5`` first, then a
+            unique ``*landmarks.h5`` file beside the video.
         output_path: Optional path where an annotated video will be written.
         show: If ``True``, show the annotated frames in an OpenCV window.
         point_radius: Radius in pixels for each landmark dot.
@@ -361,15 +538,29 @@ def draw_landmarks_on_video(
         ValueError: If the HDF5 data is invalid or does not match the video.
     """
     video_path = Path(video_path)
+    if not video_path.is_file():
+        raise FileNotFoundError(f"Video not found: {video_path}")
+
     if landmarks_path is None:
-        landmarks_path = video_path.with_name(
-            f"{video_path.stem}_landmarks.h5"
-        )
+        expected_path = video_path.with_name(f"{video_path.stem}_landmarks.h5")
+        if expected_path.is_file():
+            landmarks_path = expected_path
+        else:
+            candidates = sorted(video_path.parent.glob("*landmarks.h5"))
+            if not candidates:
+                raise FileNotFoundError(
+                    "No landmark file ending in 'landmarks.h5' was found beside "
+                    f"the video: {video_path.parent}"
+                )
+            if len(candidates) > 1:
+                raise ValueError(
+                    "Multiple landmark files ending in 'landmarks.h5' were found; "
+                    f"specify one with --landmarks: {', '.join(map(str, candidates))}"
+                )
+            landmarks_path = candidates[0]
     else:
         landmarks_path = Path(landmarks_path)
 
-    if not video_path.is_file():
-        raise FileNotFoundError(f"Video not found: {video_path}")
     if not landmarks_path.is_file():
         raise FileNotFoundError(f"Landmark file not found: {landmarks_path}")
     if output_path is not None:
@@ -539,14 +730,17 @@ def main():
     parser.add_argument(
         "--show-blur-regions",
         action="store_true",
-        help="Play the video and highlight pixels covered by saved blur regions.",
+        help=(
+            "Play the video and highlight manual and standard saved blur regions."
+        ),
     )
     parser.add_argument(
         "--landmarks",
         type=Path,
         help=(
-            "Path to the HDF5 landmarks file. Defaults to "
-            "<video_stem>_landmarks.h5 beside the video."
+            "Path to the HDF5 landmarks file. Defaults to the matching "
+            "<video_stem>_landmarks.h5 or a unique *landmarks.h5 file beside "
+            "the video."
         ),
     )
     parser.add_argument(

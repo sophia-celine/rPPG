@@ -79,7 +79,89 @@ def _find_landmarks_file(
             raise ValueError(
                 f"The landmark data in {landmarks_path} does not match the video dimensions."
             )
+        _validate_process_video_blur_regions(landmark_data, frame_count)
     return landmarks_path
+
+
+def _process_video_blur_regions_group(landmark_data: h5py.File):
+    if "blur_regions" in landmark_data:
+        blur_regions = landmark_data["blur_regions"]
+        if isinstance(blur_regions, h5py.Group):
+            if "face_blur" in blur_regions:
+                return blur_regions["face_blur"]
+            if "process_video" in blur_regions:
+                return blur_regions["process_video"]
+    if "process_video_blur_regions" in landmark_data:
+        return landmark_data["process_video_blur_regions"]
+    return None
+
+
+def _validate_process_video_blur_regions(
+    landmark_data: h5py.File,
+    frame_count: int,
+) -> h5py.Group:
+    group = _process_video_blur_regions_group(landmark_data)
+    if group is None:
+        raise ValueError(
+            "The HDF5 file does not contain the standard blur polygons in "
+            "'blur_regions/face_blur' or the legacy location. Reprocess the video "
+            "with the updated process_video_optimized.py."
+        )
+
+    group_name = group.name
+    required_datasets = (
+        "frame_indices",
+        "region_names",
+        "region_roles",
+        "stroke_width_px",
+        "polygon_offsets",
+        "polygon_points",
+    )
+    if not isinstance(group, h5py.Group) or any(
+        name not in group for name in required_datasets
+    ):
+        raise ValueError(
+            f"The HDF5 process-video blur-regions group is incomplete: "
+            f"{landmark_data.filename}"
+        )
+
+    frame_indices = group["frame_indices"]
+    if frame_indices.ndim != 1:
+        raise ValueError(
+            f"The HDF5 '{group_name}' frame_indices dataset must be one-dimensional."
+        )
+    region_names = group["region_names"]
+    region_roles = group["region_roles"]
+    stroke_widths = group["stroke_width_px"]
+    polygon_offsets = group["polygon_offsets"][:]
+    polygon_points = group["polygon_points"]
+    region_count = frame_indices.shape[0]
+    if (
+        region_names.shape != (region_count,)
+        or region_roles.shape != (region_count,)
+        or stroke_widths.shape != (region_count,)
+        or polygon_offsets.shape != (region_count + 1,)
+        or polygon_points.ndim != 2
+        or polygon_points.shape[1] != 2
+        or not np.issubdtype(frame_indices.dtype, np.integer)
+        or not np.issubdtype(polygon_offsets.dtype, np.integer)
+        or not np.issubdtype(polygon_points.dtype, np.integer)
+        or not len(polygon_offsets)
+        or polygon_offsets[0] != 0
+        or polygon_offsets[-1] != len(polygon_points)
+        or np.any(polygon_offsets[1:] < polygon_offsets[:-1])
+    ):
+        raise ValueError(
+            f"The HDF5 '{group_name}' arrays have invalid shapes or offsets."
+        )
+    if region_count and (
+        np.any(frame_indices[:] < 0)
+        or np.any(frame_indices[:] >= frame_count)
+    ):
+        raise ValueError(
+            f"The HDF5 '{group_name}' contains a frame index outside the video."
+        )
+    return group
 
 
 def _save_blur_regions(
@@ -89,7 +171,7 @@ def _save_blur_regions(
     width: int,
     height: int,
 ) -> None:
-    """Store polygons and inclusive frame ranges in the landmark HDF5 file."""
+    """Store manual regions alongside the process-generated polygons in HDF5."""
     frame_ranges = np.asarray(
         [(region.start_frame, region.end_frame) for region in regions],
         dtype=np.int64,
@@ -116,6 +198,10 @@ def _save_blur_regions(
             raise ValueError(
                 f"The landmark HDF5 file no longer matches the video: {landmarks_path}"
             )
+        process_regions = _validate_process_video_blur_regions(
+            landmark_data,
+            frame_count,
+        )
 
         pending_name = "_blur_regions_pending"
         backup_name = "_blur_regions_backup"
@@ -157,6 +243,11 @@ def _save_blur_regions(
                 compression="gzip",
                 compression_opts=4,
             )
+            landmark_data.copy(
+                process_regions,
+                pending,
+                name="face_blur",
+            )
             landmark_data.flush()
 
             if "blur_regions" in landmark_data:
@@ -164,6 +255,8 @@ def _save_blur_regions(
             landmark_data.move(pending_name, "blur_regions")
             if backup_name in landmark_data:
                 del landmark_data[backup_name]
+            if "process_video_blur_regions" in landmark_data:
+                del landmark_data["process_video_blur_regions"]
             landmark_data.flush()
         except Exception:
             if "blur_regions" not in landmark_data and backup_name in landmark_data:

@@ -136,7 +136,246 @@ def get_face_blur_indices():
     }
 
 
-def anonymize_frame(frame, face_landmarks, blur_indices):
+def _create_process_blur_regions_group(
+    landmarks_file,
+    group_name="process_video_blur_regions",
+):
+    group = landmarks_file.create_group(group_name)
+    group.attrs["schema_version"] = 1
+    group.attrs["coordinate_system"] = (
+        "Zero-based video pixel coordinates (x, y), origin at top left"
+    )
+    group.attrs["frame_indexing"] = "Zero-based frame indices"
+    group.attrs["description"] = (
+        "Frame-specific polygons used to build the anonymization mask. "
+        "Polygons are in full-frame pixel coordinates. Rasterize include "
+        "polygons, apply stroke_width_px to outside_face_ring, then subtract "
+        "exclude polygons. The final mask is feathered with a 15x15 Gaussian."
+    )
+    group.attrs["outside_face_ring"] = (
+        "The face-oval polygon is drawn as a stroke with stroke_width_px; "
+        "the face interior is removed."
+    )
+    group.create_dataset(
+        "frame_indices",
+        shape=(0,),
+        maxshape=(None,),
+        dtype=np.int64,
+        chunks=(256,),
+        compression="gzip",
+        compression_opts=4,
+    )
+    group.create_dataset(
+        "region_names",
+        shape=(0,),
+        maxshape=(None,),
+        dtype="S32",
+        chunks=(256,),
+        compression="gzip",
+        compression_opts=4,
+    )
+    group.create_dataset(
+        "region_roles",
+        shape=(0,),
+        maxshape=(None,),
+        dtype="S8",
+        chunks=(256,),
+        compression="gzip",
+        compression_opts=4,
+    )
+    group.create_dataset(
+        "stroke_width_px",
+        shape=(0,),
+        maxshape=(None,),
+        dtype=np.int32,
+        chunks=(256,),
+        compression="gzip",
+        compression_opts=4,
+    )
+    group.create_dataset(
+        "polygon_offsets",
+        data=np.asarray([0], dtype=np.uint64),
+        maxshape=(None,),
+        chunks=(256,),
+        compression="gzip",
+        compression_opts=4,
+    )
+    group.create_dataset(
+        "polygon_points",
+        shape=(0, 2),
+        maxshape=(None, 2),
+        dtype=np.int32,
+        chunks=(1024, 2),
+        compression="gzip",
+        compression_opts=4,
+    )
+    return group
+
+
+def _append_process_blur_regions(group, frame_regions):
+    if not frame_regions:
+        return
+
+    polygons = [
+        np.asarray(polygon, dtype=np.int32).reshape(-1, 2)
+        for _, _, polygon, _, _ in frame_regions
+    ]
+    point_lengths = np.asarray([len(polygon) for polygon in polygons], dtype=np.uint64)
+    if np.any(point_lengths == 0):
+        raise ValueError("A process blur-region polygon cannot be empty.")
+
+    record_start = len(group["frame_indices"])
+    point_start = int(group["polygon_offsets"][-1])
+    record_end = record_start + len(frame_regions)
+    point_end = point_start + int(point_lengths.sum())
+    offsets = point_start + np.cumsum(point_lengths, dtype=np.uint64)
+
+    for dataset_name in (
+        "frame_indices",
+        "region_names",
+        "region_roles",
+        "stroke_width_px",
+    ):
+        group[dataset_name].resize(record_end, axis=0)
+    group["polygon_offsets"].resize(record_end + 1, axis=0)
+    group["polygon_points"].resize(point_end, axis=0)
+
+    group["frame_indices"][record_start:record_end] = [
+        frame_index for frame_index, _, _, _, _ in frame_regions
+    ]
+    group["region_names"][record_start:record_end] = [
+        name.encode("ascii") for _, name, _, _, _ in frame_regions
+    ]
+    group["region_roles"][record_start:record_end] = [
+        role.encode("ascii") for _, _, _, role, _ in frame_regions
+    ]
+    group["stroke_width_px"][record_start:record_end] = [
+        stroke_width for _, _, _, _, stroke_width in frame_regions
+    ]
+    group["polygon_offsets"][record_start + 1:record_end + 1] = offsets
+    group["polygon_points"][point_start:point_end] = np.concatenate(polygons)
+
+
+def get_process_blur_region_geometry(points, width, height, blur_indices):
+    """Build the frame-specific polygons used by the anonymization mask.
+
+    Args:
+        points: Face landmarks as integer pixel coordinates with shape (478, 2).
+        width: Video frame width in pixels.
+        height: Video frame height in pixels.
+        blur_indices: Landmark indices returned by ``get_face_blur_indices``.
+
+    Returns:
+        A dictionary containing local mask polygons and full-frame region
+        records, or ``None`` if the face outline does not intersect the frame.
+    """
+    points = np.asarray(points, dtype=np.int32)
+    if points.shape != (478, 2):
+        raise ValueError(
+            "Expected landmark pixel coordinates with shape (478, 2), "
+            f"got {points.shape}."
+        )
+
+    eye_distance = int(
+        math.hypot(
+            points[33][0] - points[263][0],
+            points[33][1] - points[263][1],
+        )
+    )
+    eye_distance = max(eye_distance, 1)
+
+    face_oval_hull = cv2.convexHull(points[blur_indices["face_oval"]])
+    blur_kernel_size = max((eye_distance // 2) * 2 + 1, 3)
+    border_thickness = eye_distance * MARGIN_MASK_THICKNESS_FACTOR
+    mask_blur_radius = 7
+    margin = (
+        (border_thickness + 1) // 2
+        + mask_blur_radius
+        + blur_kernel_size
+        + 2
+    )
+    hull_x, hull_y, hull_width, hull_height = cv2.boundingRect(face_oval_hull)
+    x0 = max(0, hull_x - margin)
+    y0 = max(0, hull_y - margin)
+    x1 = min(width, hull_x + hull_width + margin)
+    y1 = min(height, hull_y + hull_height + margin)
+    if x0 >= x1 or y0 >= y1:
+        return None
+
+    frame_offset = np.array([x0, y0], dtype=np.int32)
+    local_points = points - frame_offset
+    local_face_oval_hull = cv2.convexHull(
+        local_points[blur_indices["face_oval"]]
+    )
+    left_eye_brow_indices = (
+        blur_indices["left_eye"]
+        + blur_indices["left_eyebrow"]
+        + [341, 256, 252, 253, 254, 339, 255, 463]
+    )
+    right_eye_brow_indices = (
+        blur_indices["right_eye"]
+        + blur_indices["right_eyebrow"]
+        + [130, 25, 110, 24, 23, 22, 26, 112]
+    )
+    left_eye_brow_hull = cv2.convexHull(local_points[left_eye_brow_indices])
+    right_eye_brow_hull = cv2.convexHull(local_points[right_eye_brow_indices])
+    nose_triangle = cv2.convexHull(local_points[[6, 423, 203]])
+    mouth_indices = blur_indices["lips"] + [
+        43, 106, 182, 83, 18, 313, 406, 335, 273
+    ]
+    mouth_hull = cv2.convexHull(local_points[mouth_indices])
+    lower_face_trapezoid = np.array(
+        [
+            local_points[422],
+            local_points[202],
+            [width - 1 - x0, height - 1 - y0],
+            [-x0, height - 1 - y0],
+        ],
+        dtype=np.int32,
+    )
+    regions = [
+        (
+            "left_eye_and_eyebrow",
+            "include",
+            left_eye_brow_hull.reshape(-1, 2) + frame_offset,
+            0,
+        ),
+        (
+            "right_eye_and_eyebrow",
+            "include",
+            right_eye_brow_hull.reshape(-1, 2) + frame_offset,
+            0,
+        ),
+        ("nose", "include", nose_triangle.reshape(-1, 2) + frame_offset, 0),
+        ("mouth", "include", mouth_hull.reshape(-1, 2) + frame_offset, 0),
+        (
+            "outside_face_ring",
+            "include",
+            local_face_oval_hull.reshape(-1, 2) + frame_offset,
+            border_thickness,
+        ),
+        (
+            "lower_face_exclusion",
+            "exclude",
+            lower_face_trapezoid.reshape(-1, 2) + frame_offset,
+            0,
+        ),
+    ]
+    return {
+        "roi": (x0, y0, x1, y1),
+        "blur_kernel_size": blur_kernel_size,
+        "border_thickness": border_thickness,
+        "face_oval_hull": local_face_oval_hull,
+        "left_eye_brow_hull": left_eye_brow_hull,
+        "right_eye_brow_hull": right_eye_brow_hull,
+        "nose_triangle": nose_triangle,
+        "mouth_hull": mouth_hull,
+        "lower_face_trapezoid": lower_face_trapezoid,
+        "regions": regions,
+    }
+
+
+def anonymize_frame(frame, face_landmarks, blur_indices, regions_output=None):
     """Apply anonymization blur to facial regions in a frame.
 
     Args:
@@ -144,6 +383,8 @@ def anonymize_frame(frame, face_landmarks, blur_indices):
         face_landmarks: MediaPipe landmarks for one or more faces in the frame.
         blur_indices: Landmark indices grouped by region, as returned by
             ``get_face_blur_indices``.
+        regions_output: Optional list populated with the polygons and roles
+            used to build this frame's blur mask.
 
     Returns:
         The BGR frame with blur applied to the regions defined by the mask.
@@ -158,42 +399,21 @@ def anonymize_frame(frame, face_landmarks, blur_indices):
             ],
             dtype=np.int32,
         )
-
-        eye_distance = int(
-            math.hypot(
-                points[33][0] - points[263][0],
-                points[33][1] - points[263][1],
-            )
+        geometry = get_process_blur_region_geometry(
+            points,
+            width,
+            height,
+            blur_indices,
         )
-        eye_distance = max(eye_distance, 1)
-
-        face_oval_hull = cv2.convexHull(points[blur_indices["face_oval"]])
-        blur_kernel_size = max((eye_distance // 2) * 2 + 1, 3)
-        frame_blur_radius = blur_kernel_size
-        mask_blur_radius = 7
-        border_thickness = eye_distance * MARGIN_MASK_THICKNESS_FACTOR
-        # Include the outline, mask feather, and image-blur support in the crop.
-        margin = (
-            (border_thickness + 1) // 2
-            + mask_blur_radius
-            + frame_blur_radius
-            + 2
-        )
-
-        hull_x, hull_y, hull_width, hull_height = cv2.boundingRect(face_oval_hull)
-        x0 = max(0, hull_x - margin)
-        y0 = max(0, hull_y - margin)
-        x1 = min(width, hull_x + hull_width + margin)
-        y1 = min(height, hull_y + hull_height + margin)
-        if x0 >= x1 or y0 >= y1:
+        if geometry is None:
             continue
 
+        x0, y0, x1, y1 = geometry["roi"]
+        blur_kernel_size = geometry["blur_kernel_size"]
         roi_width = x1 - x0
         roi_height = y1 - y0
-        local_points = points - np.array([x0, y0], dtype=np.int32)
-        local_face_oval_hull = cv2.convexHull(
-            local_points[blur_indices["face_oval"]]
-        )
+        local_face_oval_hull = geometry["face_oval_hull"]
+        border_thickness = geometry["border_thickness"]
         face_interior = np.zeros((roi_height, roi_width), dtype=np.uint8)
         cv2.fillConvexPoly(face_interior, local_face_oval_hull, 255)
 
@@ -211,43 +431,21 @@ def anonymize_frame(frame, face_landmarks, blur_indices):
         )
 
         features_mask = np.zeros((roi_height, roi_width), dtype=np.uint8)
-        left_eye_brow_indices = (
-            blur_indices["left_eye"] + blur_indices["left_eyebrow"]
-            # + [340, 346, 347, 348, 349, 350, 357]
-            + [341, 256, 252, 253, 254, 339, 255, 463]
-            
-        )
-        right_eye_brow_indices = (
-            blur_indices["right_eye"] + blur_indices["right_eyebrow"]
-            # + [467, 260, 259, 257]
-            # + [111, 117, 118, 119, 120, 121, 128]
-            + [130, 25, 110, 24, 23, 22, 26, 112]
-        )
-        left_eye_brow_hull = cv2.convexHull(local_points[left_eye_brow_indices])
-        right_eye_brow_hull = cv2.convexHull(local_points[right_eye_brow_indices])
+        left_eye_brow_hull = geometry["left_eye_brow_hull"]
+        right_eye_brow_hull = geometry["right_eye_brow_hull"]
+        nose_triangle = geometry["nose_triangle"]
+        mouth_hull = geometry["mouth_hull"]
         cv2.fillConvexPoly(features_mask, left_eye_brow_hull, 255)
         cv2.fillConvexPoly(features_mask, right_eye_brow_hull, 255)
-        nose_triangle = cv2.convexHull(local_points[[6, 423, 203]])
         cv2.fillConvexPoly(features_mask, nose_triangle, 255)
-        mouth_indices = (blur_indices["lips"]
-            + [43, 106, 182, 83, 18, 313, 406, 335, 273]
-        )
-        mouth_hull = cv2.convexHull(local_points[mouth_indices])
         cv2.fillConvexPoly(features_mask, mouth_hull, 255)
 
-        mouth_left = local_points[422]
-        mouth_right = local_points[202]
-        lower_face_trapezoid = np.array(
-            [
-                mouth_left,
-                mouth_right,
-                [width - 1 - x0, height - 1 - y0],
-                [-x0, height - 1 - y0],
-            ],
-            dtype=np.int32,
-        )
+        lower_face_trapezoid = geometry["lower_face_trapezoid"]
         keep_lower_face_mask = np.zeros((roi_height, roi_width), dtype=np.uint8)
         cv2.fillPoly(keep_lower_face_mask, [lower_face_trapezoid], 255)
+
+        if regions_output is not None:
+            regions_output.extend(geometry["regions"])
 
         final_mask = cv2.bitwise_or(features_mask, outside_blur_ring)
         final_mask = cv2.bitwise_and(
@@ -517,6 +715,8 @@ def process_video(
     video_writer = None
     landmarks_file = None
     landmark_datasets = None
+    process_blur_regions_group = None
+    process_blur_regions_buffer = []
     last_landmarks_source_frame = -1
     movement_frames = []
     reference_distances = []
@@ -634,6 +834,25 @@ def process_video(
                     )
                 chunk_frames = max(1, min(total_frames or 64, 64))
                 landmarks_file = h5py.File(output_landmarks_path, "w")
+                blur_regions_group = landmarks_file.create_group("blur_regions")
+                blur_regions_group.attrs["schema_version"] = 1
+                blur_regions_group.attrs["coordinate_system"] = (
+                    "Zero-based video pixel coordinates (x, y), origin at top left"
+                )
+                blur_regions_group.attrs["frame_indexing"] = (
+                    "Zero-based frame indices; start_frame and end_frame are inclusive"
+                )
+                blur_regions_group.attrs["description"] = (
+                    "Manual blur polygons and standard per-frame face blur polygons."
+                )
+                blur_regions_group.attrs["frame_width"] = width
+                blur_regions_group.attrs["frame_height"] = height
+                process_blur_regions_group = (
+                    _create_process_blur_regions_group(
+                        blur_regions_group,
+                        group_name="face_blur",
+                    )
+                )
                 landmarks_file.attrs["video_filename"] = output_video_path.name
                 landmarks_file.attrs["frame_width"] = width
                 landmarks_file.attrs["frame_height"] = height
@@ -746,12 +965,30 @@ def process_video(
             )
 
             anonymized_frame = frame.copy()
+            frame_blur_regions = []
             if blur_result is not None and blur_result.face_landmarks:
                 anonymized_frame = anonymize_frame(
                     anonymized_frame,
                     blur_result.face_landmarks,
                     blur_indices,
+                    frame_blur_regions,
                 )
+            process_blur_regions_buffer.extend(
+                (
+                    frame_index,
+                    name,
+                    polygon,
+                    role,
+                    stroke_width,
+                )
+                for name, role, polygon, stroke_width in frame_blur_regions
+            )
+            if frame_index % 128 == 127:
+                _append_process_blur_regions(
+                    process_blur_regions_group,
+                    process_blur_regions_buffer,
+                )
+                process_blur_regions_buffer.clear()
             video_writer.write(anonymized_frame)
 
             # ================================================
@@ -988,6 +1225,10 @@ def process_video(
     if video_writer is not None:
         video_writer.release()
     if landmarks_file is not None:
+        _append_process_blur_regions(
+            process_blur_regions_group,
+            process_blur_regions_buffer,
+        )
         for dataset in landmark_datasets.values():
             dataset.resize(frame_number, axis=0)
         landmarks_file.attrs["frame_count"] = frame_number
