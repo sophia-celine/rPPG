@@ -220,8 +220,6 @@ def _save_standard_regions(landmarks_path: Path) -> int:
                 parent,
                 group_name=pending_name,
             )
-            pending.attrs["reconstructed_from"] = "HDF5 landmarks dataset"
-            pending.attrs["source_script"] = "save_std_blur_regions.py"
             for frame_index in range(frame_count):
                 frame_landmarks = np.asarray(landmarks[frame_index], dtype=np.float64)
                 xy = frame_landmarks[:, :2]

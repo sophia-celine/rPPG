@@ -92,8 +92,6 @@ video_landmarks.h5
         │   ├── frame_indexing = "Zero-based frame indices"
         │   ├── description = "Frame-specific polygons used to build the anonymization mask. Polygons are in full-frame pixel coordinates. Rasterize include polygons, apply stroke_width_px to outside_face_ring, then subtract exclude polygons. The final mask is feathered with a 15x15 Gaussian."
         │   ├── outside_face_ring = "The face-oval polygon is drawn as a stroke with stroke_width_px; the face interior is removed."
-        │   ├── reconstructed_from = "HDF5 landmarks dataset"  # opcional
-        │   └── source_script = "save_std_blur_regions.py"       # opcional
         ├── frame_indices           int64   [N]
         ├── region_names            bytes   [N]
         ├── region_roles            bytes   [N]
@@ -119,7 +117,7 @@ blur_regions/face_blur/frame_indices[:7] =
   [0, 0, 0, 0, 0, 0, 1]
 blur_regions/face_blur/region_names[:7] =
   [left_eye_and_eyebrow, right_eye_and_eyebrow, nose, mouth,
-   outside_face_ring, lower_face_exclusion, left_eye_and_eyebrow]
+   outside_face_ring, lower_face_exclusion]
 blur_regions/face_blur/region_roles[:7] =
   [include, include, include, include, include, exclude, include]
 blur_regions/face_blur/stroke_width_px[:7] = [0, 0, 0, 0, 18, 0, 0]
@@ -132,8 +130,7 @@ Em cada grupo, `polygon_offsets[i:i+2]` seleciona os pontos do polígono `i` em
 `frame_indices[i]`, `region_names[i]`, `region_roles[i]` e
 `stroke_width_px[i]`. Polígonos `include` formam a máscara; `exclude` remove
 pixels dela. `outside_face_ring` é desenhado como contorno, usando sua espessura,
-e não como um polígono preenchido. Os atributos `reconstructed_from` e
-`source_script` só aparecem quando o utilitário reconstrói os polígonos. O
+e não como um polígono preenchido. O
 `read_landmarks.py --show-blur-regions`
 destaca tanto os polígonos manuais quanto esses polígonos padrão.
 Se for executado apenas `save_std_blur_regions.py`, o HDF5 pode conter somente
