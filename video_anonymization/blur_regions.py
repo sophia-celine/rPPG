@@ -164,6 +164,83 @@ def _validate_process_video_blur_regions(
     return group
 
 
+def _load_manual_blur_regions(
+    landmarks_path: Path,
+    frame_count: int,
+    width: int,
+    height: int,
+) -> list[BlurRegion]:
+    with h5py.File(landmarks_path, "r") as landmark_data:
+        group = landmark_data.get("blur_regions")
+        if group is None:
+            return []
+        if not isinstance(group, h5py.Group):
+            raise ValueError(
+                f"The HDF5 'blur_regions' entry is not a group: {landmarks_path}"
+            )
+
+        dataset_names = ("frame_ranges", "polygon_offsets", "polygon_points")
+        present = [name in group for name in dataset_names]
+        if not any(present):
+            return []
+        if not all(present):
+            raise ValueError(
+                f"The HDF5 manual blur-regions group is incomplete: {landmarks_path}"
+            )
+        if any(not isinstance(group[name], h5py.Dataset) for name in dataset_names):
+            raise ValueError(
+                f"The HDF5 manual blur-regions entries are invalid: {landmarks_path}"
+            )
+
+        frame_ranges = group["frame_ranges"][:]
+        polygon_offsets = group["polygon_offsets"][:]
+        polygon_points = group["polygon_points"][:]
+        region_count = len(frame_ranges) if frame_ranges.ndim == 2 else -1
+        if (
+            frame_ranges.ndim != 2
+            or frame_ranges.shape[1] != 2
+            or polygon_offsets.shape != (region_count + 1,)
+            or polygon_points.ndim != 2
+            or polygon_points.shape[1] != 2
+            or not np.issubdtype(frame_ranges.dtype, np.integer)
+            or not np.issubdtype(polygon_offsets.dtype, np.integer)
+            or not np.issubdtype(polygon_points.dtype, np.integer)
+            or not len(polygon_offsets)
+            or polygon_offsets[0] != 0
+            or polygon_offsets[-1] != len(polygon_points)
+            or np.any(polygon_offsets[1:] < polygon_offsets[:-1])
+        ):
+            raise ValueError(
+                f"The HDF5 manual blur-regions arrays are invalid: {landmarks_path}"
+            )
+
+        regions = []
+        for index, (start_frame, end_frame) in enumerate(frame_ranges):
+            start = int(start_frame)
+            end = int(end_frame)
+            polygon_start = int(polygon_offsets[index])
+            polygon_end = int(polygon_offsets[index + 1])
+            polygon = polygon_points[polygon_start:polygon_end]
+            if (
+                start < 0
+                or end < start
+                or end >= frame_count
+                or len(polygon) < 3
+                or np.any(polygon[:, 0] < 0)
+                or np.any(polygon[:, 0] >= width)
+                or np.any(polygon[:, 1] < 0)
+                or np.any(polygon[:, 1] >= height)
+            ):
+                raise ValueError(
+                    f"The HDF5 manual blur region {index + 1} is invalid: "
+                    f"{landmarks_path}"
+                )
+            regions.append(
+                BlurRegion(start, end, np.asarray(polygon, dtype=np.int32).copy())
+            )
+        return regions
+
+
 def _save_blur_regions(
     landmarks_path: Path,
     regions: list[BlurRegion],
@@ -175,7 +252,7 @@ def _save_blur_regions(
     frame_ranges = np.asarray(
         [(region.start_frame, region.end_frame) for region in regions],
         dtype=np.int64,
-    )
+    ).reshape(-1, 2)
     polygon_offsets = np.zeros(len(regions) + 1, dtype=np.uint64)
     if regions:
         polygon_offsets[1:] = np.cumsum(
@@ -678,21 +755,48 @@ class BlurRegionsApp:
             )
             return
 
+        video_path = Path(selected)
+        try:
+            landmarks_path = _find_landmarks_file(
+                video_path,
+                frame_count,
+                width,
+                height,
+            )
+            saved_regions = _load_manual_blur_regions(
+                landmarks_path,
+                frame_count,
+                width,
+                height,
+            )
+        except FileNotFoundError:
+            saved_regions = []
+        except (OSError, ValueError) as error:
+            capture.release()
+            messagebox.showerror("Erro ao carregar regiões", str(error))
+            return
+
         if self.capture is not None:
             self.capture.release()
         self.capture = capture
-        self.video_path = Path(selected)
+        self.video_path = video_path
         self.frame_count = frame_count
         self.fps = fps
         self.video_width = width
         self.video_height = height
         self.current_frame = 0
         self.regions.clear()
+        self.regions.extend(saved_regions)
         self.current_polygon.clear()
         self.polygon_finished = False
         self.start_frame = None
         self.end_frame = None
         self.region_list.delete(0, tk.END)
+        for index, region in enumerate(self.regions, start=1):
+            self.region_list.insert(
+                tk.END,
+                f"Região {index}  ·  frames {region.start_frame}–{region.end_frame}",
+            )
         self.start_status.configure(text="Nenhum início definido")
         self.end_status.configure(text="Nenhum fim definido")
         self.frame_total_label.configure(text=f"/ {frame_count - 1}")
@@ -891,10 +995,16 @@ class BlurRegionsApp:
     def _export(self) -> None:
         if self.exporting:
             return
-        if self.video_path is None or not self.regions:
+        if self.video_path is None:
             messagebox.showinfo(
-                "Nada para exportar", "Abra um vídeo e adicione pelo menos uma região."
+                "Nada para exportar", "Abra um vídeo antes de exportar."
             )
+            return
+        if not self.regions and not messagebox.askyesno(
+            "Nenhuma região manual",
+            "O vídeo será exportado sem blur manual e as regiões manuais salvas no "
+            "H5 serão removidas. As regiões automáticas serão preservadas. Continuar?",
+        ):
             return
         ffmpeg_path = shutil.which("ffmpeg")
         if ffmpeg_path is None:
