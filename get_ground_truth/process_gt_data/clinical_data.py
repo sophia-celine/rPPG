@@ -33,9 +33,9 @@ OPTIONAL_CLINICAL_COLUMNS = (
     "Alergia",
     "Ultima prescrição",
 )
-DIABETES_OPTIONS = ("Não", "DM1", "DM2", "Não se sabe")
+DIABETES_OPTIONS = ("Não", "Sim", "Não se sabe")
 HYPERTENSION_OPTIONS = ("Sim", "Não", "Não se sabe")
-DVA_OPTIONS = ("Noradrenalina", "Dobutamina", "Outro")
+DVA_OPTIONS = ("Noradrenalina", "Dobutamina", "Outro", "Não")
 
 
 class ClinicalDataApp:
@@ -452,7 +452,7 @@ class ClinicalDataApp:
         window = tk.Toplevel(self.root)
         self.editors[index] = window
         window.title(f"Dados clínicos - {self._display_value(row['Id do paciente'])}")
-        window.geometry("680x640")
+        window.geometry("680x700")
         window.resizable(False, False)
         window.transient(self.root)
         window.configure(bg="#10131a")
@@ -507,8 +507,33 @@ class ClinicalDataApp:
         self._add_limited_entry(frame, 4, comorbidities, 250)
 
         ttk.Label(frame, text="MUC", style="Clinical.TLabel").grid(row=5, column=0, sticky="w", pady=8)
-        muc = tk.StringVar(value=self._display_value(row["MUC"]))
-        self._add_limited_entry(frame, 5, muc, 250)
+        muc = tk.Text(
+            frame,
+            height=3,
+            width=38,
+            wrap="word",
+            font=("Segoe UI", 10),
+            background="#191e28",
+            foreground="#e7ebf2",
+            insertbackground="#eef2f8",
+            selectbackground="#394d82",
+            relief=tk.FLAT,
+            borderwidth=0,
+            padx=8,
+            pady=6,
+            undo=True,
+        )
+        muc.insert("1.0", self._display_value(row["MUC"]))
+        muc.grid(row=5, column=1, sticky="ew", pady=6)
+        muc_scrollbar = ttk.Scrollbar(
+            frame,
+            orient=tk.VERTICAL,
+            command=muc.yview,
+            style="Clinical.Vertical.TScrollbar",
+        )
+        muc_scrollbar.grid(row=5, column=2, sticky="ns", pady=6)
+        muc.configure(yscrollcommand=muc_scrollbar.set)
+        self._limit_text_length(muc, 250)
 
         ttk.Label(frame, text="Alergia", style="Clinical.TLabel").grid(row=6, column=0, sticky="w", pady=8)
         allergy = tk.StringVar(value=self._display_value(row["Alergia"]))
@@ -614,7 +639,7 @@ class ClinicalDataApp:
                 hypertension.get(),
                 cardiovascular.get(),
                 comorbidities.get(),
-                muc.get(),
+                muc.get("1.0", "end-1c"),
                 allergy.get(),
                 dva.get(),
                 dva_other.get(),
